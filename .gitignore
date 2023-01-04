@@ -38,3 +38,6 @@ out/
 
 ### secret ###
 myDatabaseInfo.properties
+
+### log ###
+*.log
