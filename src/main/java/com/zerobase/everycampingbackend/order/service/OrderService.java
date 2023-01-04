@@ -20,37 +20,37 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class OrderService {
 
-	private final OrderRepository orderRepository;
+  private final OrderRepository orderRepository;
 
-	// public Order createOrder(UserDetails userDetails, CreateOrderForm form) {
-	// 	Long id = userDetails.getId();
-	// 	//로직 진행
-	// }
+  // public Order createOrder(UserDetails userDetails, CreateOrderForm form) {
+  // 	Long id = userDetails.getId();
+  // 	//로직 진행
+  // }
 
-	//form을 바로 내려받는게 맞는가?
-	public Order createOrder(CreateOrderForm form) {
-		//로그인한 Customer 관련 로직 추가 예정
-		int totalAmount = 0;
-		List<OrderProduct> orderProductList = new ArrayList<>();
-		for(CreateOrderProductForm f : form.getOrderProducts()) {
-			//product에 대한 예외처리 추가 예정(품절 등)
-			int partialAmount = f.getPartialAmount();
-			totalAmount += partialAmount;
-			orderProductList.add(OrderProduct.builder()
-							.id(f.getProductId())
-							.count(f.getCount())
-							.partialAmount(partialAmount)
-							.build());
-		}
+  //form을 바로 내려받는게 맞는가?
+  public Order createOrder(CreateOrderForm form) {
+    //로그인한 Customer 관련 로직 추가 예정
+    int totalAmount = 0;
+    List<OrderProduct> orderProductList = new ArrayList<>();
+    for (CreateOrderProductForm f : form.getOrderProducts()) {
+      //product에 대한 예외처리 추가 예정(품절 등)
+      int partialAmount = f.getPartialAmount();
+      totalAmount += partialAmount;
+      orderProductList.add(OrderProduct.builder()
+          .id(f.getProductId())
+          .count(f.getCount())
+          .partialAmount(partialAmount)
+          .build());
+    }
 
-		if(totalAmount < 1000) {
-			throw new CustomException(ErrorCode.ORDER_AMOUNT_UNDER_1000);
-		}
+    if (totalAmount < 1000) {
+      throw new CustomException(ErrorCode.ORDER_AMOUNT_UNDER_1000);
+    }
 
-		return orderRepository.save(Order.builder()
-								.amount(totalAmount)
-								.status(OrderStatus.DELIVERY_COMPLETE)
-								.orderProductList(orderProductList)
-								.build());
-	}
+    return orderRepository.save(Order.builder()
+        .amount(totalAmount)
+        .status(OrderStatus.DELIVERY_COMPLETE)
+        .orderProductList(orderProductList)
+        .build());
+  }
 }

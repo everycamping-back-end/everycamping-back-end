@@ -12,5 +12,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateOrderForm {
-	private List<CreateOrderProductForm> orderProducts;
+
+  private List<CreateOrderProductForm> orderProducts;
 }
