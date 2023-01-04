@@ -18,20 +18,21 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderDto {
-	private Long id;
-	private OrderStatus status;
-	private Integer amount;
-	private List<OrderProductDto> orderProductList;
 
-	public static OrderDto from(Order order) {
-		List<OrderProductDto> orderProductList = order.getOrderProductList()
-			.stream().map(e -> OrderProductDto.from(e)).collect(Collectors.toList());
+  private Long id;
+  private OrderStatus status;
+  private Integer amount;
+  private List<OrderProductDto> orderProductList;
 
-		return OrderDto.builder()
-						.id(order.getId())
-						.status(order.getStatus())
-						.amount(order.getAmount())
-						.orderProductList(orderProductList)
-						.build();
-	}
+  public static OrderDto from(Order order) {
+    List<OrderProductDto> orderProductList = order.getOrderProductList()
+        .stream().map(e -> OrderProductDto.from(e)).collect(Collectors.toList());
+
+    return OrderDto.builder()
+        .id(order.getId())
+        .status(order.getStatus())
+        .amount(order.getAmount())
+        .orderProductList(orderProductList)
+        .build();
+  }
 }
