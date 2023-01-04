@@ -1,5 +1,7 @@
 package com.zerobase.everycampingbackend.product.service;
 
+import com.zerobase.everycampingbackend.common.exception.CustomException;
+import com.zerobase.everycampingbackend.common.exception.ErrorCode;
 import com.zerobase.everycampingbackend.product.domain.entity.Product;
 import com.zerobase.everycampingbackend.product.domain.form.ProductManageForm;
 import com.zerobase.everycampingbackend.product.repository.ProductRepository;
@@ -35,5 +37,33 @@ public class ProductManageService {
             .build());
 
         log.info("상품명 (" + form.getName() + ") 추가 완료");
+    }
+
+    @Transactional
+    public void updateProduct(long productId, ProductManageForm form) {
+        Product product = getProductById(productId);
+
+        // 토큰 통해 받아오는 유저객체와 product 통해 받아오는 유저객체 id 일치 여부 확인
+
+        log.info("상품명 (" + form.getName() + ") 수정 시도");
+
+        product.setName(form.getName());
+        product.setCategory(form.getCategory());
+        product.setPrice(form.getPrice());
+        product.setStock(form.getStock());
+        product.setOnSale(form.getOnSale());
+        product.setDescription(form.getDescription());
+        product.setImagePath(form.getImagePath());
+        product.setDetailImagePath(form.getDetailImagePath());
+        product.setTags(form.getTags());
+
+        productRepository.save(product);
+
+        log.info("상품명 (" + form.getName() + ") 수정 완료");
+    }
+
+    private Product getProductById(long productId) {
+        return productRepository.findById(productId)
+            .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
     }
 }
