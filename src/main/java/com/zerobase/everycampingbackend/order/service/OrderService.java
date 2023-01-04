@@ -1,34 +1,34 @@
 package com.zerobase.everycampingbackend.order.service;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-
 import com.zerobase.everycampingbackend.common.exception.CustomException;
 import com.zerobase.everycampingbackend.common.exception.ErrorCode;
 import com.zerobase.everycampingbackend.order.domain.form.CreateOrderForm;
 import com.zerobase.everycampingbackend.order.domain.form.CreateOrderProductForm;
-import com.zerobase.everycampingbackend.order.domain.model.Orders;
 import com.zerobase.everycampingbackend.order.domain.model.OrderProduct;
-import com.zerobase.everycampingbackend.order.domain.repository.OrderRepository;
+import com.zerobase.everycampingbackend.order.domain.model.Orders;
+import com.zerobase.everycampingbackend.order.domain.repository.OrdersRepository;
 import com.zerobase.everycampingbackend.order.type.OrderStatus;
-
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class OrderService {
 
-  private final OrderRepository orderRepository;
+  private final OrdersRepository ordersRepository;
 
   // public Order createOrder(UserDetails userDetails, CreateOrderForm form) {
   // 	Long id = userDetails.getId();
   // 	//로직 진행
   // }
 
-  //form을 바로 내려받는게 맞는가?
+  @Transactional
   public Orders createOrder(CreateOrderForm form) {
+
+    Orders orders = new Orders();
     //로그인한 Customer 관련 로직 추가 예정
     int totalAmount = 0;
     List<OrderProduct> orderProductList = new ArrayList<>();
@@ -37,7 +37,7 @@ public class OrderService {
       int partialAmount = f.getPartialAmount();
       totalAmount += partialAmount;
       orderProductList.add(OrderProduct.builder()
-          .id(f.getProductId())
+          .orders(orders)
           .count(f.getCount())
           .partialAmount(partialAmount)
           .build());
@@ -47,10 +47,10 @@ public class OrderService {
       throw new CustomException(ErrorCode.ORDER_AMOUNT_UNDER_1000);
     }
 
-    return orderRepository.save(Orders.builder()
-        .amount(totalAmount)
-        .status(OrderStatus.DELIVERY_COMPLETE)
-        .orderProductList(orderProductList)
-        .build());
+    orders.setAmount(totalAmount);
+    orders.setStatus(OrderStatus.DELIVERY_COMPLETE);
+    orders.setOrderProductList(orderProductList);
+
+    return ordersRepository.save(orders);
   }
 }
