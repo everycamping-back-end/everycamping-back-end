@@ -41,3 +41,4 @@ myDatabaseInfo.properties
 
 ### log ###
 *.log
+*.gz
