@@ -3,7 +3,7 @@ package com.zerobase.everycampingbackend.order.domain.dto;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.zerobase.everycampingbackend.order.domain.model.Order;
+import com.zerobase.everycampingbackend.order.domain.model.Orders;
 import com.zerobase.everycampingbackend.order.type.OrderStatus;
 
 import lombok.AllArgsConstructor;
@@ -24,14 +24,14 @@ public class OrderDto {
   private Integer amount;
   private List<OrderProductDto> orderProductList;
 
-  public static OrderDto from(Order order) {
-    List<OrderProductDto> orderProductList = order.getOrderProductList()
+  public static OrderDto from(Orders orders) {
+    List<OrderProductDto> orderProductList = orders.getOrderProductList()
         .stream().map(e -> OrderProductDto.from(e)).collect(Collectors.toList());
 
     return OrderDto.builder()
-        .id(order.getId())
-        .status(order.getStatus())
-        .amount(order.getAmount())
+        .id(orders.getId())
+        .status(orders.getStatus())
+        .amount(orders.getAmount())
         .orderProductList(orderProductList)
         .build();
   }
