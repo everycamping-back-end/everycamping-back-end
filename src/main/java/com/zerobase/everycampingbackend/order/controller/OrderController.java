@@ -1,16 +1,13 @@
 package com.zerobase.everycampingbackend.order.controller;
 
+import com.zerobase.everycampingbackend.order.domain.form.CreateOrderForm;
+import com.zerobase.everycampingbackend.order.service.OrderService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.zerobase.everycampingbackend.order.domain.dto.OrderDto;
-import com.zerobase.everycampingbackend.order.domain.form.CreateOrderForm;
-import com.zerobase.everycampingbackend.order.service.OrderService;
-
-import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/order")
@@ -26,7 +23,8 @@ public class OrderController {
   // }
 
   @PostMapping
-  public ResponseEntity<OrderDto> createOrder(@RequestBody CreateOrderForm form) {
-    return ResponseEntity.ok(OrderDto.from(orderService.createOrder(form)));
+  public ResponseEntity createOrder(@RequestBody CreateOrderForm form) {
+    orderService.createOrder(form);
+    return ResponseEntity.ok().build();
   }
 }
