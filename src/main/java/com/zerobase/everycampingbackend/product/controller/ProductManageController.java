@@ -5,7 +5,9 @@ import com.zerobase.everycampingbackend.product.service.ProductManageService;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,6 +22,13 @@ public class ProductManageController {
     @PostMapping
     public ResponseEntity<Boolean> addProduct(@RequestBody @Valid ProductManageForm form) {
         productManageService.addProduct(form);
+        return ResponseEntity.ok(true);
+    }
+
+    @PutMapping("/{productId}")
+    public ResponseEntity<Boolean> updateProduct(@PathVariable Long productId,
+        @RequestBody @Valid ProductManageForm form) {
+        productManageService.updateProduct(productId, form);
         return ResponseEntity.ok(true);
     }
 }

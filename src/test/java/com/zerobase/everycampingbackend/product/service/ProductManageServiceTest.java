@@ -2,6 +2,8 @@ package com.zerobase.everycampingbackend.product.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
 import com.zerobase.everycampingbackend.product.domain.entity.Product;
@@ -9,6 +11,7 @@ import com.zerobase.everycampingbackend.product.domain.form.ProductManageForm;
 import com.zerobase.everycampingbackend.product.repository.ProductRepository;
 import com.zerobase.everycampingbackend.product.type.ProductCategory;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -30,7 +33,7 @@ class ProductManageServiceTest {
     @InjectMocks
     private ProductManageService productManageService;
 
-    private ProductManageForm form = ProductManageForm.builder()
+    private final ProductManageForm form = ProductManageForm.builder()
         .category(ProductCategory.TENT)
         .name("텐트입니다")
         .price(100000)
@@ -42,6 +45,7 @@ class ProductManageServiceTest {
         .tags(List.of("따뜻함", "안락", "고퀄"))
         .build();
 
+    private final Product product = Product.builder().build();
     @Test
     @DisplayName("상품 추가 성공")
     void success_addProduct(){
@@ -53,16 +57,42 @@ class ProductManageServiceTest {
 
         // then
         verify(productRepository).save(captor.capture());
-        Product captorValue = captor.getValue();
-        assertEquals(form.getName(), captorValue.getName());
-        assertEquals(form.getPrice(), captorValue.getPrice());
-        assertEquals(form.getOnSale(), captorValue.isOnSale());
-        assertEquals(form.getDescription(), captorValue.getDescription());
-        assertEquals(form.getStock(), captorValue.getStock());
-        assertEquals(form.getImagePath(), captorValue.getImagePath());
-        assertEquals(form.getDetailImagePath(), captorValue.getDetailImagePath());
+
+        assertEquals(form.getName(), captor.getValue().getName());
+        assertEquals(form.getPrice(), captor.getValue().getPrice());
+        assertEquals(form.getOnSale(), captor.getValue().isOnSale());
+        assertEquals(form.getDescription(), captor.getValue().getDescription());
+        assertEquals(form.getStock(), captor.getValue().getStock());
+        assertEquals(form.getImagePath(), captor.getValue().getImagePath());
+        assertEquals(form.getDetailImagePath(), captor.getValue().getDetailImagePath());
         for(String tag : form.getTags()){
-            assertTrue(captorValue.getTags().contains(tag));
+            assertTrue(captor.getValue().getTags().contains(tag));
+        }
+    }
+
+    @Test
+    @DisplayName("상품 수정 성공")
+    void success_updateProduct(){
+        // given
+        form.setName("텐트2");
+        given(productRepository.findById(anyLong()))
+            .willReturn(Optional.of(product));
+        ArgumentCaptor<Product> captor = ArgumentCaptor.forClass(Product.class);
+
+        // when
+        productManageService.updateProduct(1L, form);
+
+        // then
+        verify(productRepository).save(captor.capture());
+        assertEquals(form.getName(), captor.getValue().getName());
+        assertEquals(form.getPrice(), captor.getValue().getPrice());
+        assertEquals(form.getOnSale(), captor.getValue().isOnSale());
+        assertEquals(form.getDescription(), captor.getValue().getDescription());
+        assertEquals(form.getStock(), captor.getValue().getStock());
+        assertEquals(form.getImagePath(), captor.getValue().getImagePath());
+        assertEquals(form.getDetailImagePath(), captor.getValue().getDetailImagePath());
+        for(String tag : form.getTags()){
+            assertTrue(captor.getValue().getTags().contains(tag));
         }
     }
 }
