@@ -46,7 +46,6 @@ class ProductManageServiceTest {
         .build();
 
     private final Product product = Product.builder().build();
-
     @Test
     @DisplayName("상품 추가 성공")
     void success_addProduct(){
@@ -58,6 +57,7 @@ class ProductManageServiceTest {
 
         // then
         verify(productRepository).save(captor.capture());
+
         assertEquals(form.getName(), captor.getValue().getName());
         assertEquals(form.getPrice(), captor.getValue().getPrice());
         assertEquals(form.getOnSale(), captor.getValue().isOnSale());
