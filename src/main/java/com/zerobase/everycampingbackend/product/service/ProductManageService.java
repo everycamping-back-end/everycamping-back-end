@@ -53,6 +53,19 @@ public class ProductManageService {
             .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
     }
 
+    @Transactional
+    public void deleteProduct(long productId) {
+        Product product = getProductById(productId);
+
+        // 토큰 통해 받아오는 유저객체와 product 통해 받아오는 유저객체 id 일치 여부 확인
+
+        log.info("상품명 (" + product.getName() + ") 삭제 시도");
+
+        productRepository.delete(product);
+
+        log.info("상품명 (" + product.getName() + ") 삭제 완료");
+    }
+
     public ProductDetailDto getProductDetail(Long productId) {
         Product product = getProductById(productId);
 
