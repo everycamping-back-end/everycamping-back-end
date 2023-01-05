@@ -2,11 +2,15 @@ package com.zerobase.everycampingbackend.product.service;
 
 import com.zerobase.everycampingbackend.common.exception.CustomException;
 import com.zerobase.everycampingbackend.common.exception.ErrorCode;
+import com.zerobase.everycampingbackend.product.domain.dto.ProductDetailDto;
+import com.zerobase.everycampingbackend.product.domain.dto.ProductDto;
 import com.zerobase.everycampingbackend.product.domain.entity.Product;
 import com.zerobase.everycampingbackend.product.domain.form.ProductManageForm;
 import com.zerobase.everycampingbackend.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,17 +28,7 @@ public class ProductManageService {
 
         log.info("상품명 (" + form.getName() + ") 추가 시도");
 
-        productRepository.save(Product.builder()
-            .name(form.getName())
-            .category(form.getCategory())
-            .price(form.getPrice())
-            .onSale(form.getOnSale())
-            .stock(form.getStock())
-            .description(form.getDescription())
-            .imagePath(form.getImagePath())
-            .detailImagePath(form.getDetailImagePath())
-            .tags(form.getTags())
-            .build());
+        productRepository.save(Product.from(form));
 
         log.info("상품명 (" + form.getName() + ") 추가 완료");
     }
@@ -47,15 +41,7 @@ public class ProductManageService {
 
         log.info("상품명 (" + form.getName() + ") 수정 시도");
 
-        product.setName(form.getName());
-        product.setCategory(form.getCategory());
-        product.setPrice(form.getPrice());
-        product.setStock(form.getStock());
-        product.setOnSale(form.getOnSale());
-        product.setDescription(form.getDescription());
-        product.setImagePath(form.getImagePath());
-        product.setDetailImagePath(form.getDetailImagePath());
-        product.setTags(form.getTags());
+        product.setFrom(form);
 
         productRepository.save(product);
 
@@ -65,5 +51,20 @@ public class ProductManageService {
     private Product getProductById(long productId) {
         return productRepository.findById(productId)
             .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
+    }
+
+    public ProductDetailDto getProductDetail(Long productId) {
+        Product product = getProductById(productId);
+
+        // 토큰 통해 받아오는 유저객체와 product 통해 받아오는 유저객체 id 일치 여부 확인
+
+        log.info("상품명 (" + product.getName() + ") 판매자용 조회");
+
+        return ProductDetailDto.from(product);
+    }
+
+    public Page<ProductDto> getProductPage(Pageable pageable) {
+        return productRepository.findAll(pageable)
+            .map(ProductDto::from);
     }
 }
