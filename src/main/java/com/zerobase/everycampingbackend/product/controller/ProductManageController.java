@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/products/manage")
+@RequestMapping("/manage/products")
 public class ProductManageController {
 
     private final ProductManageService productManageService;
