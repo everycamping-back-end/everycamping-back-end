@@ -1,4 +1,4 @@
-package com.zerobase.everycampingbackend.product.repository;
+package com.zerobase.everycampingbackend.product.domain.repository;
 
 import com.zerobase.everycampingbackend.product.domain.dto.ProductDto;
 import com.zerobase.everycampingbackend.product.domain.form.ProductSearchForm;

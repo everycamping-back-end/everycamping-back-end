@@ -1,4 +1,4 @@
-package com.zerobase.everycampingbackend.product.repository;
+package com.zerobase.everycampingbackend.product.domain.repository;
 
 import static com.zerobase.everycampingbackend.product.domain.entity.QProduct.product;
 
