@@ -5,7 +5,7 @@ import com.zerobase.everycampingbackend.common.exception.ErrorCode;
 import com.zerobase.everycampingbackend.product.domain.dto.ProductDetailDto;
 import com.zerobase.everycampingbackend.product.domain.dto.ProductDto;
 import com.zerobase.everycampingbackend.product.domain.form.ProductSearchForm;
-import com.zerobase.everycampingbackend.product.repository.ProductRepository;
+import com.zerobase.everycampingbackend.product.domain.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;

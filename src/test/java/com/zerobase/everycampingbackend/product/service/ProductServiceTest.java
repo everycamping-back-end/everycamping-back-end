@@ -9,7 +9,7 @@ import com.zerobase.everycampingbackend.product.domain.dto.ProductDetailDto;
 import com.zerobase.everycampingbackend.product.domain.dto.ProductDto;
 import com.zerobase.everycampingbackend.product.domain.entity.Product;
 import com.zerobase.everycampingbackend.product.domain.form.ProductSearchForm;
-import com.zerobase.everycampingbackend.product.repository.ProductRepository;
+import com.zerobase.everycampingbackend.product.domain.repository.ProductRepository;
 import com.zerobase.everycampingbackend.product.type.ProductCategory;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
