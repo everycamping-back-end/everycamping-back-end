@@ -29,7 +29,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
         List<Product> products =  queryFactory.selectFrom(product)
             .where(
                 likeName(form.getName()),
-//                eqSellerName(form.getSellerName()),
                 eqCategory(form.getCategory()),
                 containTags(form.getTags())
             )
@@ -58,14 +57,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
         }
         return product.category.eq(category);
     }
-
-//    private BooleanExpression eqSellerName(String sellerName) {
-//        if(StringUtils.isNullOrEmpty(sellerName)) {
-//            return null;
-//        }
-//
-//        return product.seller.eq(sellerName);
-//    }
 
     private BooleanExpression likeName(String name) {
         if(StringUtils.isNullOrEmpty(name)) {

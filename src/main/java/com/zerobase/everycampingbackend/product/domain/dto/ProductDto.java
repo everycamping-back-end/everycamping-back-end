@@ -17,6 +17,7 @@ import lombok.Setter;
 public class ProductDto {
 
     private Long id;
+    private String sellerName;
     private ProductCategory category;
     private String name;
     private int price;
@@ -29,6 +30,7 @@ public class ProductDto {
     public static ProductDto from(Product product) {
         return ProductDto.builder()
             .id(product.getId())
+            .sellerName(product.getSeller().getNickName())
             .category(product.getCategory())
             .name(product.getName())
             .price(product.getPrice())

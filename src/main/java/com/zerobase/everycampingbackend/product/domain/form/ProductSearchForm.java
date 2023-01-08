@@ -15,7 +15,6 @@ import lombok.Setter;
 @Builder
 public class ProductSearchForm {
     private String name;
-    private String sellerName;
     private ProductCategory category;
     private List<String> tags;
 }
