@@ -36,7 +36,7 @@ public class ProductDetailDto {
     public static ProductDetailDto from(Product product) {
         return ProductDetailDto.builder()
             .id(product.getId())
-            // .sellerName(product.getSeller().getName())
+            .sellerName(product.getSeller().getNickName())
             .category(product.getCategory())
             .name(product.getName())
             .description(product.getDescription())
