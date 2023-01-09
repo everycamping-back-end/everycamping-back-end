@@ -4,6 +4,7 @@ import com.zerobase.everycampingbackend.common.exception.CustomException;
 import com.zerobase.everycampingbackend.common.exception.ErrorCode;
 import com.zerobase.everycampingbackend.product.domain.dto.ProductDetailDto;
 import com.zerobase.everycampingbackend.product.domain.dto.ProductDto;
+import com.zerobase.everycampingbackend.product.domain.entity.Product;
 import com.zerobase.everycampingbackend.product.domain.form.ProductSearchForm;
 import com.zerobase.everycampingbackend.product.domain.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,5 +32,10 @@ public class ProductService {
         long end = System.currentTimeMillis();
         log.info("검색 수행 : " + (end - start) + "ms 소요");
         return result;
+    }
+
+    public Product getProductById(Long productId){
+        return productRepository.findById(productId)
+            .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
     }
 }

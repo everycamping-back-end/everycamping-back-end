@@ -16,22 +16,23 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class CustomerService {
+
   private final CustomerRepository customerRepository;
 
   private final JwtAuthenticationProvider provider;
 
-  private boolean isEmailExist(String email){
-      return customerRepository.findByEmail(email.toLowerCase(Locale.ROOT))
-          .isPresent();
+  private boolean isEmailExist(String email) {
+    return customerRepository.findByEmail(email.toLowerCase(Locale.ROOT))
+        .isPresent();
   }
 
-  private Optional<Customer> findValidCustomer(String email, String password){
+  private Optional<Customer> findValidCustomer(String email, String password) {
     return customerRepository.findByEmail(email).stream()
         .filter(customer -> customer.getPassword().equals(password))
         .findFirst();
   }
 
-  public String signUp(SignUpForm form){
+  public String signUp(SignUpForm form) {
 
     Customer customer = customerRepository.save(Customer.from(form));
 
@@ -39,17 +40,22 @@ public class CustomerService {
   }
 
 
-  public String signIn(SignInForm form){
-     // 로그인 가능 여부 체크
+  public String signIn(SignInForm form) {
+    // 로그인 가능 여부 체크
     Customer c = this.findValidCustomer(form.getEmail(), form.getPassword())
         .orElseThrow(() -> new CustomException(ErrorCode.LOGIN_CHECK_FAIL));
 
     return provider.createToken(c.getEmail(), c.getId(), UserType.CUSTOMER);
   }
 
-  public Optional<Customer> findByIdAndEmail(Long id, String email){
+  public Optional<Customer> findByIdAndEmail(Long id, String email) {
     return customerRepository.findById(id)
         .stream().filter(customer -> customer.getEmail().equals(email))
         .findFirst();
+  }
+
+  public Customer getCustomerById(Long customerId) {
+    return customerRepository.findById(customerId)
+        .orElseThrow(() -> new CustomException(ErrorCode.CUSTOMER_NOT_FOUND));
   }
 }
