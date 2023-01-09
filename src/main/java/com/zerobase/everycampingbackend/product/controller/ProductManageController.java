@@ -4,6 +4,7 @@ import com.zerobase.everycampingbackend.product.domain.dto.ProductDetailDto;
 import com.zerobase.everycampingbackend.product.domain.dto.ProductDto;
 import com.zerobase.everycampingbackend.product.domain.form.ProductManageForm;
 import com.zerobase.everycampingbackend.product.service.ProductManageService;
+import java.io.IOException;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -29,7 +30,7 @@ public class ProductManageController {
 
     @PostMapping
     public ResponseEntity<Boolean> addProduct(@AuthenticationPrincipal UserDetails user,
-        @RequestBody @Valid ProductManageForm form) {
+        @RequestBody @Valid ProductManageForm form) throws IOException {
         productManageService.addProduct(form);
         return ResponseEntity.ok(true);
     }
@@ -37,7 +38,7 @@ public class ProductManageController {
     @PutMapping("/{productId}")
     public ResponseEntity<Boolean> updateProduct(@AuthenticationPrincipal UserDetails user,
         @PathVariable Long productId,
-        @RequestBody @Valid ProductManageForm form) {
+        @RequestBody @Valid ProductManageForm form) throws IOException {
         productManageService.updateProduct(productId, form);
         return ResponseEntity.ok(true);
     }

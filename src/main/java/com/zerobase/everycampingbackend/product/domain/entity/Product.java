@@ -1,6 +1,7 @@
 package com.zerobase.everycampingbackend.product.domain.entity;
 
 import com.zerobase.everycampingbackend.common.BaseEntity;
+import com.zerobase.everycampingbackend.common.staticimage.dto.S3Path;
 import com.zerobase.everycampingbackend.product.domain.form.ProductManageForm;
 import com.zerobase.everycampingbackend.product.type.ProductCategory;
 import com.zerobase.everycampingbackend.user.domain.entity.Seller;
@@ -42,7 +43,9 @@ public class Product extends BaseEntity {
     private String description;
     private int stock;
     private int price;
+    private String imageUri;
     private String imagePath;
+    private String detailImageUri;
     private String detailImagePath;
     private boolean onSale;
     @ElementCollection
@@ -50,7 +53,7 @@ public class Product extends BaseEntity {
     private int reviewCount;
     private int totalScore;
 
-    public static Product from(ProductManageForm form){
+    public static Product of(ProductManageForm form, S3Path imagePath, S3Path detailImagePath){
         return Product.builder()
             .name(form.getName())
             .category(form.getCategory())
@@ -58,21 +61,25 @@ public class Product extends BaseEntity {
             .onSale(form.getOnSale())
             .stock(form.getStock())
             .description(form.getDescription())
-            .imagePath(form.getImagePath())
-            .detailImagePath(form.getDetailImagePath())
+            .imageUri(imagePath.getImageUri())
+            .imagePath(imagePath.getImagePath())
+            .detailImageUri(detailImagePath.getImageUri())
+            .detailImagePath(detailImagePath.getImagePath())
             .tags(form.getTags())
             .build();
     }
 
-    public void setFrom(ProductManageForm form){
+    public void setOf(ProductManageForm form, S3Path imagePath, S3Path detailImagePath){
         setName(form.getName());
         setCategory(form.getCategory());
         setPrice(form.getPrice());
         setStock(form.getStock());
         setOnSale(form.getOnSale());
         setDescription(form.getDescription());
-        setImagePath(form.getImagePath());
-        setDetailImagePath(form.getDetailImagePath());
+        setImageUri(imagePath.getImageUri());
+        setImagePath(imagePath.getImagePath());
+        setDetailImageUri(detailImagePath.getImageUri());
+        setDetailImagePath(detailImagePath.getImagePath());
         setTags(form.getTags());
     }
 }

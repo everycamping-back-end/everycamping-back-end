@@ -34,6 +34,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             , "/customers/signup"
             , "/sellers/signin"
             , "/sellers/signup"
+            , "/test/**"
         )
             .permitAll();
 
