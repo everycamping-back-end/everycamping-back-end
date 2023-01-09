@@ -39,4 +39,12 @@ public class Cart extends BaseEntity {
   private Product product;
 
   private Integer count;
+
+  public static Cart of(Product product, Customer customer, Integer count){
+    return Cart.builder()
+        .count(count)
+        .customer(customer)
+        .product(product)
+        .build();
+  }
 }
