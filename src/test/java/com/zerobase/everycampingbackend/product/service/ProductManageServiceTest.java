@@ -2,16 +2,21 @@ package com.zerobase.everycampingbackend.product.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
+import com.zerobase.everycampingbackend.common.staticimage.dto.S3Path;
+import com.zerobase.everycampingbackend.common.staticimage.service.StaticImageService;
 import com.zerobase.everycampingbackend.product.domain.dto.ProductDetailDto;
 import com.zerobase.everycampingbackend.product.domain.dto.ProductDto;
 import com.zerobase.everycampingbackend.product.domain.entity.Product;
 import com.zerobase.everycampingbackend.product.domain.form.ProductManageForm;
 import com.zerobase.everycampingbackend.product.domain.repository.ProductRepository;
 import com.zerobase.everycampingbackend.product.type.ProductCategory;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -34,6 +39,8 @@ import org.springframework.transaction.annotation.Transactional;
 class ProductManageServiceTest {
     @Mock
     private ProductRepository productRepository;
+    @Mock
+    private StaticImageService staticImageService;
 
     @InjectMocks
     private ProductManageService productManageService;
@@ -45,8 +52,6 @@ class ProductManageServiceTest {
         .onSale(true)
         .description("아주 좋은 텐트입니다")
         .stock(10)
-        .imagePath("이미지경로")
-        .detailImagePath("상세이미지경로")
         .tags(List.of("따뜻함", "안락", "고퀄"))
         .build();
 
@@ -59,8 +64,11 @@ class ProductManageServiceTest {
     private final Page<Product> products = new PageImpl<>(List.of(product, product2));
     @Test
     @DisplayName("상품 추가 성공")
-    void success_addProduct(){
+    void success_addProduct() throws IOException {
         // given
+        given(staticImageService.saveImage(any()))
+            .willReturn(new S3Path("uri", "path"));
+
         ArgumentCaptor<Product> captor = ArgumentCaptor.forClass(Product.class);
 
         // when
@@ -74,8 +82,10 @@ class ProductManageServiceTest {
         assertEquals(form.getOnSale(), captor.getValue().isOnSale());
         assertEquals(form.getDescription(), captor.getValue().getDescription());
         assertEquals(form.getStock(), captor.getValue().getStock());
-        assertEquals(form.getImagePath(), captor.getValue().getImagePath());
-        assertEquals(form.getDetailImagePath(), captor.getValue().getDetailImagePath());
+        assertEquals("uri", captor.getValue().getImageUri());
+        assertEquals("path", captor.getValue().getImagePath());
+        assertEquals("uri", captor.getValue().getDetailImageUri());
+        assertEquals("path", captor.getValue().getDetailImagePath());
         for(String tag : form.getTags()){
             assertTrue(captor.getValue().getTags().contains(tag));
         }
@@ -83,11 +93,17 @@ class ProductManageServiceTest {
 
     @Test
     @DisplayName("상품 수정 성공")
-    void success_updateProduct(){
+    void success_updateProduct() throws IOException {
         // given
         form.setName("텐트2");
+        product.setImageUri("asfdasfasf");
+        product.setImagePath("ewfwfwf");
+        product.setDetailImageUri("trbrtbrt");
+        product.setDetailImagePath("jojoinono");
         given(productRepository.findById(anyLong()))
             .willReturn(Optional.of(product));
+        given(staticImageService.editImage(anyString(), any()))
+            .willReturn(new S3Path("uri", "path"));
         ArgumentCaptor<Product> captor = ArgumentCaptor.forClass(Product.class);
 
         // when
@@ -100,8 +116,10 @@ class ProductManageServiceTest {
         assertEquals(form.getOnSale(), captor.getValue().isOnSale());
         assertEquals(form.getDescription(), captor.getValue().getDescription());
         assertEquals(form.getStock(), captor.getValue().getStock());
-        assertEquals(form.getImagePath(), captor.getValue().getImagePath());
-        assertEquals(form.getDetailImagePath(), captor.getValue().getDetailImagePath());
+        assertEquals("uri", captor.getValue().getImageUri());
+        assertEquals("path", captor.getValue().getImagePath());
+        assertEquals("uri", captor.getValue().getDetailImageUri());
+        assertEquals("path", captor.getValue().getDetailImagePath());
         for(String tag : form.getTags()){
             assertTrue(captor.getValue().getTags().contains(tag));
         }

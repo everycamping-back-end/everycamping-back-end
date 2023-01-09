@@ -21,7 +21,7 @@ public class ProductDto {
     private ProductCategory category;
     private String name;
     private int price;
-    private String imagePath;
+    private String imageUri;
     private int reviewCount;
     private double avgScore;
     private LocalDateTime createdAt;
@@ -34,7 +34,7 @@ public class ProductDto {
             .category(product.getCategory())
             .name(product.getName())
             .price(product.getPrice())
-            .imagePath(product.getImagePath())
+            .imageUri(product.getImageUri())
             .reviewCount(product.getReviewCount())
             .avgScore(product.getReviewCount() == 0 ? 0
                 : product.getTotalScore() / (double) product.getReviewCount())

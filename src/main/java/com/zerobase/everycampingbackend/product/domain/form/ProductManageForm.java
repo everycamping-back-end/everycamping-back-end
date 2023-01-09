@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @Setter
@@ -28,7 +29,7 @@ public class ProductManageForm {
 
     private String description;
     private Integer stock;
-    private String imagePath;
-    private String detailImagePath;
+    private MultipartFile image;
+    private MultipartFile detailImage;
     private List<String> tags;
 }
