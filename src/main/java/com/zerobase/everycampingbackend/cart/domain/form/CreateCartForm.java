@@ -17,5 +17,5 @@ public class CreateCartForm {
   Long customerId;
 
   @Min(1)
-  Integer count;
+  Integer quantity;
 }

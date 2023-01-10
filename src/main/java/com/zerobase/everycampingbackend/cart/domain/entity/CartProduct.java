@@ -22,7 +22,7 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Cart extends BaseEntity {
+public class CartProduct extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,11 +38,11 @@ public class Cart extends BaseEntity {
   @JoinColumn(name = "product_id")
   private Product product;
 
-  private Integer count;
+  private Integer quantity;
 
-  public static Cart of(Product product, Customer customer, Integer count){
-    return Cart.builder()
-        .count(count)
+  public static CartProduct of(Product product, Customer customer, Integer count){
+    return CartProduct.builder()
+        .quantity(count)
         .customer(customer)
         .product(product)
         .build();

@@ -3,7 +3,8 @@ package com.zerobase.everycampingbackend.cart.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.zerobase.everycampingbackend.cart.domain.entity.Cart;
+import com.zerobase.everycampingbackend.cart.domain.dto.CartProductDto;
+import com.zerobase.everycampingbackend.cart.domain.entity.CartProduct;
 import com.zerobase.everycampingbackend.cart.domain.form.CreateCartForm;
 import com.zerobase.everycampingbackend.cart.domain.repository.CartRepository;
 import com.zerobase.everycampingbackend.common.exception.CustomException;
@@ -27,7 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 @TestPropertySource(locations = "classpath:application-test.properties")
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 @Transactional
-class CartServiceTest {
+class CartProductServiceTest {
 
   @Autowired
   CartService cartService;
@@ -50,7 +51,7 @@ class CartServiceTest {
     Long customerId = createCustomer("ksj2083@naver.com");
     CreateCartForm createCartForm = CreateCartForm.builder()
         .customerId(customerId)
-        .count(6)
+        .quantity(6)
         .build();
 
     Long productId = createProduct("잡템", 5, ProductCategory.TENT);
@@ -73,7 +74,7 @@ class CartServiceTest {
     Long customerId = createCustomer("ksj2083@naver.com");
     CreateCartForm createCartForm = CreateCartForm.builder()
         .customerId(customerId)
-        .count(5)
+        .quantity(5)
         .build();
 
     Long productId = createProduct("잡템", 5, ProductCategory.TENT);
@@ -83,10 +84,50 @@ class CartServiceTest {
 
     //then
     PageRequest pageRequest = PageRequest.of(0, 5);
-    Page<Cart> result = cartRepository.findAllByCustomerId(customerId, pageRequest);
+    Page<CartProduct> result = cartRepository.findAllByCustomerId(customerId, pageRequest);
 
-    assertEquals(result.getContent().get(0).getCount(), 5);
+    assertEquals(result.getContent().get(0).getQuantity(), 5);
     assertEquals(result.getContent().get(0).getProduct().getName(), "잡템");
+  }
+
+  @Test
+  @DisplayName("장바구니 조회 성공")
+  @Transactional
+  void getCartProductSuccess() throws Exception {
+
+    //given
+    //유저 세팅
+    Long customerId = createCustomer("ksj2083@naver.com");
+
+    //상품 세팅
+    Long productId1 = createProduct("텐트1", 5, ProductCategory.TENT);
+    Long productId2 = createProduct("텐트2", 10, ProductCategory.TENT);
+
+    //장바구니에 넣기
+    addToCart(customerId, productId1, 3);
+    addToCart(customerId, productId2, 3);
+
+    //when
+    PageRequest pageRequest = PageRequest.of(0, 5);
+    Page<CartProductDto> cartProductPage = cartService.getCartProductList(customerId, pageRequest);
+
+    //then
+    CartProductDto dto1 = cartProductPage.getContent().get(0);
+    CartProductDto dto2 = cartProductPage.getContent().get(1);
+
+    assertEquals(productId1, dto1.getProductId());
+    assertEquals(false, dto1.getIsCountChanged());
+
+    assertEquals(productId2, dto2.getProductId());
+    assertEquals(false, dto2.getIsCountChanged());
+
+  }
+
+  private void addToCart(Long customerId, Long productId, Integer quantity) {
+    cartService.createCart(CreateCartForm.builder()
+        .customerId(customerId)
+        .quantity(quantity)
+        .build(), productId);
   }
 
 
