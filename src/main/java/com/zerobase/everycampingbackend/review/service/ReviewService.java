@@ -6,6 +6,7 @@ import com.zerobase.everycampingbackend.common.staticimage.dto.S3Path;
 import com.zerobase.everycampingbackend.common.staticimage.service.StaticImageService;
 import com.zerobase.everycampingbackend.product.domain.entity.Product;
 import com.zerobase.everycampingbackend.product.service.ProductService;
+import com.zerobase.everycampingbackend.review.domain.dto.ReviewDto;
 import com.zerobase.everycampingbackend.review.domain.entity.Review;
 import com.zerobase.everycampingbackend.review.domain.form.ReviewForm;
 import com.zerobase.everycampingbackend.review.domain.repository.ReviewRepository;
@@ -13,6 +14,7 @@ import com.zerobase.everycampingbackend.user.domain.entity.Customer;
 import com.zerobase.everycampingbackend.user.service.CustomerService;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -85,17 +87,24 @@ public class ReviewService {
         log.info(userEmail + " -> 리뷰 삭제 완료");
     }
 
+    public ReviewDto getReviewDetail(Long reviewId) {
+        return ReviewDto.from(getReviewById(reviewId));
+    }
+
+    public List<ReviewDto> getReviewsByCustomerId(Long customerId) {
+        Customer customer = customerService.getCustomerById(customerId);
+        return reviewRepository.findAllByCustomer(customer)
+            .stream().map(ReviewDto::from).collect(Collectors.toList());
+    }
+
+    public List<ReviewDto> getReviewsByProductId(Long productId) {
+        Product product = productService.getProductById(productId);
+        return reviewRepository.findAllByProduct(product)
+            .stream().map(ReviewDto::from).collect(Collectors.toList());
+    }
+
     public Review getReviewById(Long id) {
         return reviewRepository.findById(id)
             .orElseThrow(() -> new CustomException(ErrorCode.REVIEW_NOT_FOUND));
     }
-
-    public List<Review> getReviewsByCustomer(Customer customer) {
-        return reviewRepository.findAllByCustomer(customer);
-    }
-
-    public List<Review> getReviewsByProduct(Product product) {
-        return reviewRepository.findAllByProduct(product);
-    }
-
 }
