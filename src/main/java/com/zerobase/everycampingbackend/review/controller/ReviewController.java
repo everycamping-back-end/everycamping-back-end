@@ -8,6 +8,7 @@ import java.security.Principal;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,18 +50,20 @@ public class ReviewController {
     }
 
     @GetMapping("/{reviewId}")
-    public ResponseEntity<ReviewDto> getReviewDetail(@PathVariable Long reviewId){
+    public ResponseEntity<ReviewDto> getReviewDetail(@PathVariable Long reviewId) {
         return ResponseEntity.ok(reviewService.getReviewDetail(reviewId));
     }
 
     @GetMapping
-    public ResponseEntity<List<ReviewDto>> getReviewsByCustomerId(@RequestParam Long customerId){
-        return ResponseEntity.ok(reviewService.getReviewsByCustomerId(customerId));
-    }
-
-    @GetMapping
-    public ResponseEntity<List<ReviewDto>> getReviewsByProductId(@RequestParam Long productId){
-        return ResponseEntity.ok(reviewService.getReviewsByProductId(productId));
+    public ResponseEntity<List<ReviewDto>> getReviewsById(@RequestParam Long customerId,
+        @RequestParam Long productId) {
+        List<ReviewDto> reviews = null;
+        if(!ObjectUtils.isEmpty(customerId)){
+            reviews = reviewService.getReviewsByCustomerId(customerId);
+        } else if(!ObjectUtils.isEmpty(productId)){
+            reviews = reviewService.getReviewsByProductId(productId);
+        }
+        return ResponseEntity.ok(reviews);
     }
 
 }
