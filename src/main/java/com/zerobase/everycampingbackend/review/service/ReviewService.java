@@ -72,6 +72,7 @@ public class ReviewService {
         log.info(userEmail + " -> 리뷰 수정 완료");
     }
 
+    @Transactional
     public void deleteReview(String userEmail, Long reviewId) {
         log.info(userEmail + " -> 리뷰 삭제 시도");
 
