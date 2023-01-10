@@ -12,6 +12,7 @@ public enum ErrorCode {
   UNKNOWN_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "알 수 없는 예외가 발생했습니다."),
   ARGUMENT_NOT_VALID_EXCEPTION(HttpStatus.BAD_REQUEST, "필드 값이 올바르지 않습니다."),
 
+  CART_PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "장바구니에 들어있지 않은 상품입니다."),
   ORDER_AMOUNT_UNDER_1000(HttpStatus.BAD_REQUEST, "1000원 이하로는 주문할 수 없습니다."),
 
 
