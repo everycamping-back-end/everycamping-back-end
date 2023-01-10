@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -58,4 +59,11 @@ public class CartController {
     return ResponseEntity.ok().build();
   }
 
+  @DeleteMapping("/{productId}")
+  public ResponseEntity deleteCartProduct(@RequestBody @NotNull Long customerId,
+      @PathVariable Long productId) {
+
+    cartService.deleteCartProduct(productId, customerId);
+    return ResponseEntity.ok().build();
+  }
 }

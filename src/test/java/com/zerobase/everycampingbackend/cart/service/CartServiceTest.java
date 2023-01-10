@@ -1,6 +1,7 @@
 package com.zerobase.everycampingbackend.cart.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.zerobase.everycampingbackend.cart.domain.dto.CartProductDto;
@@ -191,7 +192,32 @@ class CartServiceTest {
     });
 
     //then
-    assertEquals(ex.getErrorCode(), ErrorCode.PRODUCT_NOT_ENOUGH_STOCK);
+    assertEquals(ErrorCode.PRODUCT_NOT_ENOUGH_STOCK, ex.getErrorCode());
+  }
+
+  @Test
+  @DisplayName("장바구니 물품 삭제 성공")
+  @Transactional
+  void deleteCartProductSuccess() throws Exception {
+
+    //given
+    //유저 세팅
+    Long customerId = createCustomer("ksj2083@naver.com");
+
+    //상품 세팅
+    Long productId1 = createProduct("텐트1", 5, ProductCategory.TENT);
+
+    //장바구니에 넣기
+    addToCart(customerId, productId1, 3);
+
+    //when
+    cartService.deleteCartProduct(productId1, customerId);
+
+    //then
+    Optional<CartProduct> optionalCartProduct = cartRepository.findByCustomerIdAndProductId(
+        customerId, productId1);
+
+    assertFalse(optionalCartProduct.isPresent());
   }
 
   private void addToCart(Long customerId, Long productId, Integer quantity) {

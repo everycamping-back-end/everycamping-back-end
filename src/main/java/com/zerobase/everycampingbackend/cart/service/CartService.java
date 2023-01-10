@@ -75,4 +75,13 @@ public class CartService {
     cartRepository.save(cartProduct);
   }
 
+  @Transactional
+  public void deleteCartProduct(Long productId, Long customerId) {
+    //로그인한 Customer 관련 로직 추가 예정
+
+    CartProduct cartProduct = cartRepository.findByCustomerIdAndProductId(customerId, productId)
+        .orElseThrow(() -> new CustomException(ErrorCode.CART_PRODUCT_NOT_FOUND));
+
+    cartRepository.delete(cartProduct);
+  }
 }
