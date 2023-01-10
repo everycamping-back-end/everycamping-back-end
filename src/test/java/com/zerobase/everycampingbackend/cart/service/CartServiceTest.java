@@ -11,6 +11,7 @@ import com.zerobase.everycampingbackend.common.exception.CustomException;
 import com.zerobase.everycampingbackend.common.exception.ErrorCode;
 import com.zerobase.everycampingbackend.product.domain.entity.Product;
 import com.zerobase.everycampingbackend.product.domain.repository.ProductRepository;
+import com.zerobase.everycampingbackend.product.service.ProductService;
 import com.zerobase.everycampingbackend.product.type.ProductCategory;
 import com.zerobase.everycampingbackend.user.domain.entity.Customer;
 import com.zerobase.everycampingbackend.user.domain.repository.CustomerRepository;
@@ -28,7 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @TestPropertySource(locations = "classpath:application-test.properties")
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 @Transactional
-class CartProductServiceTest {
+class CartServiceTest {
 
   @Autowired
   CartService cartService;
@@ -41,6 +42,9 @@ class CartProductServiceTest {
 
   @Autowired
   CartRepository cartRepository;
+
+  @Autowired
+  ProductService productService;
 
   @Test
   @DisplayName("장바구니 넣기 실패 - 재고가 부족해서 실패")
@@ -105,9 +109,15 @@ class CartProductServiceTest {
 
     //장바구니에 넣기
     addToCart(customerId, productId1, 3);
-    addToCart(customerId, productId2, 3);
+    addToCart(customerId, productId2, 5);
 
     //when
+
+    //2번 상품은 재고가 1개 남게 되었음
+    Product product = productService.getProductById(productId2);
+    product.setStock(1);
+    productRepository.save(product);
+
     PageRequest pageRequest = PageRequest.of(0, 5);
     Page<CartProductDto> cartProductPage = cartService.getCartProductList(customerId, pageRequest);
 
@@ -116,10 +126,12 @@ class CartProductServiceTest {
     CartProductDto dto2 = cartProductPage.getContent().get(1);
 
     assertEquals(productId1, dto1.getProductId());
+    assertEquals(3, dto1.getQuantity());
     assertEquals(false, dto1.getIsCountChanged());
 
     assertEquals(productId2, dto2.getProductId());
-    assertEquals(false, dto2.getIsCountChanged());
+    assertEquals(1, dto2.getQuantity());
+    assertEquals(true, dto2.getIsCountChanged());
 
   }
 
