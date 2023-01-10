@@ -54,16 +54,14 @@ public class ReviewController {
         return ResponseEntity.ok(reviewService.getReviewDetail(reviewId));
     }
 
-    @GetMapping
-    public ResponseEntity<List<ReviewDto>> getReviewsById(@RequestParam Long customerId,
-        @RequestParam Long productId) {
-        List<ReviewDto> reviews = null;
-        if(!ObjectUtils.isEmpty(customerId)){
-            reviews = reviewService.getReviewsByCustomerId(customerId);
-        } else if(!ObjectUtils.isEmpty(productId)){
-            reviews = reviewService.getReviewsByProductId(productId);
-        }
-        return ResponseEntity.ok(reviews);
+    @GetMapping("/products/{productId}")
+    public ResponseEntity<List<ReviewDto>> getReviewsByProductId(@PathVariable Long productId) {
+        return ResponseEntity.ok(reviewService.getReviewsByProductId(productId));
+    }
+
+    @GetMapping("/customers/{customerId}")
+    public ResponseEntity<List<ReviewDto>> getReviewsByCustomerId(@PathVariable Long customerId) {
+        return ResponseEntity.ok(reviewService.getReviewsByCustomerId(customerId));
     }
 
 }
