@@ -20,7 +20,7 @@ public class CartProductDto {
   private Integer price; //상품 가격
   private Boolean onSale; //판매여부
   private Integer quantity; //장바구니 등록 수량
-  Boolean isCountChanged; //count 변경 여부(재고부족 등으로 인하여 등록 수량이 변했는지 여부)
+  Boolean isQuantityChanged; //quantity 변경 여부(재고부족 등으로 인하여 등록 수량이 변했는지 여부)
 
   public static CartProductDto of(CartProduct cartProduct, Boolean isCountChanged) {
     return CartProductDto.builder()
@@ -30,7 +30,7 @@ public class CartProductDto {
         .price(cartProduct.getProduct().getPrice())
         .onSale(cartProduct.getProduct().isOnSale())
         .quantity(cartProduct.getQuantity())
-        .isCountChanged(isCountChanged)
+        .isQuantityChanged(isCountChanged)
         .build();
   }
 }
