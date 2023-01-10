@@ -52,6 +52,17 @@ public class ProductService {
         productRepository.save(product);
     }
 
+    @Transactional
+    public void deleteReview(Product product, Integer score){
+        product.setTotalScore(product.getTotalScore() - score);
+
+        if(product.getTotalScore() < 0){
+            log.error("상품 내 리뷰 총점이 음수가 됨. 확인 요망.");
+        }
+
+        productRepository.save(product);
+    }
+
     public Product getProductById(Long productId){
         return productRepository.findById(productId)
             .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));

@@ -70,6 +70,21 @@ public class ReviewService {
         log.info(userEmail + " -> 리뷰 수정 완료");
     }
 
+    public void deleteReview(String userEmail, Long reviewId) {
+        log.info(userEmail + " -> 리뷰 삭제 시도");
+
+        Review review = getReviewById(reviewId);
+        if (!review.getCustomer().getEmail().equals(userEmail)) {
+            throw new CustomException(ErrorCode.REVIEW_EDITOR_NOT_MATCHED);
+        }
+
+        reviewRepository.delete(review);
+        staticImageService.deleteImage(review.getImagePath());
+        productService.deleteReview(review.getProduct(), review.getScore());
+
+        log.info(userEmail + " -> 리뷰 삭제 완료");
+    }
+
     public Review getReviewById(Long id) {
         return reviewRepository.findById(id)
             .orElseThrow(() -> new CustomException(ErrorCode.REVIEW_NOT_FOUND));
