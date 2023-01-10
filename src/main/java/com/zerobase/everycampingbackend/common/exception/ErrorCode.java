@@ -22,7 +22,11 @@ public enum ErrorCode {
   PRODUCT_NOT_FOUND(HttpStatus.BAD_REQUEST, "상품을 찾을 수 없습니다."),
   PRODUCT_SELLER_NOT_MATCHED(HttpStatus.BAD_REQUEST, "상품 수정/삭제 권한이 없습니다."),
   PRODUCT_NOT_ENOUGH_STOCK(HttpStatus.BAD_REQUEST, "상품의 재고가 부족합니다."),
-  PRODUCT_NOT_ON_SALE(HttpStatus.BAD_REQUEST, "상품이 판매 중이 아닙니다.")
+  PRODUCT_NOT_ON_SALE(HttpStatus.BAD_REQUEST, "상품이 판매 중이 아닙니다."),
+
+  REVIEW_NOT_FOUND(HttpStatus.BAD_REQUEST, "리뷰를 찾을 수 없습니다."),
+  REVIEW_WRITER_NOT_QUALIFIED(HttpStatus.BAD_REQUEST, "리뷰 작성은 해당 상품을 구매한 고객만 가능합니다."),
+  REVIEW_EDITOR_NOT_MATCHED(HttpStatus.BAD_REQUEST, "리뷰 수정/삭제 권한이 없습니다."),
 
   ;
 
