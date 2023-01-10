@@ -1,7 +1,9 @@
 package com.zerobase.everycampingbackend.review.domain.entity;
 
 import com.zerobase.everycampingbackend.common.BaseEntity;
+import com.zerobase.everycampingbackend.common.staticimage.dto.S3Path;
 import com.zerobase.everycampingbackend.product.domain.entity.Product;
+import com.zerobase.everycampingbackend.review.domain.form.ReviewForm;
 import com.zerobase.everycampingbackend.user.domain.entity.Customer;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -39,4 +41,14 @@ public class Review extends BaseEntity {
     private String imagePath;
 
 
+    public static Review of(ReviewForm form, Customer customer, Product product, S3Path s3Path) {
+        return Review.builder()
+            .customer(customer)
+            .product(product)
+            .score(form.getScore())
+            .text(form.getText())
+            .imageUri(s3Path.getImageUri())
+            .imagePath(s3Path.getImagePath())
+            .build();
+    }
 }
