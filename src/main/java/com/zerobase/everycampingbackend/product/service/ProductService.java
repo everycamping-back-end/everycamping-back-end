@@ -34,6 +34,24 @@ public class ProductService {
         return result;
     }
 
+    @Transactional
+    public void addReview(Product product, Integer score){
+        product.setReviewCount(product.getReviewCount() + 1);
+        product.setTotalScore(product.getTotalScore() + score);
+        productRepository.save(product);
+    }
+
+    @Transactional
+    public void updateReview(Product product, Integer scoreDiff){
+        product.setTotalScore(product.getTotalScore() + scoreDiff);
+
+        if(product.getTotalScore() < 0){
+            log.error("상품 내 리뷰 총점이 음수가 됨. 확인 요망.");
+        }
+
+        productRepository.save(product);
+    }
+
     public Product getProductById(Long productId){
         return productRepository.findById(productId)
             .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
