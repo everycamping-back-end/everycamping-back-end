@@ -2,13 +2,16 @@ package com.zerobase.everycampingbackend.cart.controller;
 
 import com.zerobase.everycampingbackend.cart.domain.dto.CartProductDto;
 import com.zerobase.everycampingbackend.cart.domain.form.CreateCartForm;
+import com.zerobase.everycampingbackend.cart.domain.form.UpdateQuantityForm;
 import com.zerobase.everycampingbackend.cart.service.CartService;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,9 +43,19 @@ public class CartController {
    * 원래는 토큰을 받아야 하지만, 임시로 customerId를 받는다.
    */
   @GetMapping
-  public ResponseEntity<Page<CartProductDto>> getCartProductList(@RequestParam Long customerId,
+  public ResponseEntity<Page<CartProductDto>> getCartProductList(
+      @RequestParam @Valid @NotNull Long customerId,
       Pageable pageable) {
+
     return ResponseEntity.ok(cartService.getCartProductList(customerId, pageable));
+  }
+
+  @PatchMapping("/{productId}")
+  public ResponseEntity updateQuantity(@RequestBody @Valid UpdateQuantityForm updateQuantityForm,
+      @PathVariable Long productId) {
+
+    cartService.updateQuantity(productId, updateQuantityForm);
+    return ResponseEntity.ok().build();
   }
 
 }

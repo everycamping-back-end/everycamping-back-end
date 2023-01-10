@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.zerobase.everycampingbackend.cart.domain.dto.CartProductDto;
 import com.zerobase.everycampingbackend.cart.domain.entity.CartProduct;
 import com.zerobase.everycampingbackend.cart.domain.form.CreateCartForm;
+import com.zerobase.everycampingbackend.cart.domain.form.UpdateQuantityForm;
 import com.zerobase.everycampingbackend.cart.domain.repository.CartRepository;
 import com.zerobase.everycampingbackend.common.exception.CustomException;
 import com.zerobase.everycampingbackend.common.exception.ErrorCode;
@@ -15,6 +16,7 @@ import com.zerobase.everycampingbackend.product.service.ProductService;
 import com.zerobase.everycampingbackend.product.type.ProductCategory;
 import com.zerobase.everycampingbackend.user.domain.entity.Customer;
 import com.zerobase.everycampingbackend.user.domain.repository.CustomerRepository;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -127,12 +129,69 @@ class CartServiceTest {
 
     assertEquals(productId1, dto1.getProductId());
     assertEquals(3, dto1.getQuantity());
-    assertEquals(false, dto1.getIsCountChanged());
+    assertEquals(false, dto1.getIsQuantityChanged());
 
     assertEquals(productId2, dto2.getProductId());
     assertEquals(1, dto2.getQuantity());
-    assertEquals(true, dto2.getIsCountChanged());
+    assertEquals(true, dto2.getIsQuantityChanged());
 
+  }
+
+  @Test
+  @DisplayName("장바구니 수량 변경 성공")
+  @Transactional
+  void updateQuantitySuccess() throws Exception {
+
+    //given
+    //유저 세팅
+    Long customerId = createCustomer("ksj2083@naver.com");
+
+    //상품 세팅
+    Long productId1 = createProduct("텐트1", 5, ProductCategory.TENT);
+
+    //장바구니에 넣기
+    addToCart(customerId, productId1, 3);
+
+    //when
+    cartService.updateQuantity(customerId,
+        UpdateQuantityForm.builder().
+                      customerId(customerId)
+                      .updateQuantity(4)
+                      .build());
+
+    //then
+    CartProduct cartProduct = cartRepository.findByCustomerIdAndProductId(
+        customerId, productId1).orElseThrow();
+
+    assertEquals(4, cartProduct.getQuantity());
+  }
+
+  @Test
+  @DisplayName("장바구니 수량 변경 실패 - 재고가 부족해서 실패")
+  @Transactional
+  void updateQuantityNotEnoughStock() throws Exception {
+
+    //given
+    //유저 세팅
+    Long customerId = createCustomer("ksj2083@naver.com");
+
+    //상품 세팅
+    Long productId1 = createProduct("텐트1", 5, ProductCategory.TENT);
+
+    //장바구니에 넣기
+    addToCart(customerId, productId1, 3);
+
+    //when
+    CustomException ex = (CustomException) assertThrows(RuntimeException.class, () -> {
+      cartService.updateQuantity(customerId,
+          UpdateQuantityForm.builder().
+              customerId(customerId)
+              .updateQuantity(6)
+              .build());
+    });
+
+    //then
+    assertEquals(ex.getErrorCode(), ErrorCode.PRODUCT_NOT_ENOUGH_STOCK);
   }
 
   private void addToCart(Long customerId, Long productId, Integer quantity) {
