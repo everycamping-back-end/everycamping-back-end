@@ -13,10 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 public class ReviewForm {
     @NotNull
-    private Long customerId;
-    @NotNull
-    private Long productId;
-    @NotNull
     @Min(1)
     @Max(5)
     private Integer score;

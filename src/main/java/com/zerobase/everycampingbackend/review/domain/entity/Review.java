@@ -51,4 +51,11 @@ public class Review extends BaseEntity {
             .imagePath(s3Path.getImagePath())
             .build();
     }
+
+    public void setOf(ReviewForm form, S3Path s3Path) {
+        score = form.getScore();
+        text = form.getText();
+        imageUri = s3Path.getImageUri();
+        imagePath = s3Path.getImagePath();
+    }
 }
