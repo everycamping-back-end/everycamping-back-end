@@ -1,57 +1,65 @@
 package com.zerobase.everycampingbackend.common.config;
 
+import com.zerobase.everycampingbackend.common.auth.filter.JwtAuthFilter;
+import com.zerobase.everycampingbackend.common.auth.model.UserType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @RequiredArgsConstructor
 @EnableWebSecurity
 @Configuration
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-  @Override
-  public void configure(WebSecurity web) throws Exception {
+    private final JwtAuthFilter jwtAuthFilter;
 
-    web.ignoring().antMatchers("/favicon.ico", "files/**");
+    private static final String[] AUTH_IGNORELIST = {
+        "/swagger-resources/**",
+        "/swagger-ui/**",
+        "/v2/api-docs",
+        "/webjars/**"
+    };
 
-    super.configure(web);
-  }
+    private static final String[] AUTH_WHITELIST = {
+        "/"
+        , "/customers/signin"
+        , "/customers/signup"
+        , "/sellers/signin"
+        , "/sellers/signup"
+        , "/test/**"
+    };
 
-  @Override
-  protected void configure(HttpSecurity http) throws Exception {
+    @Bean
+    @Override
+    protected AuthenticationManager authenticationManager() throws Exception {
+        return super.authenticationManager();
+    }
 
-    http.csrf().disable();
-    http.headers().frameOptions().sameOrigin();
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring().antMatchers(AUTH_IGNORELIST);
+    }
 
-    //
-
-    http.authorizeRequests()
-        .antMatchers("/"
-            , "/customers/signin"
-            , "/customers/signup"
-            , "/sellers/signin"
-            , "/sellers/signup"
-            , "/test/**"
-        )
-            .permitAll();
-
-    // seller/** 페이지는 ROLE_SELLER 권한이 있어야 접근 가능하게 설정
-
-    /*
-    http.authorizeRequests()
-        .antMatchers("/sellers/**")
-            .hasAuthority("ROLE_SELLER");
-
-    http.authorizeRequests()
-        .antMatchers("/admin/**")
-            .hasAuthority("ROLE_ADMIN");
-     */
-
-
-
-    super.configure(http);
-  }
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http
+            .httpBasic().disable()
+            .csrf().disable()
+            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and()
+            .authorizeRequests()
+            .antMatchers(AUTH_WHITELIST).permitAll()
+            .antMatchers("/admin/**").hasRole(UserType.ADMIN.name())
+            .antMatchers("/sellers/**").hasRole(UserType.SELLER.name())
+            .anyRequest().hasAnyRole(UserType.CUSTOMER.name(), UserType.SELLER.name(), UserType.ADMIN.name())
+            .and()
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+    }
 }
