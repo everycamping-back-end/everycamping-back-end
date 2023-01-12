@@ -1,4 +1,4 @@
-package com.zerobase.everycampingbackend.common.token.util;
+package com.zerobase.everycampingbackend.common.auth.util;
 
 import org.apache.tomcat.util.codec.binary.Base64;
 

@@ -1,4 +1,4 @@
-package com.zerobase.everycampingbackend.common.token.model;
+package com.zerobase.everycampingbackend.common.auth.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
