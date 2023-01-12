@@ -13,6 +13,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 
 @Entity
@@ -36,10 +37,10 @@ public class Customer extends BaseEntity {
 
   private LocalDateTime deleteAt;  // 탈퇴일
 
-  public static Customer from(SignUpForm form) {
+  public static Customer from(SignUpForm form, PasswordEncoder passwordEncoder) {
     return Customer.builder()
         .email(form.getEmail().toLowerCase(Locale.ROOT))
-        .password(form.getPassword())
+        .password(passwordEncoder.encode(form.getPassword()))
         .nickName(form.getNickName())
         .phone(form.getPhoneNumber())
         .build();
