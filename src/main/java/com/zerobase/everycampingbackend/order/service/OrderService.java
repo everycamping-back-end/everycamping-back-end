@@ -2,14 +2,16 @@ package com.zerobase.everycampingbackend.order.service;
 
 import com.zerobase.everycampingbackend.common.exception.CustomException;
 import com.zerobase.everycampingbackend.common.exception.ErrorCode;
-import com.zerobase.everycampingbackend.order.domain.form.CreateOrderForm;
-import com.zerobase.everycampingbackend.order.domain.form.CreateOrderProductForm;
-import com.zerobase.everycampingbackend.order.domain.model.OrderProduct;
-import com.zerobase.everycampingbackend.order.domain.model.Orders;
+import com.zerobase.everycampingbackend.order.domain.entity.OrderProduct;
+import com.zerobase.everycampingbackend.order.domain.entity.Orders;
+import com.zerobase.everycampingbackend.order.domain.form.OrderForm;
+import com.zerobase.everycampingbackend.order.domain.form.OrderForm.OrderProductForm;
+import com.zerobase.everycampingbackend.order.domain.repository.OrderProductRepository;
 import com.zerobase.everycampingbackend.order.domain.repository.OrdersRepository;
-import com.zerobase.everycampingbackend.order.type.OrderStatus;
-import java.util.ArrayList;
-import java.util.List;
+import com.zerobase.everycampingbackend.product.domain.entity.Product;
+import com.zerobase.everycampingbackend.product.service.ProductService;
+import com.zerobase.everycampingbackend.user.domain.entity.Customer;
+import com.zerobase.everycampingbackend.user.service.CustomerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,39 +20,36 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class OrderService {
 
+  private final CustomerService customerService;
+  private final ProductService productService;
   private final OrdersRepository ordersRepository;
+  private final OrderProductRepository orderProductRepository;
 
-  // public Order createOrder(UserDetails userDetails, CreateOrderForm form) {
-  // 	Long id = userDetails.getId();
-  // 	//로직 진행
-  // }
 
   @Transactional
-  public Orders createOrder(CreateOrderForm form) {
+  public void order(OrderForm form) {
 
-    Orders orders = new Orders();
     //로그인한 Customer 관련 로직 추가 예정
-    int totalAmount = 0;
-    List<OrderProduct> orderProductList = new ArrayList<>();
-    for (CreateOrderProductForm f : form.getOrderProducts()) {
-      //product에 대한 예외처리 추가 예정(품절 등)
-      int partialAmount = f.getPartialAmount();
-      totalAmount += partialAmount;
-      orderProductList.add(OrderProduct.builder()
-          .orders(orders)
-          .count(f.getCount())
-          .partialAmount(partialAmount)
-          .build());
+
+    Customer customer = customerService.getCustomerById(form.getCustomerId());
+    Orders orders = ordersRepository.save(Orders.builder()
+                                                .customer(customer)
+                                                .build());
+
+    form.getOrderProductFormList().stream().forEach(f ->
+        orderProduct(orders, f));
+  }
+
+  private void orderProduct(Orders orders, OrderProductForm orderProductForm) {
+
+    Product product = productService.getProductById(orderProductForm.getProductId());
+    if (!product.isOnSale()) {
+      throw new CustomException(ErrorCode.PRODUCT_NOT_ENOUGH_STOCK);
+    }
+    if (product.getStock() < orderProductForm.getQuantity()) {
+      throw new CustomException(ErrorCode.PRODUCT_NOT_ON_SALE);
     }
 
-    if (totalAmount < 1000) {
-      throw new CustomException(ErrorCode.ORDER_AMOUNT_UNDER_1000);
-    }
-
-    orders.setAmount(totalAmount);
-    orders.setStatus(OrderStatus.DELIVERY_COMPLETE);
-    orders.setOrderProductList(orderProductList);
-
-    return ordersRepository.save(orders);
+    orderProductRepository.save(OrderProduct.of(orders, product, orderProductForm.getQuantity()));
   }
 }
