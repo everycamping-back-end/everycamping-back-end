@@ -10,10 +10,12 @@ import com.zerobase.everycampingbackend.user.domain.entity.Seller;
 import com.zerobase.everycampingbackend.user.domain.form.SignInForm;
 import com.zerobase.everycampingbackend.user.domain.form.SignUpForm;
 import com.zerobase.everycampingbackend.user.domain.repository.SellerRepository;
-import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,12 +30,13 @@ public class SellerService implements CustomUserDetailsService {
     private final SellerRepository sellerRepository;
     private final JwtIssuer jwtIssuer;
     private final PasswordEncoder passwordEncoder;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     public void signUp(SignUpForm form) {
         if(sellerRepository.existsByEmail(form.getEmail().toLowerCase(Locale.ROOT))){
             throw new CustomException(ErrorCode.EMAIL_BEING_USED);
         }
-        sellerRepository.save(Seller.from(form));
+        sellerRepository.save(Seller.from(form, passwordEncoder));
     }
 
     public JwtDto signIn(SignInForm form) {
@@ -43,7 +46,15 @@ public class SellerService implements CustomUserDetailsService {
             throw new CustomException(ErrorCode.LOGIN_CHECK_FAIL);
         }
 
-        return jwtIssuer.createToken(seller.getEmail(), seller.getId(), UserType.SELLER);
+        JwtDto jwtDto = jwtIssuer.createToken(seller.getEmail(), seller.getId(), UserType.SELLER);
+
+        putRefreshToken(seller.getEmail(), jwtDto.getRefreshToken());
+
+        return jwtDto;
+    }
+
+    public void signOut(String email){
+        deleteRefreshToken(email);
     }
 
     public Optional<Seller> findByIdAndEmail(Long id, String email) {
@@ -64,22 +75,22 @@ public class SellerService implements CustomUserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return sellerRepository.findByEmail(email)
-            .map(e -> new User(e.getEmail(), null,
-                Collections.singleton(new SimpleGrantedAuthority("ROLE_SELLER"))))
-            .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        Seller seller = getSellerByEmail(email);
+        return new User(seller.getEmail(), "",
+                List.of(new SimpleGrantedAuthority("ROLE_SELLER")));
     }
 
     @Override
     public String getRefreshToken(String email) {
-        return "refresh-token";
+        return (String) redisTemplate.opsForValue().get("RT-SELLER:" + email);
     }
 
-    public void putRefreshToken(String email, String token){
-
+    public void putRefreshToken(String email, String token) {
+        redisTemplate.opsForValue()
+            .set("RT-SELLER:" + email, token, JwtIssuer.EXPIRE_TIME, TimeUnit.MILLISECONDS);
     }
 
-    public void deleteRefreshToken(String email){
-
+    public void deleteRefreshToken(String email) {
+        redisTemplate.delete("RT-SELLER:" + email);
     }
 }
