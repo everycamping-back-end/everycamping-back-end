@@ -1,9 +1,9 @@
 package com.zerobase.everycampingbackend.user.controller;
 
 
+import com.zerobase.everycampingbackend.common.auth.model.JwtDto;
 import com.zerobase.everycampingbackend.user.domain.form.SignInForm;
 import com.zerobase.everycampingbackend.user.domain.form.SignUpForm;
-import com.zerobase.everycampingbackend.user.domain.repository.CustomerRepository;
 import com.zerobase.everycampingbackend.user.service.CustomerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,16 +18,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 public class CustomerController {
 
-  private final CustomerService customerService;
+    private final CustomerService customerService;
 
+    @PostMapping("/signup")
+    public ResponseEntity customerSignUp(@RequestBody SignUpForm form) {
+        customerService.signUp(form);
+        return ResponseEntity.ok().build();
+    }
 
-  @PostMapping("/signup")
-  public ResponseEntity<String> customerSignUp(@RequestBody SignUpForm form) {
-    return ResponseEntity.ok(customerService.signUp(form));
-  }
+    @PostMapping("/signin")
+    public ResponseEntity<JwtDto> customerSignIn(@RequestBody SignInForm form) {
+        return ResponseEntity.ok(customerService.signIn(form));
+    }
 
-  @PostMapping("/signin")
-  public ResponseEntity<String> customerSignIn(@RequestBody SignInForm form) {
-    return ResponseEntity.ok(customerService.signIn(form));
-  }
 }

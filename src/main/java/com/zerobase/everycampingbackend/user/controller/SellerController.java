@@ -1,5 +1,6 @@
 package com.zerobase.everycampingbackend.user.controller;
 
+import com.zerobase.everycampingbackend.common.auth.model.JwtDto;
 import com.zerobase.everycampingbackend.user.domain.form.SignInForm;
 import com.zerobase.everycampingbackend.user.domain.form.SignUpForm;
 import com.zerobase.everycampingbackend.user.service.SellerService;
@@ -18,12 +19,13 @@ public class SellerController {
   private final SellerService sellerService;
 
   @PostMapping("/signup")
-  public ResponseEntity<String> sellerSignUp(@RequestBody SignUpForm form) {
-    return ResponseEntity.ok(sellerService.signUp(form));
+  public ResponseEntity sellerSignUp(@RequestBody SignUpForm form) {
+    sellerService.signUp(form);
+    return ResponseEntity.ok().build();
   }
 
   @PostMapping("/signin")
-  public ResponseEntity<String> sellerSignIn(@RequestBody SignInForm form) {
+  public ResponseEntity<JwtDto> sellerSignIn(@RequestBody SignInForm form) {
     return ResponseEntity.ok(sellerService.signIn(form));
   }
 }
