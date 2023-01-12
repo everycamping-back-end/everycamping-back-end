@@ -1,61 +1,87 @@
 package com.zerobase.everycampingbackend.user.service;
 
+import com.zerobase.everycampingbackend.common.auth.CustomUserDetailsService;
+import com.zerobase.everycampingbackend.common.auth.issuer.JwtIssuer;
+import com.zerobase.everycampingbackend.common.auth.model.JwtDto;
+import com.zerobase.everycampingbackend.common.auth.model.UserType;
 import com.zerobase.everycampingbackend.common.exception.CustomException;
 import com.zerobase.everycampingbackend.common.exception.ErrorCode;
-import com.zerobase.everycampingbackend.common.token.config.JwtAuthenticationProvider;
-import com.zerobase.everycampingbackend.common.token.model.UserType;
+import com.zerobase.everycampingbackend.user.domain.entity.Customer;
 import com.zerobase.everycampingbackend.user.domain.form.SignInForm;
 import com.zerobase.everycampingbackend.user.domain.form.SignUpForm;
-import com.zerobase.everycampingbackend.user.domain.entity.Customer;
 import com.zerobase.everycampingbackend.user.domain.repository.CustomerRepository;
+import java.util.Collections;
 import java.util.Locale;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class CustomerService {
+public class CustomerService implements CustomUserDetailsService {
 
-  private final CustomerRepository customerRepository;
+    private final CustomerRepository customerRepository;
+    private final JwtIssuer jwtIssuer;
+    private final PasswordEncoder passwordEncoder;
 
-  private final JwtAuthenticationProvider provider;
-
-  private boolean isEmailExist(String email) {
-    return customerRepository.findByEmail(email.toLowerCase(Locale.ROOT))
-        .isPresent();
-  }
-
-  private Optional<Customer> findValidCustomer(String email, String password) {
-    return customerRepository.findByEmail(email).stream()
-        .filter(customer -> customer.getPassword().equals(password))
-        .findFirst();
-  }
-
-  public String signUp(SignUpForm form) {
-
-    Customer customer = customerRepository.save(Customer.from(form));
-
-    return "회원 가입에 성공하였습니다.";
-  }
+    public void signUp(SignUpForm form) {
+        if(customerRepository.existsByEmail(form.getEmail().toLowerCase(Locale.ROOT))){
+            throw new CustomException(ErrorCode.EMAIL_BEING_USED);
+        }
+        customerRepository.save(Customer.from(form));
+    }
 
 
-  public String signIn(SignInForm form) {
-    // 로그인 가능 여부 체크
-    Customer c = this.findValidCustomer(form.getEmail(), form.getPassword())
-        .orElseThrow(() -> new CustomException(ErrorCode.LOGIN_CHECK_FAIL));
+    public JwtDto signIn(SignInForm form) {
+        Customer customer = getCustomerByEmail(form.getEmail().toLowerCase(Locale.ROOT));
 
-    return provider.createToken(c.getEmail(), c.getId(), UserType.CUSTOMER);
-  }
+        if(!passwordEncoder.matches(form.getPassword(), customer.getPassword())){
+            throw new CustomException(ErrorCode.LOGIN_CHECK_FAIL);
+        }
 
-  public Optional<Customer> findByIdAndEmail(Long id, String email) {
-    return customerRepository.findById(id)
-        .stream().filter(customer -> customer.getEmail().equals(email))
-        .findFirst();
-  }
+        return jwtIssuer.createToken(customer.getEmail(), customer.getId(), UserType.CUSTOMER);
+    }
 
-  public Customer getCustomerById(Long customerId) {
-    return customerRepository.findById(customerId)
-        .orElseThrow(() -> new CustomException(ErrorCode.CUSTOMER_NOT_FOUND));
-  }
+    public Optional<Customer> findByIdAndEmail(Long id, String email) {
+        return customerRepository.findById(id)
+            .stream().filter(customer -> customer.getEmail().equals(email))
+            .findFirst();
+    }
+
+    public Customer getCustomerById(Long customerId) {
+        return customerRepository.findById(customerId)
+            .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    public Customer getCustomerByEmail(String email) {
+        return customerRepository.findByEmail(email)
+            .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        return customerRepository.findByEmail(email)
+            .map(e -> new User(e.getEmail(), null,
+                Collections.singleton(new SimpleGrantedAuthority("ROLE_CUSTOMER"))))
+            .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    @Override
+    public String getRefreshToken(String email) {
+        return "refresh-token";
+    }
+
+    public void putRefreshToken(String email, String token){
+
+    }
+
+    public void deleteRefreshToken(String email){
+
+    }
+
 }
