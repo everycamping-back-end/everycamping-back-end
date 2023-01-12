@@ -13,7 +13,9 @@ import com.zerobase.everycampingbackend.user.domain.repository.CustomerRepositor
 import java.util.Collections;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,23 +30,32 @@ public class CustomerService implements CustomUserDetailsService {
     private final CustomerRepository customerRepository;
     private final JwtIssuer jwtIssuer;
     private final PasswordEncoder passwordEncoder;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     public void signUp(SignUpForm form) {
-        if(customerRepository.existsByEmail(form.getEmail().toLowerCase(Locale.ROOT))){
+        if (customerRepository.existsByEmail(form.getEmail().toLowerCase(Locale.ROOT))) {
             throw new CustomException(ErrorCode.EMAIL_BEING_USED);
         }
-        customerRepository.save(Customer.from(form));
+        customerRepository.save(Customer.from(form, passwordEncoder));
     }
 
 
     public JwtDto signIn(SignInForm form) {
         Customer customer = getCustomerByEmail(form.getEmail().toLowerCase(Locale.ROOT));
 
-        if(!passwordEncoder.matches(form.getPassword(), customer.getPassword())){
+        if (!passwordEncoder.matches(form.getPassword(), customer.getPassword())) {
             throw new CustomException(ErrorCode.LOGIN_CHECK_FAIL);
         }
 
-        return jwtIssuer.createToken(customer.getEmail(), customer.getId(), UserType.CUSTOMER);
+        JwtDto jwtDto = jwtIssuer.createToken(customer.getEmail(), customer.getId(), UserType.CUSTOMER);
+
+        putRefreshToken(customer.getEmail(), jwtDto.getRefreshToken());
+
+        return jwtDto;
+    }
+
+    public void signOut(String email){
+        deleteRefreshToken(email);
     }
 
     public Optional<Customer> findByIdAndEmail(Long id, String email) {
@@ -66,22 +77,22 @@ public class CustomerService implements CustomUserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         return customerRepository.findByEmail(email)
-            .map(e -> new User(e.getEmail(), null,
+            .map(e -> new User(e.getEmail(), "",
                 Collections.singleton(new SimpleGrantedAuthority("ROLE_CUSTOMER"))))
             .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
     }
 
-    @Override
     public String getRefreshToken(String email) {
-        return "refresh-token";
+        return (String) redisTemplate.opsForValue().get("RT-CUSTOMER:" + email);
     }
 
-    public void putRefreshToken(String email, String token){
-
+    public void putRefreshToken(String email, String token) {
+        redisTemplate.opsForValue()
+            .set("RT-CUSTOMER:" + email, token, JwtIssuer.EXPIRE_TIME, TimeUnit.MILLISECONDS);
     }
 
-    public void deleteRefreshToken(String email){
-
+    public void deleteRefreshToken(String email) {
+        redisTemplate.delete("RT-CUSTOMER:" + email);
     }
 
 }
