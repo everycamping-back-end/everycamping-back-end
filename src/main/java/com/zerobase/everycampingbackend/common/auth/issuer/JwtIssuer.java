@@ -25,7 +25,7 @@ public class JwtIssuer {
 
     private static final String SECRET_KEY = "secretKey";
     private static final String REFRESH_SUBJECT = "REFRESH";
-    private static final long EXPIRE_TIME = 1000 * 60 * 30;
+    public static final long EXPIRE_TIME = 1000 * 60 * 30;
     public static final String KEY_ROLES = "roles";
 
     @Bean

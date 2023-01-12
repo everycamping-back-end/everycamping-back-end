@@ -16,12 +16,9 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
@@ -41,11 +38,6 @@ public class JwtAuthenticationProvider {
         map.put(UserType.SELLER.name(), sellerService);
     }
 
-    @Bean
-    PasswordEncoder getPasswordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
     public boolean validateToken(String token) {
         if (!StringUtils.hasText(token)) {
             return false;
@@ -54,9 +46,12 @@ public class JwtAuthenticationProvider {
         if (claims == null) {
             return false;
         }
-        if (claims.getExpiration().before(new Date()) ||
-            ObjectUtils.isEmpty(
-                getUserDetailsService(claims).getRefreshToken(claims.getSubject()))) {
+        if (claims.getExpiration().before(new Date())){
+            throw new CustomException(ErrorCode.TOKEN_NOT_VALID);
+        }
+        UserVo userVo = jwtIssuer.getUserVo(claims);
+        if(ObjectUtils.isEmpty(
+                getUserDetailsService(claims).getRefreshToken(userVo.getEmail()))) {
             throw new CustomException(ErrorCode.TOKEN_NOT_VALID);
         }
         return true;

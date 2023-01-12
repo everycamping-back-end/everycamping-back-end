@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 public class Aes256Util {
 
   public static String alg = "AES/CBC/PKCS5Padding";
-  private static final String KEY = "EVERYCAMPINGISSHOP";
+  private static final String KEY = "ZEROBASEEVERYCAMPINGISSHOP".substring(0, 24);
   private static final String IV = KEY.substring(0, 16);
 
   public static String encrypt(String text){

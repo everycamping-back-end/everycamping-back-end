@@ -13,7 +13,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import net.bytebuddy.asm.Advice.Local;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Entity
 @Getter
@@ -36,11 +36,11 @@ public class Seller extends BaseEntity {
 
   private LocalDateTime deleteAt;  // 탈퇴일
 
-  public static Seller from(SignUpForm form) {
+  public static Seller from(SignUpForm form, PasswordEncoder passwordEncoder) {
     return Seller.builder()
         .email(form.getEmail().toLowerCase(Locale.ROOT))
+        .password(passwordEncoder.encode(form.getPassword()))
         .nickName(form.getNickName())
-        .password(form.getPassword())
         .phone(form.getPhoneNumber())
         .build();
   }
