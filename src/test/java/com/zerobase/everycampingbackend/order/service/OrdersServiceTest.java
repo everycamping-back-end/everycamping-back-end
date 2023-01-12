@@ -61,8 +61,8 @@ class OrdersServiceTest {
 
     //given
     Long customerId = createCustomer("ksj2083@naver.com");
-    Long productId1 = createProduct("텐트1", 5, ProductCategory.TENT);
-    Long productId2 = createProduct("텐트2", 5, ProductCategory.TENT);
+    Long productId1 = createProduct("텐트1", 300,5, ProductCategory.TENT);
+    Long productId2 = createProduct("텐트2", 200,5, ProductCategory.TENT);
 
     OrderProductForm form1 = OrderProductForm.builder().productId(productId1)
         .quantity(5)
@@ -91,11 +91,13 @@ class OrdersServiceTest {
 
     assertEquals(productId1, orderProduct1.getProduct().getId());
     assertEquals(5, orderProduct1.getQuantity());
+    assertEquals(300*5, orderProduct1.getAmount());
     assertEquals(orders.getId(), orderProduct1.getOrders().getId());
     assertEquals(product1.getStock(), 0);
 
     assertEquals(productId2, orderProduct2.getProduct().getId());
     assertEquals(4, orderProduct2.getQuantity());
+    assertEquals(200*4, orderProduct2.getAmount());
     assertEquals(orders.getId(), orderProduct2.getOrders().getId());
     assertEquals(product2.getStock(), 1);
   }
@@ -106,8 +108,8 @@ class OrdersServiceTest {
 
     //given
     Long customerId = createCustomer("ksj2083@naver.com");
-    Long productId1 = createProduct("텐트1", 5, ProductCategory.TENT);
-    Long productId2 = createProduct("텐트2", 5, ProductCategory.TENT);
+    Long productId1 = createProduct("텐트1", 300,5, ProductCategory.TENT);
+    Long productId2 = createProduct("텐트2", 200,5, ProductCategory.TENT);
 
     OrderProductForm form1 = OrderProductForm.builder().productId(productId1)
         .quantity(5)
@@ -136,10 +138,11 @@ class OrdersServiceTest {
     assertTrue(orderProductRepository.findAll().isEmpty());
   }
 
-  private Long createProduct(String name, int stock, ProductCategory category) {
+  private Long createProduct(String name, int price, int stock, ProductCategory category) {
     Product product = Product.builder()
         .name(name)
         .category(category)
+        .price(price)
         .stock(stock)
         .onSale(true)
         .build();
