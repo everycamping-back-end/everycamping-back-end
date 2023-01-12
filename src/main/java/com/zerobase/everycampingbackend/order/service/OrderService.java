@@ -36,19 +36,20 @@ public class OrderService {
                                                 .customer(customer)
                                                 .build());
 
-    form.getOrderProductFormList().stream().forEach(f ->
-        orderProduct(orders, f));
+    form.getOrderProductFormList().forEach(f -> orderProduct(orders, f));
   }
 
   private void orderProduct(Orders orders, OrderProductForm orderProductForm) {
 
     Product product = productService.getProductById(orderProductForm.getProductId());
     if (!product.isOnSale()) {
-      throw new CustomException(ErrorCode.PRODUCT_NOT_ENOUGH_STOCK);
-    }
-    if (product.getStock() < orderProductForm.getQuantity()) {
       throw new CustomException(ErrorCode.PRODUCT_NOT_ON_SALE);
     }
+    if (product.getStock() < orderProductForm.getQuantity()) {
+      throw new CustomException(ErrorCode.PRODUCT_NOT_ENOUGH_STOCK);
+    }
+
+    product.setStock(product.getStock()-orderProductForm.getQuantity()); //더티체킹
 
     orderProductRepository.save(OrderProduct.of(orders, product, orderProductForm.getQuantity()));
   }
