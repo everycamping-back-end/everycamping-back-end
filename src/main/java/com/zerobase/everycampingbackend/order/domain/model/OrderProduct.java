@@ -24,16 +24,16 @@ import lombok.Setter;
 @AllArgsConstructor
 public class OrderProduct extends BaseEntity {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "orders_id")
-  private Orders orders;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "orders_id")
+    private Orders orders;
 
-  // private Item item;
+    // private Item item;
 
-  Integer count;
-  Integer partialAmount;
+    Integer count;
+    Integer partialAmount;
 }

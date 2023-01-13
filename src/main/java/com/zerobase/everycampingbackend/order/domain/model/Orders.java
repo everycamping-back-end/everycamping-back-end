@@ -29,17 +29,17 @@ import lombok.Setter;
 @AllArgsConstructor
 public class Orders extends BaseEntity {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  // private Customer customer;
+    // private Customer customer;
 
-  @Enumerated(EnumType.STRING)
-  private OrderStatus status;
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
 
-  private Integer amount;
+    private Integer amount;
 
-  @OneToMany(mappedBy = "orders", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-  private List<OrderProduct> orderProductList;
+    @OneToMany(mappedBy = "orders", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<OrderProduct> orderProductList;
 }

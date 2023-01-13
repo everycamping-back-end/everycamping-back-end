@@ -27,66 +27,66 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class OrderServiceTest {
 
-  @Autowired
-  OrderService orderService;
+    @Autowired
+    OrderService orderService;
 
-  @Autowired
-  OrdersRepository ordersRepository;
+    @Autowired
+    OrdersRepository ordersRepository;
 
-  @Autowired
-  OrderProductRepository orderProductRepository;
+    @Autowired
+    OrderProductRepository orderProductRepository;
 
-  @AfterEach
-  public void clean() {
-    ordersRepository.deleteAll();
-    orderProductRepository.deleteAll();
-  }
+    @AfterEach
+    public void clean() {
+        ordersRepository.deleteAll();
+        orderProductRepository.deleteAll();
+    }
 
-  @Test
-  @DisplayName("주문 성공")
-  void createOrderSuccess() throws Exception {
+    @Test
+    @DisplayName("주문 성공")
+    void createOrderSuccess() throws Exception {
 
-    //given
-    List<CreateOrderProductForm> orderProductList = new ArrayList<>();
-    orderProductList.add(createOrderProductForm(0L, 3, 500));
-    orderProductList.add(createOrderProductForm(3L, 2, 500));
+        //given
+        List<CreateOrderProductForm> orderProductList = new ArrayList<>();
+        orderProductList.add(createOrderProductForm(0L, 3, 500));
+        orderProductList.add(createOrderProductForm(3L, 2, 500));
 
-    CreateOrderForm createOrderForm = new CreateOrderForm(orderProductList);
+        CreateOrderForm createOrderForm = new CreateOrderForm(orderProductList);
 
-    //when
-    Orders order = orderService.createOrder(createOrderForm);
+        //when
+        Orders order = orderService.createOrder(createOrderForm);
 
-    //then
-    assertEquals(order.getAmount(), 1000);
-  }
+        //then
+        assertEquals(order.getAmount(), 1000);
+    }
 
-  @Test
-  @DisplayName("주문 실패 - 총 금액이 1000원 미만이라서 실패")
-  void createOrderAmountUnder1000() throws Exception {
+    @Test
+    @DisplayName("주문 실패 - 총 금액이 1000원 미만이라서 실패")
+    void createOrderAmountUnder1000() throws Exception {
 
-    //given
-    List<CreateOrderProductForm> orderProductList = new ArrayList<>();
-    orderProductList.add(createOrderProductForm(0L, 3, 500));
-    orderProductList.add(createOrderProductForm(3L, 2, 499));
+        //given
+        List<CreateOrderProductForm> orderProductList = new ArrayList<>();
+        orderProductList.add(createOrderProductForm(0L, 3, 500));
+        orderProductList.add(createOrderProductForm(3L, 2, 499));
 
-    CreateOrderForm createOrderForm = new CreateOrderForm(orderProductList);
+        CreateOrderForm createOrderForm = new CreateOrderForm(orderProductList);
 
-    //when
-    CustomException ex = (CustomException)assertThrows(RuntimeException.class, () -> {
-      orderService.createOrder(createOrderForm);
-    });
+        //when
+        CustomException ex = (CustomException) assertThrows(RuntimeException.class, () -> {
+            orderService.createOrder(createOrderForm);
+        });
 
-    //then
-    assertEquals(ex.getErrorCode(), ErrorCode.ORDER_AMOUNT_UNDER_1000);
-  }
+        //then
+        assertEquals(ex.getErrorCode(), ErrorCode.ORDER_AMOUNT_UNDER_1000);
+    }
 
 
-  private CreateOrderProductForm createOrderProductForm(Long productId, Integer count,
-      Integer partialAmount) {
-    return CreateOrderProductForm.builder()
-        .productId(productId)
-        .count(count)
-        .partialAmount(partialAmount)
-        .build();
-  }
+    private CreateOrderProductForm createOrderProductForm(Long productId, Integer count,
+        Integer partialAmount) {
+        return CreateOrderProductForm.builder()
+            .productId(productId)
+            .count(count)
+            .partialAmount(partialAmount)
+            .build();
+    }
 }

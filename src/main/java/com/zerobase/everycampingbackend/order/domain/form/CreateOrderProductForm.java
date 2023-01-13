@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CreateOrderProductForm {
 
-  private Long productId;
-  private Integer count;
-  private Integer partialAmount;
+    private Long productId;
+    private Integer count;
+    private Integer partialAmount;
 }

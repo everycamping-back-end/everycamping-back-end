@@ -15,15 +15,15 @@ import lombok.ToString;
 @AllArgsConstructor
 public class OrderProductDto {
 
-  private Long id;
-  private Integer count;
-  private Integer partialAmount;
+    private Long id;
+    private Integer count;
+    private Integer partialAmount;
 
-  public static OrderProductDto from(OrderProduct orderProduct) {
-    return OrderProductDto.builder()
-        .id(orderProduct.getId())
-        .count(orderProduct.getCount())
-        .partialAmount(orderProduct.getPartialAmount())
-        .build();
-  }
+    public static OrderProductDto from(OrderProduct orderProduct) {
+        return OrderProductDto.builder()
+            .id(orderProduct.getId())
+            .count(orderProduct.getCount())
+            .partialAmount(orderProduct.getPartialAmount())
+            .build();
+    }
 }
