@@ -13,9 +13,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CreateCartForm {
 
-  @NotNull
-  Long customerId;
+    @NotNull
+    Long customerId;
 
-  @Min(1)
-  Integer quantity;
+    @Min(1)
+    Integer quantity;
 }

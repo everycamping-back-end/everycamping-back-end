@@ -12,8 +12,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CartRepository extends JpaRepository<CartProduct, Long> {
 
-  @EntityGraph(attributePaths = {"product"}, type = EntityGraphType.LOAD)
-  Page<CartProduct> findAllByCustomerId(Long customerId, Pageable pageable);
+    @EntityGraph(attributePaths = {"product"}, type = EntityGraphType.LOAD)
+    Page<CartProduct> findAllByCustomerId(Long customerId, Pageable pageable);
 
-  Optional<CartProduct> findByCustomerIdAndProductId(Long customerId, Long productId);
+    Optional<CartProduct> findByCustomerIdAndProductId(Long customerId, Long productId);
 }
