@@ -1,20 +1,14 @@
 package com.zerobase.everycampingbackend.common.auth.provider;
 
 
-import com.zerobase.everycampingbackend.common.auth.CustomUserDetailsService;
 import com.zerobase.everycampingbackend.common.auth.issuer.JwtIssuer;
 import com.zerobase.everycampingbackend.common.auth.model.JwtDto;
-import com.zerobase.everycampingbackend.common.auth.model.UserType;
 import com.zerobase.everycampingbackend.common.auth.model.UserVo;
+import com.zerobase.everycampingbackend.common.auth.service.CustomUserDetailsServiceImpl;
 import com.zerobase.everycampingbackend.common.exception.CustomException;
 import com.zerobase.everycampingbackend.common.exception.ErrorCode;
-import com.zerobase.everycampingbackend.user.service.CustomerService;
-import com.zerobase.everycampingbackend.user.service.SellerService;
 import io.jsonwebtoken.Claims;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import javax.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -27,16 +21,8 @@ import org.springframework.util.StringUtils;
 @RequiredArgsConstructor
 public class JwtAuthenticationProvider {
 
-    private final CustomerService customerService;
-    private final SellerService sellerService;
+    private final CustomUserDetailsServiceImpl customUserDetailsService;
     private final JwtIssuer jwtIssuer;
-    private final Map<String, CustomUserDetailsService> map = new HashMap<>();
-
-    @PostConstruct
-    public void init() {
-        map.put(UserType.CUSTOMER.name(), customerService);
-        map.put(UserType.SELLER.name(), sellerService);
-    }
 
     public boolean validateToken(String token) {
         if (!StringUtils.hasText(token)) {
@@ -46,14 +32,15 @@ public class JwtAuthenticationProvider {
         if (claims == null) {
             return false;
         }
-        if (claims.getExpiration().before(new Date())){
-            throw new CustomException(ErrorCode.TOKEN_NOT_VALID);
+        if (claims.getExpiration().before(new Date())) {
+            throw new CustomException(ErrorCode.TOKEN_NOT_ALIVE);
         }
         UserVo userVo = jwtIssuer.getUserVo(claims);
-        if(ObjectUtils.isEmpty(
-                getUserDetailsService(claims).getRefreshToken(userVo.getEmail()))) {
+        if (ObjectUtils.isEmpty(
+            customUserDetailsService.getRefreshToken(getRoleFromClaims(claims), userVo.getEmail()))) {
             throw new CustomException(ErrorCode.TOKEN_NOT_VALID);
         }
+
         return true;
     }
 
@@ -64,6 +51,11 @@ public class JwtAuthenticationProvider {
         }
 
         Claims accessClaims = jwtIssuer.getClaims(jwtDto.getAccessToken());
+
+        if (accessClaims != null && accessClaims.getExpiration().after(new Date())) {
+            throw new CustomException(ErrorCode.TOKEN_STILL_ALIVE);
+        }
+
         Claims refreshClaims = jwtIssuer.getClaims(jwtDto.getRefreshToken());
 
         return accessClaims != null && refreshClaims != null;
@@ -72,14 +64,15 @@ public class JwtAuthenticationProvider {
     public Authentication getAuthentication(String token) {
         Claims claims = jwtIssuer.getClaims(token);
         UserVo userVo = jwtIssuer.getUserVo(claims);
-        UserDetails userDetails = getUserDetailsService(claims).loadUserByUsername(userVo.getEmail());
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(
+            getRoleFromClaims(claims), userVo.getEmail());
 
         return new UsernamePasswordAuthenticationToken(userDetails, userVo,
             userDetails.getAuthorities());
     }
 
-    private CustomUserDetailsService getUserDetailsService(Claims claims) {
-        return map.get(claims.get(JwtIssuer.KEY_ROLES, String.class));
+    public String getRoleFromClaims(Claims claims) {
+        return claims.get(JwtIssuer.KEY_ROLES, String.class);
     }
 
 }

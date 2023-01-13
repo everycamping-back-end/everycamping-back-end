@@ -1,23 +1,19 @@
 package com.zerobase.everycampingbackend.user.service;
 
-import com.zerobase.everycampingbackend.common.auth.CustomUserDetailsService;
 import com.zerobase.everycampingbackend.common.auth.issuer.JwtIssuer;
 import com.zerobase.everycampingbackend.common.auth.model.JwtDto;
 import com.zerobase.everycampingbackend.common.auth.model.UserType;
+import com.zerobase.everycampingbackend.common.auth.service.CustomUserDetailsService;
 import com.zerobase.everycampingbackend.common.exception.CustomException;
 import com.zerobase.everycampingbackend.common.exception.ErrorCode;
 import com.zerobase.everycampingbackend.user.domain.entity.Customer;
 import com.zerobase.everycampingbackend.user.domain.form.SignInForm;
 import com.zerobase.everycampingbackend.user.domain.form.SignUpForm;
 import com.zerobase.everycampingbackend.user.domain.repository.CustomerRepository;
-import java.util.Collections;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,7 +35,6 @@ public class CustomerService implements CustomUserDetailsService {
         customerRepository.save(Customer.from(form, passwordEncoder));
     }
 
-
     public JwtDto signIn(SignInForm form) {
         Customer customer = getCustomerByEmail(form.getEmail().toLowerCase(Locale.ROOT));
 
@@ -47,21 +42,18 @@ public class CustomerService implements CustomUserDetailsService {
             throw new CustomException(ErrorCode.LOGIN_CHECK_FAIL);
         }
 
-        JwtDto jwtDto = jwtIssuer.createToken(customer.getEmail(), customer.getId(), UserType.CUSTOMER);
-
-        putRefreshToken(customer.getEmail(), jwtDto.getRefreshToken());
-
-        return jwtDto;
+        return issueJwt(customer.getEmail(), customer.getId());
     }
 
-    public void signOut(String email){
+    public void signOut(String email) {
         deleteRefreshToken(email);
     }
 
-    public Optional<Customer> findByIdAndEmail(Long id, String email) {
-        return customerRepository.findById(id)
-            .stream().filter(customer -> customer.getEmail().equals(email))
-            .findFirst();
+    @Override
+    public JwtDto issueJwt(String email, Long id) {
+        JwtDto jwtDto = jwtIssuer.createToken(email, id, UserType.CUSTOMER.name());
+        putRefreshToken(email, jwtDto.getRefreshToken());
+        return jwtDto;
     }
 
     public Customer getCustomerById(Long customerId) {
@@ -76,22 +68,20 @@ public class CustomerService implements CustomUserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return customerRepository.findByEmail(email)
-            .map(e -> new User(e.getEmail(), "",
-                Collections.singleton(new SimpleGrantedAuthority("ROLE_CUSTOMER"))))
-            .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        return getCustomerByEmail(email);
     }
 
+    @Override
     public String getRefreshToken(String email) {
         return (String) redisTemplate.opsForValue().get("RT-CUSTOMER:" + email);
     }
 
-    public void putRefreshToken(String email, String token) {
+    private void putRefreshToken(String email, String token) {
         redisTemplate.opsForValue()
-            .set("RT-CUSTOMER:" + email, token, JwtIssuer.EXPIRE_TIME, TimeUnit.MILLISECONDS);
+            .set("RT-CUSTOMER:" + email, token, JwtIssuer.EXPIRE_TIME * 2, TimeUnit.MILLISECONDS);
     }
 
-    public void deleteRefreshToken(String email) {
+    private void deleteRefreshToken(String email) {
         redisTemplate.delete("RT-CUSTOMER:" + email);
     }
 

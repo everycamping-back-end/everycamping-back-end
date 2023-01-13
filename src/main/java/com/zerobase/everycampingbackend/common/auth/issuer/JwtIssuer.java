@@ -2,7 +2,6 @@ package com.zerobase.everycampingbackend.common.auth.issuer;
 
 
 import com.zerobase.everycampingbackend.common.auth.model.JwtDto;
-import com.zerobase.everycampingbackend.common.auth.model.UserType;
 import com.zerobase.everycampingbackend.common.auth.model.UserVo;
 import com.zerobase.everycampingbackend.common.auth.util.Aes256Util;
 import com.zerobase.everycampingbackend.common.exception.CustomException;
@@ -33,10 +32,10 @@ public class JwtIssuer {
         return new BCryptPasswordEncoder();
     }
 
-    public JwtDto createToken(String userEmail, Long id, UserType userType) {
+    public JwtDto createToken(String userEmail, Long id, String role) {
         Claims claims = Jwts.claims().setSubject(Aes256Util.encrypt(userEmail))
             .setId(Aes256Util.encrypt(id.toString()));
-        claims.put(KEY_ROLES, userType.name());
+        claims.put(KEY_ROLES, role);
 
         Date now = new Date();
 
