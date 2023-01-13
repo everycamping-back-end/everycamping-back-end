@@ -12,15 +12,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderForm {
-  private Long customerId; //임시
-  private List<OrderProductForm> orderProductFormList;
 
-  @Getter
-  @Builder
-  @NoArgsConstructor
-  @AllArgsConstructor
-  public static class OrderProductForm {
-    private Long productId;
-    private Integer quantity;
-  }
+    private Long customerId; //임시
+    private List<OrderProductForm> orderProductFormList;
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class OrderProductForm {
+
+        private Long productId;
+        private Integer quantity;
+    }
 }

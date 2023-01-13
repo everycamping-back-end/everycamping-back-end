@@ -14,17 +14,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class OrderController {
 
-  private final OrderService orderService;
+    private final OrderService orderService;
 
-  // @PostMapping
-  // public ResponseEntity<OrderDto> order(@AuthenticationPrincipal UserDetails loggedInUser,
-  // 	@RequestBody CreateOrderForm form) {
-  // 	return ResponseEntity.ok(OrderDto.from(orderService.order(loggedInUser, form)));
-  // }
+    // @PostMapping
+    // public ResponseEntity<OrderDto> order(@AuthenticationPrincipal UserDetails loggedInUser,
+    // 	@RequestBody CreateOrderForm form) {
+    // 	return ResponseEntity.ok(OrderDto.from(orderService.order(loggedInUser, form)));
+    // }
 
-  @PostMapping
-  public ResponseEntity order(@RequestBody OrderForm form) {
-    orderService.order(form);
-    return ResponseEntity.ok().build();
-  }
+    @PostMapping
+    public ResponseEntity order(@RequestBody OrderForm form) {
+        orderService.order(form);
+        return ResponseEntity.ok().build();
+    }
 }
