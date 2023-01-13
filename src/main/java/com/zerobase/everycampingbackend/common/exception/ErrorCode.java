@@ -29,8 +29,9 @@ public enum ErrorCode {
   REVIEW_WRITER_NOT_QUALIFIED(HttpStatus.BAD_REQUEST, "리뷰 작성은 해당 상품을 구매한 고객만 가능합니다."),
   REVIEW_EDITOR_NOT_MATCHED(HttpStatus.BAD_REQUEST, "리뷰 수정/삭제 권한이 없습니다."),
 
-  TOKEN_NOT_VALID(HttpStatus.BAD_REQUEST, "유효하지 않은 토큰입니다."),
-  TOKEN_STILL_VALID(HttpStatus.BAD_REQUEST, "재발급 대상 토큰이 아닙니다."),
+  TOKEN_NOT_VALID(HttpStatus.FORBIDDEN, "유효하지 않은 토큰입니다."),
+  TOKEN_STILL_ALIVE(HttpStatus.BAD_REQUEST, "재발급 대상 토큰이 아닙니다."),
+  TOKEN_NOT_ALIVE(HttpStatus.BAD_REQUEST, "재발급 대상 토큰입니다."),
 
   ;
 

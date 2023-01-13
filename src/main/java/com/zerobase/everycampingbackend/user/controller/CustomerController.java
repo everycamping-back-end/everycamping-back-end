@@ -2,12 +2,14 @@ package com.zerobase.everycampingbackend.user.controller;
 
 
 import com.zerobase.everycampingbackend.common.auth.model.JwtDto;
+import com.zerobase.everycampingbackend.common.auth.service.JwtReissueService;
+import com.zerobase.everycampingbackend.user.domain.entity.Customer;
 import com.zerobase.everycampingbackend.user.domain.form.SignInForm;
 import com.zerobase.everycampingbackend.user.domain.form.SignUpForm;
 import com.zerobase.everycampingbackend.user.service.CustomerService;
-import java.security.Principal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class CustomerController {
 
     private final CustomerService customerService;
+    private final JwtReissueService jwtReissueService;
 
     @PostMapping("/signup")
     public ResponseEntity<?> customerSignUp(@RequestBody SignUpForm form) {
@@ -34,9 +37,14 @@ public class CustomerController {
     }
 
     @GetMapping("/signout")
-    public ResponseEntity<?> customerSignOut(Principal principal){
-        customerService.signOut(principal.getName());
+    public ResponseEntity<?> customerSignOut(@AuthenticationPrincipal Customer customer){
+        customerService.signOut(customer.getEmail());
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/reissue")
+    public ResponseEntity<JwtDto> jwtReissue(@RequestBody JwtDto jwtDto){
+        return ResponseEntity.ok(jwtReissueService.reissue(jwtDto));
     }
 
 }
