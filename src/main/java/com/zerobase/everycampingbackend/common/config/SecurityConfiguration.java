@@ -31,8 +31,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         "/"
         , "/customers/signin"
         , "/customers/signup"
+        , "/customers/reissue"
         , "/sellers/signin"
         , "/sellers/signup"
+        , "/sellers/reissue"
         , "/test/**"
     };
 
@@ -43,7 +45,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    public void configure(WebSecurity web) throws Exception {
+    public void configure(WebSecurity web) {
         web.ignoring().antMatchers(AUTH_IGNORELIST);
     }
 
