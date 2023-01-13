@@ -13,9 +13,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UpdateQuantityForm {
 
-  @NotNull
-  Long customerId;
+    @NotNull
+    Long customerId;
 
-  @Min(1)
-  Integer updateQuantity;
+    @Min(1)
+    Integer updateQuantity;
 }
