@@ -24,7 +24,7 @@ public class ProductDetailDto {
     private String description;
     private int stock;
     private int price;
-    private String imagePath;
+    private String detailImageUri;
     private List<String> tags;
     private boolean onSale;
     private int reviewCount;
@@ -42,7 +42,7 @@ public class ProductDetailDto {
             .description(product.getDescription())
             .stock(product.getStock())
             .price(product.getPrice())
-            .imagePath(product.getDetailImagePath())
+            .detailImageUri(product.getDetailImageUri())
             .tags(product.getTags())
             .onSale(product.isOnSale())
             .reviewCount(product.getReviewCount())

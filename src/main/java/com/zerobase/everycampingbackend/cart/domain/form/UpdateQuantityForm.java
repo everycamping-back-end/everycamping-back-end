@@ -11,11 +11,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateCartForm {
+public class UpdateQuantityForm {
 
     @NotNull
     Long customerId;
 
     @Min(1)
-    Integer quantity;
+    Integer updateQuantity;
 }

@@ -22,29 +22,29 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Cart extends BaseEntity {
+public class CartProduct extends BaseEntity {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  //N:1 단방향
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "customer_id")
-  private Customer customer;
+    //N:1 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
 
-  //N:1 단방향
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "product_id")
-  private Product product;
+    //N:1 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
+    private Product product;
 
-  private Integer count;
+    private Integer quantity;
 
-  public static Cart of(Product product, Customer customer, Integer count){
-    return Cart.builder()
-        .count(count)
-        .customer(customer)
-        .product(product)
-        .build();
-  }
+    public static CartProduct of(Product product, Customer customer, Integer count) {
+        return CartProduct.builder()
+            .quantity(count)
+            .customer(customer)
+            .product(product)
+            .build();
+    }
 }
