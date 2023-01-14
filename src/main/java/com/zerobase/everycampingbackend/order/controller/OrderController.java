@@ -41,8 +41,12 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getOrdersByCustomer(form, customerId, pageable));
     }
 
-//    @GetMapping
-//    public ResponseEntity getOrdersBySeller(@RequestParam @NotNull Long sellerId) {
-//
-//    }
+    @GetMapping("seller")
+    public ResponseEntity<Page<OrderProductBySellerDto>> getOrdersBySeller(
+        @ModelAttribute SearchOrderBySellerForm form,
+        @RequestParam @NotNull Long sellerId,
+        Pageable pageable) {
+
+        return ResponseEntity.ok(orderService.getOrdersBySeller(form, sellerId, pageable));
+    }
 }

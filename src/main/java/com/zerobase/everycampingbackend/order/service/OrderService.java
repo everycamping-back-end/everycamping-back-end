@@ -3,11 +3,13 @@ package com.zerobase.everycampingbackend.order.service;
 import com.zerobase.everycampingbackend.common.exception.CustomException;
 import com.zerobase.everycampingbackend.common.exception.ErrorCode;
 import com.zerobase.everycampingbackend.order.domain.dto.OrderProductByCustomerDto;
+import com.zerobase.everycampingbackend.order.domain.dto.OrderProductBySellerDto;
 import com.zerobase.everycampingbackend.order.domain.entity.OrderProduct;
 import com.zerobase.everycampingbackend.order.domain.entity.Orders;
 import com.zerobase.everycampingbackend.order.domain.form.OrderForm;
 import com.zerobase.everycampingbackend.order.domain.form.OrderForm.OrderProductForm;
 import com.zerobase.everycampingbackend.order.domain.form.SearchOrderByCustomerForm;
+import com.zerobase.everycampingbackend.order.domain.form.SearchOrderBySellerForm;
 import com.zerobase.everycampingbackend.order.domain.repository.OrderProductRepository;
 import com.zerobase.everycampingbackend.order.domain.repository.OrdersRepository;
 import com.zerobase.everycampingbackend.product.domain.entity.Product;
@@ -62,5 +64,10 @@ public class OrderService {
     public Page<OrderProductByCustomerDto> getOrdersByCustomer(SearchOrderByCustomerForm form,
         Long customerId, Pageable pageable) {
         return orderProductRepository.searchByCustomer(form, customerId, pageable);
+    }
+
+    public Page<OrderProductBySellerDto> getOrdersBySeller(SearchOrderBySellerForm form,
+        Long sellerId, Pageable pageable) {
+        return orderProductRepository.searchBySeller(form, sellerId, pageable);
     }
 }
