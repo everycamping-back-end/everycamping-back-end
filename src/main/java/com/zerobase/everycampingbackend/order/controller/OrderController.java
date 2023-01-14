@@ -1,8 +1,10 @@
 package com.zerobase.everycampingbackend.order.controller;
 
 import com.zerobase.everycampingbackend.order.domain.dto.OrderProductByCustomerDto;
+import com.zerobase.everycampingbackend.order.domain.dto.OrderProductBySellerDto;
 import com.zerobase.everycampingbackend.order.domain.form.OrderForm;
 import com.zerobase.everycampingbackend.order.domain.form.SearchOrderByCustomerForm;
+import com.zerobase.everycampingbackend.order.domain.form.SearchOrderBySellerForm;
 import com.zerobase.everycampingbackend.order.service.OrderService;
 import javax.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +32,7 @@ public class OrderController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping
+    @GetMapping("/customer")
     public ResponseEntity<Page<OrderProductByCustomerDto>> getOrdersByCustomer(
         @ModelAttribute SearchOrderByCustomerForm form,
         @RequestParam @NotNull Long customerId,

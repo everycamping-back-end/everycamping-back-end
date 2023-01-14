@@ -31,16 +31,4 @@ public class OrderProductByCustomerDto {
     //판매자 관련 정보
     private Long sellerId;
     private String sellerNickName;
-
-//  public static OrderByCustomerDto from(Orders orders) {
-//    List<OrderProductDto> orderProductList = orders.getOrderProductList()
-//        .stream().map(e -> OrderProductDto.from(e)).collect(Collectors.toList());
-//
-//    return OrderByCustomerDto.builder()
-//        .id(orders.getId())
-//        .status(orders.getStatus())
-//        .amount(orders.getAmount())
-//        .orderProductList(orderProductList)
-//        .build();
-//  }
 }

@@ -15,7 +15,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 @AllArgsConstructor
 public class SearchOrderByCustomerForm {
 
-
     private String productName;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
