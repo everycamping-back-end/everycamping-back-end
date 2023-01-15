@@ -12,6 +12,7 @@ import com.zerobase.everycampingbackend.order.domain.form.SearchOrderByCustomerF
 import com.zerobase.everycampingbackend.order.domain.form.SearchOrderBySellerForm;
 import com.zerobase.everycampingbackend.order.domain.repository.OrderProductRepository;
 import com.zerobase.everycampingbackend.order.domain.repository.OrdersRepository;
+import com.zerobase.everycampingbackend.order.type.OrderStatus;
 import com.zerobase.everycampingbackend.product.domain.entity.Product;
 import com.zerobase.everycampingbackend.product.service.ProductService;
 import com.zerobase.everycampingbackend.user.domain.entity.Customer;
@@ -70,4 +71,27 @@ public class OrderService {
         Long sellerId, Pageable pageable) {
         return orderProductRepository.searchBySeller(form, sellerId, pageable);
     }
+
+    @Transactional
+    public void confirm(Customer customer, Long orderProductId) {
+
+        OrderProduct orderProduct = orderProductRepository.findById(orderProductId)
+            .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUNT));
+
+        if(!orderProduct.getOrders().getCustomer().getId().equals(customer.getId())) {
+            throw new CustomException(ErrorCode.NOT_AUTHORISED);
+        }
+
+        if(orderProduct.getStatus().equals(OrderStatus.CONFIRM)) {
+            throw new CustomException(ErrorCode.ORDER_ALREADY_CONFIRMED);
+        }
+
+        if(orderProduct.getStatus().equals(OrderStatus.CANCEL)) {
+            throw new CustomException(ErrorCode.ORDER_ALREADY_CANCELED);
+        }
+
+        orderProduct.setStatus(OrderStatus.CONFIRM);
+    }
+
+
 }

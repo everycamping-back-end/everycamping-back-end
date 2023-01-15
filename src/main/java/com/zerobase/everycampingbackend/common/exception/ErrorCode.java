@@ -14,6 +14,10 @@ public enum ErrorCode {
 
   CART_PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "장바구니에 들어있지 않은 상품입니다."),
 
+  ORDER_NOT_FOUNT(HttpStatus.NOT_FOUND, "존재하지 않는 주문입니다."),
+  ORDER_ALREADY_CONFIRMED(HttpStatus.BAD_REQUEST, "이미 구매확정된 주문입니다."),
+  ORDER_ALREADY_CANCELED(HttpStatus.BAD_REQUEST, "이미 취소된 주문입니다."),
+
 
   LOGIN_CHECK_FAIL(HttpStatus.BAD_REQUEST, "일치하는 정보가 없습니다."),
   USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "존재하지 않는 회원입니다."),
@@ -32,6 +36,8 @@ public enum ErrorCode {
   TOKEN_NOT_VALID(HttpStatus.FORBIDDEN, "유효하지 않은 토큰입니다."),
   TOKEN_STILL_ALIVE(HttpStatus.BAD_REQUEST, "재발급 대상 토큰이 아닙니다."),
   TOKEN_NOT_ALIVE(HttpStatus.BAD_REQUEST, "재발급 대상 토큰입니다."),
+
+  NOT_AUTHORISED(HttpStatus.UNAUTHORIZED, "권한이 없습니다.")
 
   ;
 

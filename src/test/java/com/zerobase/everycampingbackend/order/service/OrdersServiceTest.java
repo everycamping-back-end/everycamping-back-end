@@ -14,6 +14,7 @@ import com.zerobase.everycampingbackend.order.domain.form.OrderForm.OrderProduct
 import com.zerobase.everycampingbackend.order.domain.form.SearchOrderByCustomerForm;
 import com.zerobase.everycampingbackend.order.domain.repository.OrderProductRepository;
 import com.zerobase.everycampingbackend.order.domain.repository.OrdersRepository;
+import com.zerobase.everycampingbackend.order.type.OrderStatus;
 import com.zerobase.everycampingbackend.product.domain.entity.Product;
 import com.zerobase.everycampingbackend.product.domain.repository.ProductRepository;
 import com.zerobase.everycampingbackend.product.type.ProductCategory;
@@ -185,6 +186,40 @@ class OrdersServiceTest {
         assertEquals("텐트1", dto2.getProductName());
 
     }
+
+    @Test
+    @DisplayName("구매확정 성공")
+    void confirmSuccess() throws Exception {
+
+        //given
+        Long customerId = createCustomer("ksj2083@naver.com");
+        Customer customer = customerRepository.findById(customerId).orElseThrow();
+
+        Long productId1 = createProduct("텐트1", 300, 10, ProductCategory.TENT);
+
+        OrderProductForm form1 = OrderProductForm.builder().productId(productId1)
+            .quantity(5)
+            .build();
+
+        OrderForm orderForm = OrderForm.builder()
+            .customerId(customerId)
+            .orderProductFormList(List.of(form1))
+            .build();
+
+        orderService.order(orderForm);
+
+        OrderProduct orderProduct = orderProductRepository.findAll().get(0);
+        Long orderProductId = orderProduct.getId();
+
+        //when
+        orderService.confirm(customer, orderProductId);
+
+        //then
+        OrderProduct result = orderProductRepository.findAll().get(0);
+        assertEquals(result.getId(), orderProductId);
+        assertEquals(result.getStatus(), OrderStatus.CONFIRM);
+    }
+
 
     private Long createProduct(String name, int price, int stock, ProductCategory category) {
         Product product = Product.builder()
