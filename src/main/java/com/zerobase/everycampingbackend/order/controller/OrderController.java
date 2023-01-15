@@ -62,4 +62,11 @@ public class OrderController {
         return ResponseEntity.ok().build();
     }
 
+    @PatchMapping("/{orderProductId}/cancel")
+    public ResponseEntity cancel(@AuthenticationPrincipal Customer customer,
+        @PathVariable @NotNull Long orderProductId) {
+
+        orderService.cancel(customer, orderProductId);
+        return ResponseEntity.ok().build();
+    }
 }

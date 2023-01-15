@@ -93,5 +93,27 @@ public class OrderService {
         orderProduct.setStatus(OrderStatus.CONFIRM);
     }
 
+    @Transactional
+    public void cancel(Customer customer, Long orderProductId) {
 
+        OrderProduct orderProduct = orderProductRepository.findById(orderProductId)
+            .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUNT));
+
+        if(!orderProduct.getOrders().getCustomer().getId().equals(customer.getId())) {
+            throw new CustomException(ErrorCode.NOT_AUTHORISED);
+        }
+
+        if(orderProduct.getStatus().equals(OrderStatus.CONFIRM)) {
+            throw new CustomException(ErrorCode.ORDER_ALREADY_CONFIRMED);
+        }
+
+        if(orderProduct.getStatus().equals(OrderStatus.CANCEL)) {
+            throw new CustomException(ErrorCode.ORDER_ALREADY_CANCELED);
+        }
+
+        orderProduct.getProduct().setStock(
+            orderProduct.getProduct().getStock() - orderProduct.getQuantity());
+
+        orderProduct.setStatus(OrderStatus.CANCEL);
+    }
 }
