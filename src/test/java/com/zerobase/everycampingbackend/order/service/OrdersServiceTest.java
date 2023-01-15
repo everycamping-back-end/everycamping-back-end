@@ -6,29 +6,33 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.zerobase.everycampingbackend.common.exception.CustomException;
 import com.zerobase.everycampingbackend.common.exception.ErrorCode;
+import com.zerobase.everycampingbackend.order.domain.dto.OrderProductByCustomerDto;
 import com.zerobase.everycampingbackend.order.domain.entity.OrderProduct;
 import com.zerobase.everycampingbackend.order.domain.entity.Orders;
 import com.zerobase.everycampingbackend.order.domain.form.OrderForm;
 import com.zerobase.everycampingbackend.order.domain.form.OrderForm.OrderProductForm;
+import com.zerobase.everycampingbackend.order.domain.form.SearchOrderByCustomerForm;
 import com.zerobase.everycampingbackend.order.domain.repository.OrderProductRepository;
 import com.zerobase.everycampingbackend.order.domain.repository.OrdersRepository;
 import com.zerobase.everycampingbackend.product.domain.entity.Product;
 import com.zerobase.everycampingbackend.product.domain.repository.ProductRepository;
 import com.zerobase.everycampingbackend.product.type.ProductCategory;
 import com.zerobase.everycampingbackend.user.domain.entity.Customer;
+import com.zerobase.everycampingbackend.user.domain.entity.Seller;
 import com.zerobase.everycampingbackend.user.domain.repository.CustomerRepository;
+import com.zerobase.everycampingbackend.user.domain.repository.SellerRepository;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.TestPropertySource;
 
 @SpringBootTest
 @TestPropertySource(locations = "classpath:application-test.properties")
-@TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class OrdersServiceTest {
 
     @Autowired
@@ -45,6 +49,9 @@ class OrdersServiceTest {
 
     @Autowired
     CustomerRepository customerRepository;
+
+    @Autowired
+    SellerRepository sellerRepository;
 
     @AfterEach
     void clean() {
@@ -137,6 +144,48 @@ class OrdersServiceTest {
         assertTrue(orderProductRepository.findAll().isEmpty());
     }
 
+    @Test
+    @DisplayName("고객 주문 조회 성공 - 전체 조회")
+    void getOrdersByCustomerSuccess() throws Exception {
+
+        //given
+        Long customerId = createCustomer("ksj2083@naver.com");
+        Long productId1 = createProduct("텐트1", 300, 10, ProductCategory.TENT);
+        Long productId2 = createProduct("텐트2", 200, 10, ProductCategory.TENT);
+
+        OrderProductForm form1 = OrderProductForm.builder().productId(productId1)
+            .quantity(5)
+            .build();
+
+        OrderProductForm form2 = OrderProductForm.builder().productId(productId2)
+            .quantity(4)
+            .build();
+
+        OrderForm orderForm = OrderForm.builder()
+            .customerId(customerId)
+            .orderProductFormList(List.of(form1, form2))
+            .build();
+
+        orderService.order(orderForm);
+
+        SearchOrderByCustomerForm form = SearchOrderByCustomerForm.builder().build();
+        PageRequest pageRequest = PageRequest.of(0, 5);
+
+        //when
+        Page<OrderProductByCustomerDto> result = orderService.getOrdersByCustomer(form,
+            customerId, pageRequest);
+
+        //then
+        OrderProductByCustomerDto dto1 = result.getContent().get(0);
+        OrderProductByCustomerDto dto2 = result.getContent().get(1);
+
+        assertEquals(productId2, dto1.getProductId());
+        assertEquals(productId1, dto2.getProductId());
+        assertEquals("텐트2", dto1.getProductName());
+        assertEquals("텐트1", dto2.getProductName());
+
+    }
+
     private Long createProduct(String name, int price, int stock, ProductCategory category) {
         Product product = Product.builder()
             .name(name)
@@ -144,6 +193,7 @@ class OrdersServiceTest {
             .price(price)
             .stock(stock)
             .onSale(true)
+            .seller(createSeller())
             .build();
 
         Product saved = productRepository.save(product);
@@ -157,5 +207,14 @@ class OrdersServiceTest {
 
         Customer saved = customerRepository.save(customer);
         return saved.getId();
+    }
+
+    private Seller createSeller() {
+        Seller seller = Seller.builder()
+            .email("seller@naver.com")
+            .nickName("판매자닉네임")
+            .build();
+
+        return sellerRepository.save(seller);
     }
 }
