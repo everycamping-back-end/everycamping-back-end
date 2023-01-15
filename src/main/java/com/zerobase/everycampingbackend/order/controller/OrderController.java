@@ -7,7 +7,6 @@ import com.zerobase.everycampingbackend.order.domain.form.SearchOrderByCustomerF
 import com.zerobase.everycampingbackend.order.domain.form.SearchOrderBySellerForm;
 import com.zerobase.everycampingbackend.order.service.OrderService;
 import com.zerobase.everycampingbackend.user.domain.entity.Customer;
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,6 +16,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,7 +45,7 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getOrdersByCustomer(form, customerId, pageable));
     }
 
-    @GetMapping("seller")
+    @GetMapping("/seller")
     public ResponseEntity<Page<OrderProductBySellerDto>> getOrdersBySeller(
         @ModelAttribute SearchOrderBySellerForm form,
         @RequestParam @NotNull Long sellerId,
@@ -54,11 +54,12 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getOrdersBySeller(form, sellerId, pageable));
     }
 
-    @PatchMapping
+    @PatchMapping("/{orderProductId}/confirm")
     public ResponseEntity confirm(@AuthenticationPrincipal Customer customer,
-        @RequestBody @Valid @NotNull Long orderProductId) {
+        @PathVariable @NotNull Long orderProductId) {
 
         orderService.confirm(customer, orderProductId);
         return ResponseEntity.ok().build();
     }
+
 }
