@@ -23,7 +23,7 @@ public class OrderProductBySellerDto {
     private String imagePath;
 
     //주문 관련정보
-    private Long orderId;
+    private Long orderProductId;
     private Integer quantity;
     private Integer amount;
     private OrderStatus status;
