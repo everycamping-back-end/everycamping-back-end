@@ -31,7 +31,7 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping
-    public ResponseEntity order(@RequestBody OrderForm form) {
+    public ResponseEntity<?> order(@RequestBody OrderForm form) {
         orderService.order(form);
         return ResponseEntity.ok().build();
     }
@@ -55,7 +55,7 @@ public class OrderController {
     }
 
     @PatchMapping("/{orderProductId}/confirm")
-    public ResponseEntity confirm(@AuthenticationPrincipal Customer customer,
+    public ResponseEntity<?> confirm(@AuthenticationPrincipal Customer customer,
         @PathVariable @NotNull Long orderProductId) {
 
         orderService.confirm(customer, orderProductId);
@@ -63,7 +63,7 @@ public class OrderController {
     }
 
     @PatchMapping("/{orderProductId}/cancel")
-    public ResponseEntity cancel(@AuthenticationPrincipal Customer customer,
+    public ResponseEntity<?> cancel(@AuthenticationPrincipal Customer customer,
         @PathVariable @NotNull Long orderProductId) {
 
         orderService.cancel(customer, orderProductId);

@@ -32,7 +32,7 @@ public class CartController {
      * token을받아서 사용하는 방법이 정립되지 않았기 때문에 임시로 Customer_id(pk)를 받도록 구현하였음.
      */
     @PostMapping("/add/{productId}")
-    public ResponseEntity createCarts(@RequestBody @Valid CreateCartForm form,
+    public ResponseEntity<?> createCarts(@RequestBody @Valid CreateCartForm form,
         @PathVariable Long productId) {
 
         cartService.createCart(form, productId);
@@ -51,7 +51,7 @@ public class CartController {
     }
 
     @PatchMapping("/{productId}")
-    public ResponseEntity updateQuantity(@RequestBody @Valid UpdateQuantityForm updateQuantityForm,
+    public ResponseEntity<?> updateQuantity(@RequestBody @Valid UpdateQuantityForm updateQuantityForm,
         @PathVariable Long productId) {
 
         cartService.updateQuantity(productId, updateQuantityForm);
@@ -59,7 +59,7 @@ public class CartController {
     }
 
     @DeleteMapping("/{productId}")
-    public ResponseEntity deleteCartProduct(@RequestBody @NotNull Long customerId,
+    public ResponseEntity<?> deleteCartProduct(@RequestBody @NotNull Long customerId,
         @PathVariable Long productId) {
 
         cartService.deleteCartProduct(productId, customerId);
