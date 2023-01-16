@@ -1,55 +1,88 @@
 package com.zerobase.everycampingbackend.user.service;
 
+import com.zerobase.everycampingbackend.common.auth.issuer.JwtIssuer;
+import com.zerobase.everycampingbackend.common.auth.model.JwtDto;
+import com.zerobase.everycampingbackend.common.auth.model.UserType;
+import com.zerobase.everycampingbackend.common.auth.service.CustomUserDetailsService;
 import com.zerobase.everycampingbackend.common.exception.CustomException;
 import com.zerobase.everycampingbackend.common.exception.ErrorCode;
-import com.zerobase.everycampingbackend.common.token.config.JwtAuthenticationProvider;
-import com.zerobase.everycampingbackend.common.token.model.UserType;
+import com.zerobase.everycampingbackend.user.domain.entity.Customer;
 import com.zerobase.everycampingbackend.user.domain.form.SignInForm;
 import com.zerobase.everycampingbackend.user.domain.form.SignUpForm;
-import com.zerobase.everycampingbackend.user.domain.entity.Customer;
 import com.zerobase.everycampingbackend.user.domain.repository.CustomerRepository;
 import java.util.Locale;
-import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class CustomerService {
-  private final CustomerRepository customerRepository;
+public class CustomerService implements CustomUserDetailsService {
 
-  private final JwtAuthenticationProvider provider;
+    private final CustomerRepository customerRepository;
+    private final JwtIssuer jwtIssuer;
+    private final PasswordEncoder passwordEncoder;
+    private final RedisTemplate<String, Object> redisTemplate;
 
-  private boolean isEmailExist(String email){
-      return customerRepository.findByEmail(email.toLowerCase(Locale.ROOT))
-          .isPresent();
-  }
+    public void signUp(SignUpForm form) {
+        if (customerRepository.existsByEmail(form.getEmail().toLowerCase(Locale.ROOT))) {
+            throw new CustomException(ErrorCode.EMAIL_BEING_USED);
+        }
+        customerRepository.save(Customer.from(form, passwordEncoder));
+    }
 
-  private Optional<Customer> findValidCustomer(String email, String password){
-    return customerRepository.findByEmail(email).stream()
-        .filter(customer -> customer.getPassword().equals(password))
-        .findFirst();
-  }
+    public JwtDto signIn(SignInForm form) {
+        Customer customer = getCustomerByEmail(form.getEmail().toLowerCase(Locale.ROOT));
 
-  public String signUp(SignUpForm form){
+        if (!passwordEncoder.matches(form.getPassword(), customer.getPassword())) {
+            throw new CustomException(ErrorCode.LOGIN_CHECK_FAIL);
+        }
 
-    Customer customer = customerRepository.save(Customer.from(form));
+        return issueJwt(customer.getEmail(), customer.getId());
+    }
 
-    return "회원 가입에 성공하였습니다.";
-  }
+    public void signOut(String email) {
+        deleteRefreshToken(email);
+    }
 
+    @Override
+    public JwtDto issueJwt(String email, Long id) {
+        JwtDto jwtDto = jwtIssuer.createToken(email, id, UserType.CUSTOMER.name());
+        putRefreshToken(email, jwtDto.getRefreshToken());
+        return jwtDto;
+    }
 
-  public String signIn(SignInForm form){
-     // 로그인 가능 여부 체크
-    Customer c = this.findValidCustomer(form.getEmail(), form.getPassword())
-        .orElseThrow(() -> new CustomException(ErrorCode.LOGIN_CHECK_FAIL));
+    public Customer getCustomerById(Long customerId) {
+        return customerRepository.findById(customerId)
+            .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+    }
 
-    return provider.createToken(c.getEmail(), c.getId(), UserType.CUSTOMER);
-  }
+    public Customer getCustomerByEmail(String email) {
+        return customerRepository.findByEmail(email)
+            .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+    }
 
-  public Optional<Customer> findByIdAndEmail(Long id, String email){
-    return customerRepository.findById(id)
-        .stream().filter(customer -> customer.getEmail().equals(email))
-        .findFirst();
-  }
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        return getCustomerByEmail(email);
+    }
+
+    @Override
+    public String getRefreshToken(String email) {
+        return (String) redisTemplate.opsForValue().get("RT-CUSTOMER:" + email);
+    }
+
+    private void putRefreshToken(String email, String token) {
+        redisTemplate.opsForValue()
+            .set("RT-CUSTOMER:" + email, token, JwtIssuer.EXPIRE_TIME * 2, TimeUnit.MILLISECONDS);
+    }
+
+    private void deleteRefreshToken(String email) {
+        redisTemplate.delete("RT-CUSTOMER:" + email);
+    }
+
 }
