@@ -6,8 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.zerobase.everycampingbackend.cart.domain.dto.CartProductDto;
 import com.zerobase.everycampingbackend.cart.domain.entity.CartProduct;
-import com.zerobase.everycampingbackend.cart.domain.form.CreateCartForm;
-import com.zerobase.everycampingbackend.cart.domain.form.UpdateQuantityForm;
 import com.zerobase.everycampingbackend.cart.domain.repository.CartRepository;
 import com.zerobase.everycampingbackend.common.exception.CustomException;
 import com.zerobase.everycampingbackend.common.exception.ErrorCode;
@@ -27,7 +25,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @TestPropertySource(locations = "classpath:application-test.properties")
@@ -60,17 +57,13 @@ class CartServiceTest {
     void createCartProductNotEnoughStock() throws Exception {
 
         //given
-        Long customerId = createCustomer("ksj2083@naver.com");
-        CreateCartForm createCartForm = CreateCartForm.builder()
-            .customerId(customerId)
-            .quantity(6)
-            .build();
-
+        Customer customer = createCustomer("ksj2083@naver.com");
         Long productId = createProduct("잡템", 5, ProductCategory.TENT);
+        Integer quantity = 6;
 
         //when
         CustomException ex = (CustomException) assertThrows(RuntimeException.class, () -> {
-            cartService.createCart(createCartForm, productId);
+            cartService.createCart(customer, productId, quantity);
         });
 
         //then
@@ -82,20 +75,16 @@ class CartServiceTest {
     void createCartSuccess() throws Exception {
 
         //given
-        Long customerId = createCustomer("ksj2083@naver.com");
-        CreateCartForm createCartForm = CreateCartForm.builder()
-            .customerId(customerId)
-            .quantity(5)
-            .build();
-
+        Customer customer = createCustomer("ksj2083@naver.com");
         Long productId = createProduct("잡템", 5, ProductCategory.TENT);
+        Integer quantity = 5;
 
         //when
-        cartService.createCart(createCartForm, productId);
+        cartService.createCart(customer, productId, quantity);
 
         //then
         PageRequest pageRequest = PageRequest.of(0, 5);
-        Page<CartProduct> result = cartRepository.findAllByCustomerId(customerId, pageRequest);
+        Page<CartProduct> result = cartRepository.findAllByCustomerId(customer.getId(), pageRequest);
 
         assertEquals(result.getContent().get(0).getQuantity(), 5);
         assertEquals(result.getContent().get(0).getProduct().getName(), "잡템");
@@ -107,15 +96,15 @@ class CartServiceTest {
 
         //given
         //유저 세팅
-        Long customerId = createCustomer("ksj2083@naver.com");
+        Customer customer = createCustomer("ksj2083@naver.com");
 
         //상품 세팅
         Long productId1 = createProduct("텐트1", 5, ProductCategory.TENT);
         Long productId2 = createProduct("텐트2", 10, ProductCategory.TENT);
 
         //장바구니에 넣기
-        addToCart(customerId, productId1, 3);
-        addToCart(customerId, productId2, 5);
+        addToCart(customer, productId1, 3);
+        addToCart(customer, productId2, 5);
 
         //when
 
@@ -125,7 +114,7 @@ class CartServiceTest {
         productRepository.save(product);
 
         PageRequest pageRequest = PageRequest.of(0, 5);
-        Page<CartProductDto> cartProductPage = cartService.getCartProductList(customerId,
+        Page<CartProductDto> cartProductPage = cartService.getCartProductList(customer,
             pageRequest);
 
         //then
@@ -148,24 +137,22 @@ class CartServiceTest {
 
         //given
         //유저 세팅
-        Long customerId = createCustomer("ksj2083@naver.com");
+        Customer customer = createCustomer("ksj2083@naver.com");
 
         //상품 세팅
-        Long productId1 = createProduct("텐트1", 5, ProductCategory.TENT);
+        Long productId = createProduct("텐트1", 5, ProductCategory.TENT);
 
         //장바구니에 넣기
-        addToCart(customerId, productId1, 3);
+        addToCart(customer, productId, 3);
+
+        Integer updateQuantity = 4;
 
         //when
-        cartService.updateQuantity(customerId,
-            UpdateQuantityForm.builder().
-                customerId(customerId)
-                .updateQuantity(4)
-                .build());
+        cartService.updateQuantity(customer, productId, updateQuantity);
 
         //then
         CartProduct cartProduct = cartRepository.findByCustomerIdAndProductId(
-            customerId, productId1).orElseThrow();
+            customer.getId(), productId).orElseThrow();
 
         assertEquals(4, cartProduct.getQuantity());
     }
@@ -176,21 +163,18 @@ class CartServiceTest {
 
         //given
         //유저 세팅
-        Long customerId = createCustomer("ksj2083@naver.com");
+        Customer customer = createCustomer("ksj2083@naver.com");
 
         //상품 세팅
-        Long productId1 = createProduct("텐트1", 5, ProductCategory.TENT);
+        Long productId = createProduct("텐트1", 5, ProductCategory.TENT);
 
         //장바구니에 넣기
-        addToCart(customerId, productId1, 3);
+        addToCart(customer, productId, 3);
+        Integer updateQuantity = 6;
 
         //when
         CustomException ex = (CustomException) assertThrows(RuntimeException.class, () -> {
-            cartService.updateQuantity(productId1,
-                UpdateQuantityForm.builder().
-                    customerId(customerId)
-                    .updateQuantity(6)
-                    .build());
+            cartService.updateQuantity(customer, productId, updateQuantity);
         });
 
         //then
@@ -203,31 +187,27 @@ class CartServiceTest {
 
         //given
         //유저 세팅
-        Long customerId = createCustomer("ksj2083@naver.com");
+        Customer customer = createCustomer("ksj2083@naver.com");
 
         //상품 세팅
-        Long productId1 = createProduct("텐트1", 5, ProductCategory.TENT);
+        Long productId = createProduct("텐트1", 5, ProductCategory.TENT);
 
         //장바구니에 넣기
-        addToCart(customerId, productId1, 3);
+        addToCart(customer, productId, 3);
 
         //when
-        cartService.deleteCartProduct(productId1, customerId);
+        cartService.deleteCartProduct(customer, productId);
 
         //then
         Optional<CartProduct> optionalCartProduct = cartRepository.findByCustomerIdAndProductId(
-            customerId, productId1);
+            customer.getId(), productId);
 
         assertFalse(optionalCartProduct.isPresent());
     }
 
-    private void addToCart(Long customerId, Long productId, Integer quantity) {
-        cartService.createCart(CreateCartForm.builder()
-            .customerId(customerId)
-            .quantity(quantity)
-            .build(), productId);
+    private void addToCart(Customer customer, Long productId, Integer quantity) {
+        cartService.createCart(customer, productId, quantity);
     }
-
 
     private Long createProduct(String name, int stock, ProductCategory category) {
         Product product = Product.builder()
@@ -240,13 +220,13 @@ class CartServiceTest {
         return saved.getId();
     }
 
-    private Long createCustomer(String email) {
+    private Customer createCustomer(String email) {
         Customer customer = Customer.builder()
             .email(email)
             .build();
 
         Customer saved = customerRepository.save(customer);
-        return saved.getId();
+        return saved;
     }
 
 }
