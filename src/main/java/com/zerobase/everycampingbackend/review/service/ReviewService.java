@@ -32,12 +32,12 @@ public class ReviewService {
     private final StaticImageService staticImageService;
 
     @Transactional
-    public void writeReview(String userEmail, Long customerId, Long productId, ReviewForm form)
+    public void writeReview(Customer customer, Long productId, ReviewForm form)
         throws IOException {
-        log.info(userEmail + " -> 리뷰 작성 시도");
+        log.info(customer.getEmail() + " -> 리뷰 작성 시도");
 
-        Customer customer = customerService.getCustomerById(customerId);
-        if (!customer.getEmail().equals(userEmail)) {
+        Customer validCustomer = customerService.getCustomerById(customer.getId());
+        if (!validCustomer.getEmail().equals(customer.getEmail())) {
             throw new CustomException(ErrorCode.REVIEW_WRITER_NOT_QUALIFIED);
         }
 
@@ -49,15 +49,15 @@ public class ReviewService {
         reviewRepository.save(Review.of(form, customer, product, s3Path));
         productService.addReview(product, form.getScore());
 
-        log.info(userEmail + " -> 리뷰 작성 완료");
+        log.info(customer.getEmail() + " -> 리뷰 작성 완료");
     }
 
     @Transactional
-    public void editReview(String userEmail, Long reviewId, ReviewForm form) throws IOException{
-        log.info(userEmail + " -> 리뷰 수정 시도");
+    public void editReview(Customer customer, Long reviewId, ReviewForm form) throws IOException{
+        log.info(customer.getEmail() + " -> 리뷰 수정 시도");
 
         Review review = getReviewById(reviewId);
-        if (!review.getCustomer().getEmail().equals(userEmail)) {
+        if (!review.getCustomer().getEmail().equals(customer.getEmail())) {
             throw new CustomException(ErrorCode.REVIEW_EDITOR_NOT_MATCHED);
         }
 
@@ -69,15 +69,15 @@ public class ReviewService {
 
         productService.updateReview(review.getProduct(), review.getScore() - oldScore);
 
-        log.info(userEmail + " -> 리뷰 수정 완료");
+        log.info(customer.getEmail() + " -> 리뷰 수정 완료");
     }
 
     @Transactional
-    public void deleteReview(String userEmail, Long reviewId) {
-        log.info(userEmail + " -> 리뷰 삭제 시도");
+    public void deleteReview(Customer customer, Long reviewId) {
+        log.info(customer.getEmail() + " -> 리뷰 삭제 시도");
 
         Review review = getReviewById(reviewId);
-        if (!review.getCustomer().getEmail().equals(userEmail)) {
+        if (!review.getCustomer().getEmail().equals(customer.getEmail())) {
             throw new CustomException(ErrorCode.REVIEW_EDITOR_NOT_MATCHED);
         }
 
@@ -85,7 +85,7 @@ public class ReviewService {
         staticImageService.deleteImage(review.getImagePath());
         productService.deleteReview(review.getProduct(), review.getScore());
 
-        log.info(userEmail + " -> 리뷰 삭제 완료");
+        log.info(customer.getEmail() + " -> 리뷰 삭제 완료");
     }
 
     public ReviewDto getReviewDetail(Long reviewId) {

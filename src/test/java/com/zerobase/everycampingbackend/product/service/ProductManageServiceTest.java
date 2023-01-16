@@ -16,26 +16,27 @@ import com.zerobase.everycampingbackend.product.domain.entity.Product;
 import com.zerobase.everycampingbackend.product.domain.form.ProductManageForm;
 import com.zerobase.everycampingbackend.product.domain.repository.ProductRepository;
 import com.zerobase.everycampingbackend.product.type.ProductCategory;
+import com.zerobase.everycampingbackend.user.domain.entity.Seller;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@SpringBootTest
+
 @TestPropertySource(locations = "classpath:application-test.properties")
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-@Transactional
+@ExtendWith(SpringExtension.class)
 class ProductManageServiceTest {
     @Mock
     private ProductRepository productRepository;
@@ -55,11 +56,14 @@ class ProductManageServiceTest {
         .tags(List.of("따뜻함", "안락", "고퀄"))
         .build();
 
+    Seller seller = Seller.builder().nickName("판매자1").build();
     private final Product product = Product.builder()
         .name("상품1")
+        .seller(seller)
         .build();
     private final Product product2 = Product.builder()
         .name("상품1")
+        .seller(Seller.builder().nickName("판매자2").build())
         .build();
     private final Page<Product> products = new PageImpl<>(List.of(product, product2));
     @Test
@@ -72,7 +76,7 @@ class ProductManageServiceTest {
         ArgumentCaptor<Product> captor = ArgumentCaptor.forClass(Product.class);
 
         // when
-        productManageService.addProduct(form);
+        productManageService.addProduct(seller, form);
 
         // then
         verify(productRepository).save(captor.capture());
@@ -107,7 +111,7 @@ class ProductManageServiceTest {
         ArgumentCaptor<Product> captor = ArgumentCaptor.forClass(Product.class);
 
         // when
-        productManageService.updateProduct(1L, form);
+        productManageService.updateProduct(seller,1L, form);
 
         // then
         verify(productRepository).save(captor.capture());
@@ -134,7 +138,7 @@ class ProductManageServiceTest {
         ArgumentCaptor<Product> captor = ArgumentCaptor.forClass(Product.class);
 
         // when
-        productManageService.deleteProduct(1L);
+        productManageService.deleteProduct(seller, 1L);
 
         // then
         verify(productRepository).delete(captor.capture());
@@ -145,11 +149,11 @@ class ProductManageServiceTest {
     void success_getProducts(){
         // given
         PageRequest pageRequest = PageRequest.of(0, 5);
-        given(productRepository.findAll(pageRequest))
+        given(productRepository.findAllBySeller(seller, pageRequest))
             .willReturn(products);
 
         // when
-        Page<ProductDto> result = productManageService.getProductPage(pageRequest);
+        Page<ProductDto> result = productManageService.getProductPage(seller, pageRequest);
 
         // then
         assertEquals(products.getSize(), result.getSize());
@@ -165,7 +169,7 @@ class ProductManageServiceTest {
             .willReturn(Optional.of(product));
 
         // when
-        ProductDetailDto result = productManageService.getProductDetail(1L);
+        ProductDetailDto result = productManageService.getProductDetail(seller, 1L);
 
         // then
         assertEquals(product.getName(), result.getName());

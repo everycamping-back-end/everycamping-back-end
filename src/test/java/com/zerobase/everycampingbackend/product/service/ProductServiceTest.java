@@ -11,6 +11,8 @@ import com.zerobase.everycampingbackend.product.domain.entity.Product;
 import com.zerobase.everycampingbackend.product.domain.form.ProductSearchForm;
 import com.zerobase.everycampingbackend.product.domain.repository.ProductRepository;
 import com.zerobase.everycampingbackend.product.type.ProductCategory;
+import com.zerobase.everycampingbackend.user.domain.entity.Seller;
+import com.zerobase.everycampingbackend.user.domain.repository.SellerRepository;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -31,29 +33,36 @@ class ProductServiceTest {
 
     @Autowired
     private ProductRepository productRepository;
+    @Autowired
+    private SellerRepository sellerRepository;
 
     @Autowired
     private ProductService productService;
 
+    Seller seller = Seller.builder().nickName("판매자1").build();
     Product product1 = Product.builder()
         .name("상품1")
+        .seller(seller)
         .category(ProductCategory.TENT)
         .tags(List.of("따뜻", "단아"))
         .build();
     Product product2 = Product.builder()
         .name("상품2")
+        .seller(seller)
         .category(ProductCategory.MAT)
         .tags(List.of("따뜻", "우리집"))
         .build();
 
     Product product3 = Product.builder()
         .name("상품3")
+        .seller(seller)
         .category(ProductCategory.TABLE)
         .tags(List.of("쿨", "우리집"))
         .build();
 
     Product product4 = Product.builder()
         .name("텐트임")
+        .seller(seller)
         .category(ProductCategory.TENT)
         .tags(List.of("럭셔리"))
         .build();
@@ -62,6 +71,7 @@ class ProductServiceTest {
 
     @BeforeEach
     void setUp() {
+        sellerRepository.save(seller);
         productRepository.save(product1);
         productRepository.save(product2);
         productRepository.save(product3);

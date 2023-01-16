@@ -51,8 +51,8 @@ class ReviewServiceTest {
     private ReviewService reviewService;
 
     private final ReviewForm form = new ReviewForm(1, "리뷰", null);
-    private String userEmail = "aaa";
     private final Customer customer = Customer.builder().id(1L).email("aaa").build();
+    private final Customer customer2 = Customer.builder().id(2L).email("bbb").build();
     private final Product product = Product.builder().id(1L).build();
     private final Review review = Review.builder()
         .id(1L)
@@ -76,7 +76,7 @@ class ReviewServiceTest {
         ArgumentCaptor<Review> captor = ArgumentCaptor.forClass(Review.class);
 
         // when
-        reviewService.writeReview(userEmail, 1L, 1L, form);
+        reviewService.writeReview(customer, 1L, form);
 
         // then
         verify(reviewRepository).save(captor.capture());
@@ -92,13 +92,12 @@ class ReviewServiceTest {
     @DisplayName("리뷰 작성 실패 - 로그인 유저와 폼 유저 정보 불일치")
     void fail_writeReview_customerNotMatched(){
         // given
-        userEmail = "eeeee";
         given(customerService.getCustomerById(anyLong()))
             .willReturn(customer);
 
         // when
         CustomException exception = assertThrows(CustomException.class, () ->
-            reviewService.writeReview(userEmail, 1L, 1L, form));
+            reviewService.writeReview(customer2, 1L, form));
 
         // then
         assertEquals(ErrorCode.REVIEW_WRITER_NOT_QUALIFIED, exception.getErrorCode());
@@ -117,7 +116,7 @@ class ReviewServiceTest {
         ArgumentCaptor<Review> captor = ArgumentCaptor.forClass(Review.class);
 
         // when
-        reviewService.editReview(userEmail, 1L, form);
+        reviewService.editReview(customer, 1L, form);
 
         // then
         verify(reviewRepository).save(captor.capture());
@@ -131,13 +130,12 @@ class ReviewServiceTest {
     @DisplayName("리뷰 수정 실패 - 해당 리뷰 없음")
     void fail_editReview_reviewNotFound(){
         // given
-        userEmail = "not-matched-user";
         given(reviewRepository.findById(anyLong()))
             .willReturn(Optional.empty());
 
         // when
         CustomException exception = assertThrows(CustomException.class, () ->
-            reviewService.editReview(userEmail, 1L, form));
+            reviewService.editReview(customer, 1L, form));
 
         // then
         assertEquals(ErrorCode.REVIEW_NOT_FOUND, exception.getErrorCode());
@@ -147,13 +145,12 @@ class ReviewServiceTest {
     @DisplayName("리뷰 수정 실패 - 해당 리뷰 수정 권한 없음")
     void fail_editReview_userNotEditor(){
         // given
-        userEmail = "not-matched-user";
         given(reviewRepository.findById(anyLong()))
             .willReturn(Optional.of(review));
 
         // when
         CustomException exception = assertThrows(CustomException.class, () ->
-            reviewService.editReview(userEmail, 1L, form));
+            reviewService.editReview(customer2, 1L, form));
 
         // then
         assertEquals(ErrorCode.REVIEW_EDITOR_NOT_MATCHED, exception.getErrorCode());
@@ -168,7 +165,7 @@ class ReviewServiceTest {
         ArgumentCaptor<Review> captor = ArgumentCaptor.forClass(Review.class);
 
         // when
-        reviewService.deleteReview(userEmail, 1L);
+        reviewService.deleteReview(customer, 1L);
 
         // then
         verify(reviewRepository).delete(captor.capture());
@@ -183,7 +180,7 @@ class ReviewServiceTest {
 
         // when
         CustomException exception = assertThrows(CustomException.class, () ->
-            reviewService.deleteReview(userEmail, 1L));
+            reviewService.deleteReview(customer, 1L));
 
         // then
         assertEquals(ErrorCode.REVIEW_NOT_FOUND, exception.getErrorCode());
@@ -193,13 +190,12 @@ class ReviewServiceTest {
     @DisplayName("리뷰 삭제 실패 - 리뷰 삭제 권한 없음")
     void fail_deleteReview_userNotEditor(){
         // given
-        userEmail = "wfqwfqf";
         given(reviewRepository.findById(anyLong()))
             .willReturn(Optional.of(review));
 
         // when
         CustomException exception = assertThrows(CustomException.class, () ->
-            reviewService.deleteReview(userEmail, 1L));
+            reviewService.deleteReview(customer2, 1L));
 
         // then
         assertEquals(ErrorCode.REVIEW_EDITOR_NOT_MATCHED, exception.getErrorCode());
