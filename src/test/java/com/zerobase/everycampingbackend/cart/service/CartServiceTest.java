@@ -71,6 +71,27 @@ class CartServiceTest {
     }
 
     @Test
+    @DisplayName("장바구니 넣기 실패 - 이미 장바구니에 있는 상품이라 실패")
+    void createCartProductAlreadyAdded() throws Exception {
+
+        //given
+        Customer customer = createCustomer("ksj2083@naver.com");
+        Long productId = createProduct("잡템", 5, ProductCategory.TENT);
+
+        addToCart(customer, productId, 2);
+
+        Integer quantity = 2;
+
+        //when
+        CustomException ex = (CustomException) assertThrows(RuntimeException.class, () -> {
+            cartService.createCart(customer, productId, quantity);
+        });
+
+        //then
+        assertEquals(ex.getErrorCode(), ErrorCode.CART_PRODUCT_ALREADY_ADDED);
+    }
+
+    @Test
     @DisplayName("장바구니 넣기 성공")
     void createCartSuccess() throws Exception {
 

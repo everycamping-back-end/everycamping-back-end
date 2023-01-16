@@ -8,6 +8,7 @@ import com.zerobase.everycampingbackend.common.exception.ErrorCode;
 import com.zerobase.everycampingbackend.product.domain.entity.Product;
 import com.zerobase.everycampingbackend.product.service.ProductService;
 import com.zerobase.everycampingbackend.user.domain.entity.Customer;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +24,12 @@ public class CartService {
 
     @Transactional
     public void createCart(Customer customer, Long productId, Integer quantity) {
+
+        Optional<CartProduct> cartProduct = cartRepository.findByCustomerIdAndProductId(
+            customer.getId(), productId);
+        if(cartProduct.isPresent()) {
+            throw new CustomException(ErrorCode.CART_PRODUCT_ALREADY_ADDED);
+        }
 
         Product product = productService.getProductById(productId);
         if (product.getStock() < quantity) {
