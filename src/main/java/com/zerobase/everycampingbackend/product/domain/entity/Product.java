@@ -53,9 +53,10 @@ public class Product extends BaseEntity {
     private int reviewCount;
     private int totalScore;
 
-    public static Product of(ProductManageForm form, S3Path imagePath, S3Path detailImagePath){
+    public static Product of(ProductManageForm form, Seller seller, S3Path imagePath, S3Path detailImagePath){
         return Product.builder()
             .name(form.getName())
+            .seller(seller)
             .category(form.getCategory())
             .price(form.getPrice())
             .onSale(form.getOnSale())

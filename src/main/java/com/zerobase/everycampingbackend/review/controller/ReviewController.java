@@ -3,11 +3,12 @@ package com.zerobase.everycampingbackend.review.controller;
 import com.zerobase.everycampingbackend.review.domain.dto.ReviewDto;
 import com.zerobase.everycampingbackend.review.domain.form.ReviewForm;
 import com.zerobase.everycampingbackend.review.service.ReviewService;
+import com.zerobase.everycampingbackend.user.domain.entity.Customer;
 import java.io.IOException;
-import java.security.Principal;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,26 +26,25 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @PostMapping
-    public ResponseEntity<Boolean> writeReview(Principal principal,
-        @RequestBody Long customerId,
+    public ResponseEntity<?> writeReview(@AuthenticationPrincipal Customer customer,
         @RequestBody Long productId,
         @RequestBody ReviewForm form)
         throws IOException {
-        reviewService.writeReview(principal.getName(), customerId, productId, form);
-        return ResponseEntity.ok(true);
+        reviewService.writeReview(customer, productId, form);
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{reviewId}")
-    public ResponseEntity<Boolean> editReview(Principal principal,
+    public ResponseEntity<?> editReview(@AuthenticationPrincipal Customer customer,
         @PathVariable Long reviewId, @RequestBody ReviewForm form) throws IOException {
-        reviewService.editReview(principal.getName(), reviewId, form);
-        return ResponseEntity.ok(true);
+        reviewService.editReview(customer, reviewId, form);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{reviewId}")
-    public ResponseEntity<Boolean> deleteReview(Principal principal, @PathVariable Long reviewId) {
-        reviewService.deleteReview(principal.getName(), reviewId);
-        return ResponseEntity.ok(true);
+    public ResponseEntity<?> deleteReview(@AuthenticationPrincipal Customer customer, @PathVariable Long reviewId) {
+        reviewService.deleteReview(customer, reviewId);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/{reviewId}")

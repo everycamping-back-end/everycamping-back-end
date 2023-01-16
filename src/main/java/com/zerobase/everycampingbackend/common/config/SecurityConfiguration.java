@@ -3,9 +3,7 @@ package com.zerobase.everycampingbackend.common.config;
 import com.zerobase.everycampingbackend.common.auth.filter.JwtAuthFilter;
 import com.zerobase.everycampingbackend.common.auth.model.UserType;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -37,12 +35,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         , "/sellers/reissue"
         , "/test/**"
     };
-
-    @Bean
-    @Override
-    protected AuthenticationManager authenticationManager() throws Exception {
-        return super.authenticationManager();
-    }
 
     @Override
     public void configure(WebSecurity web) {
