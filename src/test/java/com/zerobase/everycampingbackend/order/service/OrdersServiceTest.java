@@ -67,7 +67,7 @@ class OrdersServiceTest {
     void orderSuccess() throws Exception {
 
         //given
-        Long customerId = createCustomer("ksj2083@naver.com");
+        Customer customer = createCustomer("ksj2083@naver.com");
         Long productId1 = createProduct("텐트1", 300, 5, ProductCategory.TENT);
         Long productId2 = createProduct("텐트2", 200, 5, ProductCategory.TENT);
 
@@ -80,16 +80,15 @@ class OrdersServiceTest {
             .build();
 
         OrderForm orderForm = OrderForm.builder()
-            .customerId(customerId)
             .orderProductFormList(List.of(form1, form2))
             .build();
 
         //when
-        orderService.order(orderForm);
+        orderService.order(customer, orderForm);
 
         //then
         Orders orders = ordersRepository.findAll().get(0);
-        assertEquals(customerId, orders.getCustomer().getId());
+        assertEquals(customer.getId(), orders.getCustomer().getId());
 
         OrderProduct orderProduct1 = orderProductRepository.findAll().get(0);
         OrderProduct orderProduct2 = orderProductRepository.findAll().get(1);
@@ -114,7 +113,7 @@ class OrdersServiceTest {
     void createOrderAmountUnder1000() throws Exception {
 
         //given
-        Long customerId = createCustomer("ksj2083@naver.com");
+        Customer customer = createCustomer("ksj2083@naver.com");
         Long productId1 = createProduct("텐트1", 300, 5, ProductCategory.TENT);
         Long productId2 = createProduct("텐트2", 200, 5, ProductCategory.TENT);
 
@@ -127,13 +126,12 @@ class OrdersServiceTest {
             .build();
 
         OrderForm orderForm = OrderForm.builder()
-            .customerId(customerId)
             .orderProductFormList(List.of(form1, form2))
             .build();
 
         //when
         CustomException ex = (CustomException) assertThrows(RuntimeException.class, () -> {
-            orderService.order(orderForm);
+            orderService.order(customer, orderForm);
         });
 
         //then
@@ -150,7 +148,7 @@ class OrdersServiceTest {
     void getOrdersByCustomerSuccess() throws Exception {
 
         //given
-        Long customerId = createCustomer("ksj2083@naver.com");
+        Customer customer = createCustomer("ksj2083@naver.com");
         Long productId1 = createProduct("텐트1", 300, 10, ProductCategory.TENT);
         Long productId2 = createProduct("텐트2", 200, 10, ProductCategory.TENT);
 
@@ -163,18 +161,17 @@ class OrdersServiceTest {
             .build();
 
         OrderForm orderForm = OrderForm.builder()
-            .customerId(customerId)
             .orderProductFormList(List.of(form1, form2))
             .build();
 
-        orderService.order(orderForm);
+        orderService.order(customer, orderForm);
 
         SearchOrderByCustomerForm form = SearchOrderByCustomerForm.builder().build();
         PageRequest pageRequest = PageRequest.of(0, 5);
 
         //when
         Page<OrderProductByCustomerDto> result = orderService.getOrdersByCustomer(form,
-            customerId, pageRequest);
+            customer.getId(), pageRequest);
 
         //then
         OrderProductByCustomerDto dto1 = result.getContent().get(0);
@@ -192,8 +189,7 @@ class OrdersServiceTest {
     void confirmSuccess() throws Exception {
 
         //given
-        Long customerId = createCustomer("ksj2083@naver.com");
-        Customer customer = customerRepository.findById(customerId).orElseThrow();
+        Customer customer = createCustomer("ksj2083@naver.com");
 
         Long productId1 = createProduct("텐트1", 300, 10, ProductCategory.TENT);
 
@@ -202,11 +198,10 @@ class OrdersServiceTest {
             .build();
 
         OrderForm orderForm = OrderForm.builder()
-            .customerId(customerId)
             .orderProductFormList(List.of(form1))
             .build();
 
-        orderService.order(orderForm);
+        orderService.order(customer, orderForm);
 
         OrderProduct orderProduct = orderProductRepository.findAll().get(0);
         Long orderProductId = orderProduct.getId();
@@ -235,13 +230,13 @@ class OrdersServiceTest {
         return saved.getId();
     }
 
-    private Long createCustomer(String email) {
+    private Customer createCustomer(String email) {
         Customer customer = Customer.builder()
             .email(email)
             .build();
 
         Customer saved = customerRepository.save(customer);
-        return saved.getId();
+        return saved;
     }
 
     private Seller createSeller() {

@@ -16,7 +16,6 @@ import com.zerobase.everycampingbackend.order.type.OrderStatus;
 import com.zerobase.everycampingbackend.product.domain.entity.Product;
 import com.zerobase.everycampingbackend.product.service.ProductService;
 import com.zerobase.everycampingbackend.user.domain.entity.Customer;
-import com.zerobase.everycampingbackend.user.service.CustomerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,18 +26,14 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class OrderService {
 
-    private final CustomerService customerService;
     private final ProductService productService;
     private final OrdersRepository ordersRepository;
     private final OrderProductRepository orderProductRepository;
 
 
     @Transactional
-    public void order(OrderForm form) {
+    public void order(Customer customer, OrderForm form) {
 
-        //로그인한 Customer 관련 로직 추가 예정
-
-        Customer customer = customerService.getCustomerById(form.getCustomerId());
         Orders orders = ordersRepository.save(Orders.builder()
             .customer(customer)
             .build());
