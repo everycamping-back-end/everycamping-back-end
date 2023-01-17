@@ -13,6 +13,7 @@ public enum ErrorCode {
   ARGUMENT_NOT_VALID_EXCEPTION(HttpStatus.BAD_REQUEST, "필드 값이 올바르지 않습니다."),
 
   CART_PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "장바구니에 들어있지 않은 상품입니다."),
+  CART_PRODUCT_ALREADY_ADDED(HttpStatus.BAD_REQUEST, "이미 장바구니에 등록된 상품입니다."),
 
   ORDER_NOT_FOUNT(HttpStatus.NOT_FOUND, "존재하지 않는 주문입니다."),
   ORDER_ALREADY_CONFIRMED(HttpStatus.BAD_REQUEST, "이미 구매확정된 주문입니다."),

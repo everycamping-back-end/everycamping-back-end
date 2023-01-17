@@ -7,6 +7,8 @@ import com.zerobase.everycampingbackend.order.domain.form.SearchOrderByCustomerF
 import com.zerobase.everycampingbackend.order.domain.form.SearchOrderBySellerForm;
 import com.zerobase.everycampingbackend.order.service.OrderService;
 import com.zerobase.everycampingbackend.user.domain.entity.Customer;
+import com.zerobase.everycampingbackend.user.domain.entity.Seller;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,7 +22,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -31,31 +32,32 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping
-    public ResponseEntity order(@RequestBody OrderForm form) {
-        orderService.order(form);
+    public ResponseEntity<?> order(@AuthenticationPrincipal Customer customer,
+        @RequestBody @Valid OrderForm form) {
+        orderService.order(customer, form);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/customer")
     public ResponseEntity<Page<OrderProductByCustomerDto>> getOrdersByCustomer(
+        @AuthenticationPrincipal Customer customer,
         @ModelAttribute SearchOrderByCustomerForm form,
-        @RequestParam @NotNull Long customerId,
         Pageable pageable) {
 
-        return ResponseEntity.ok(orderService.getOrdersByCustomer(form, customerId, pageable));
+        return ResponseEntity.ok(orderService.getOrdersByCustomer(form, customer.getId(), pageable));
     }
 
     @GetMapping("/seller")
     public ResponseEntity<Page<OrderProductBySellerDto>> getOrdersBySeller(
+        @AuthenticationPrincipal Seller seller,
         @ModelAttribute SearchOrderBySellerForm form,
-        @RequestParam @NotNull Long sellerId,
         Pageable pageable) {
 
-        return ResponseEntity.ok(orderService.getOrdersBySeller(form, sellerId, pageable));
+        return ResponseEntity.ok(orderService.getOrdersBySeller(form, seller.getId(), pageable));
     }
 
     @PatchMapping("/{orderProductId}/confirm")
-    public ResponseEntity confirm(@AuthenticationPrincipal Customer customer,
+    public ResponseEntity<?> confirm(@AuthenticationPrincipal Customer customer,
         @PathVariable @NotNull Long orderProductId) {
 
         orderService.confirm(customer, orderProductId);
@@ -63,7 +65,7 @@ public class OrderController {
     }
 
     @PatchMapping("/{orderProductId}/cancel")
-    public ResponseEntity cancel(@AuthenticationPrincipal Customer customer,
+    public ResponseEntity<?> cancel(@AuthenticationPrincipal Customer customer,
         @PathVariable @NotNull Long orderProductId) {
 
         orderService.cancel(customer, orderProductId);

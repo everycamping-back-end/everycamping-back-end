@@ -2,14 +2,13 @@ package com.zerobase.everycampingbackend.cart.service;
 
 import com.zerobase.everycampingbackend.cart.domain.dto.CartProductDto;
 import com.zerobase.everycampingbackend.cart.domain.entity.CartProduct;
-import com.zerobase.everycampingbackend.cart.domain.form.CreateCartForm;
-import com.zerobase.everycampingbackend.cart.domain.form.UpdateQuantityForm;
 import com.zerobase.everycampingbackend.cart.domain.repository.CartRepository;
 import com.zerobase.everycampingbackend.common.exception.CustomException;
 import com.zerobase.everycampingbackend.common.exception.ErrorCode;
 import com.zerobase.everycampingbackend.product.domain.entity.Product;
 import com.zerobase.everycampingbackend.product.service.ProductService;
-import com.zerobase.everycampingbackend.user.service.CustomerService;
+import com.zerobase.everycampingbackend.user.domain.entity.Customer;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,34 +19,35 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CartService {
 
-    private final CustomerService customerService;
     private final ProductService productService;
     private final CartRepository cartRepository;
 
     @Transactional
-    public void createCart(CreateCartForm form, Long productId) {
+    public void createCart(Customer customer, Long productId, Integer quantity) {
 
-        //로그인한 Customer 관련 로직 추가 예정
+        Optional<CartProduct> cartProduct = cartRepository.findByCustomerIdAndProductId(
+            customer.getId(), productId);
+        if(cartProduct.isPresent()) {
+            throw new CustomException(ErrorCode.CART_PRODUCT_ALREADY_ADDED);
+        }
 
         Product product = productService.getProductById(productId);
-        if (product.getStock() < form.getQuantity()) {
+        if (product.getStock() < quantity) {
             throw new CustomException(ErrorCode.PRODUCT_NOT_ENOUGH_STOCK);
         }
 
         cartRepository.save(
-            CartProduct.of(product, customerService.getCustomerById((form.getCustomerId())),
-                form.getQuantity()));
+            CartProduct.of(product, customer, quantity)
+        );
     }
 
     /**
      * 재고 부족 시 주문가능한 최대 수량을 장바구니에 저장하고 response에 담아 준다.
      */
     @Transactional
-    public Page<CartProductDto> getCartProductList(Long customerId, Pageable pageable) {
+    public Page<CartProductDto> getCartProductList(Customer customer, Pageable pageable) {
 
-        //로그인한 Customer 관련 로직 추가 예정
-
-        Page<CartProduct> cartProductList = cartRepository.findAllByCustomerId(customerId,
+        Page<CartProduct> cartProductList = cartRepository.findAllByCustomerId(customer.getId(),
             pageable);
 
         return cartProductList.map(
@@ -62,26 +62,24 @@ public class CartService {
     }
 
     @Transactional
-    public void updateQuantity(Long productId, UpdateQuantityForm updateQuantityForm) {
-        //로그인한 Customer 관련 로직 추가 예정
+    public void updateQuantity(Customer customer, Long productId, Integer updateQuantity) {
 
         CartProduct cartProduct = cartRepository.findByCustomerIdAndProductId(
-                updateQuantityForm.getCustomerId(), productId)
+                customer.getId(), productId)
             .orElseThrow(() -> new CustomException(ErrorCode.CART_PRODUCT_NOT_FOUND));
 
-        if (cartProduct.getProduct().getStock() < updateQuantityForm.getUpdateQuantity()) {
+        if (cartProduct.getProduct().getStock() < updateQuantity) {
             throw new CustomException(ErrorCode.PRODUCT_NOT_ENOUGH_STOCK);
         }
 
-        cartProduct.setQuantity(updateQuantityForm.getUpdateQuantity());
-        cartRepository.save(cartProduct);
+        cartProduct.setQuantity(updateQuantity);
     }
 
     @Transactional
-    public void deleteCartProduct(Long productId, Long customerId) {
+    public void deleteCartProduct(Customer customer, Long productId) {
         //로그인한 Customer 관련 로직 추가 예정
 
-        CartProduct cartProduct = cartRepository.findByCustomerIdAndProductId(customerId, productId)
+        CartProduct cartProduct = cartRepository.findByCustomerIdAndProductId(customer.getId(), productId)
             .orElseThrow(() -> new CustomException(ErrorCode.CART_PRODUCT_NOT_FOUND));
 
         cartRepository.delete(cartProduct);
