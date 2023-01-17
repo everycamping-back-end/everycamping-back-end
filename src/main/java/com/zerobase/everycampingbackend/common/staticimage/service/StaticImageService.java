@@ -22,7 +22,7 @@ public class StaticImageService {
     private static final String IMG_DIR_PATH = "img";
 
     public S3Path saveImage(MultipartFile multipartFile) throws IOException {
-        if(multipartFile.isEmpty()){
+        if(ObjectUtils.isEmpty(multipartFile)){
             return new S3Path("", "");
         }
 
@@ -46,7 +46,7 @@ public class StaticImageService {
         if(StringUtils.hasText(bucketFilePath)){
             awsS3Client.deleteFile(bucketFilePath);
         }
-        if(multipartFile.isEmpty()){
+        if(ObjectUtils.isEmpty(multipartFile)){
             return new S3Path("", "");
         }
         return awsS3Client.uploadFileWithUUID(multipartFile, IMG_DIR_PATH);

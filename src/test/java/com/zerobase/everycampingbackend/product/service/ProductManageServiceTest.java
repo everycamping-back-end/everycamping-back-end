@@ -76,7 +76,7 @@ class ProductManageServiceTest {
         ArgumentCaptor<Product> captor = ArgumentCaptor.forClass(Product.class);
 
         // when
-        productManageService.addProduct(seller, form);
+        productManageService.addProduct(seller, form, null, null);
 
         // then
         verify(productRepository).save(captor.capture());
@@ -111,7 +111,7 @@ class ProductManageServiceTest {
         ArgumentCaptor<Product> captor = ArgumentCaptor.forClass(Product.class);
 
         // when
-        productManageService.updateProduct(seller,1L, form);
+        productManageService.updateProduct(seller,1L, form, null, null);
 
         // then
         verify(productRepository).save(captor.capture());

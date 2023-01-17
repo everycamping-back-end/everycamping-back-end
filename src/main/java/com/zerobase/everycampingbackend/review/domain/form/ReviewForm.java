@@ -19,5 +19,5 @@ public class ReviewForm {
     @NotBlank
     @Size(min = 10)
     private String text;
-    private MultipartFile image;
+//    private MultipartFile image;
 }
