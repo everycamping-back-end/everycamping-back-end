@@ -1,9 +1,12 @@
 package com.zerobase.everycampingbackend.common.staticimage.client;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
-import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.zerobase.everycampingbackend.common.staticimage.dto.S3Path;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -24,20 +27,33 @@ public class AwsS3Client {
     @Value("${aws.s3.endpointurl}")
     private String endPointUrl;
 
-    public S3Path uploadFileWithUUID(MultipartFile file, String bucketDirPath) throws IOException {
+    public S3Path uploadFileWithUUID(MultipartFile multipartFile, String bucketDirPath) throws IOException {
+        File file = convertMultiPartToFile(multipartFile);
         String filePath = bucketDirPath + "/" + generateFilename(file);
 
-        ObjectMetadata objectMetadata = new ObjectMetadata();
-        objectMetadata.setContentLength(file.getInputStream().available());
-        amazonS3.putObject(bucketName, filePath, file.getInputStream(), objectMetadata);
+//        ObjectMetadata objectMetadata = new ObjectMetadata();
+//        objectMetadata.setContentType(multipartFile.getContentType());
+//        objectMetadata.setContentLength(multipartFile.getInputStream().available());
+//        amazonS3.putObject(bucketName, filePath, multipartFile.getInputStream(), objectMetadata);
+
+        amazonS3.putObject(new PutObjectRequest(bucketName, filePath, file)
+            .withCannedAcl(CannedAccessControlList.PublicRead));
 
         return new S3Path(endPointUrl + "/" + filePath, filePath);
     }
 
-    private String generateFilename(MultipartFile file){
+    private File convertMultiPartToFile(MultipartFile multipartFile) throws IOException {
+        File file = new File(multipartFile.getOriginalFilename());
+        FileOutputStream outputStream = new FileOutputStream(file);
+        outputStream.write(multipartFile.getBytes());
+        outputStream.close();
+        return file;
+    }
+
+    private String generateFilename(File file){
         String datetimeStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddhhmmss"));
         String uuid = datetimeStr + "-" + UUID.randomUUID();
-        String fileName = Objects.requireNonNull(file.getOriginalFilename()).replace(" ", "-");
+        String fileName = Objects.requireNonNull(file.getName()).replace(" ", "-");
 
         return uuid + "-" + fileName;
     }
