@@ -29,7 +29,7 @@ public class ProductManageForm {
 
     private String description;
     private Integer stock;
-    private MultipartFile image;
-    private MultipartFile detailImage;
+//    private MultipartFile image;
+//    private MultipartFile detailImage;
     private List<String> tags;
 }

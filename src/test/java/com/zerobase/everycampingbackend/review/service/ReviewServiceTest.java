@@ -50,7 +50,7 @@ class ReviewServiceTest {
     @InjectMocks
     private ReviewService reviewService;
 
-    private final ReviewForm form = new ReviewForm(1, "리뷰", null);
+    private final ReviewForm form = new ReviewForm(1, "리뷰");
     private final Customer customer = Customer.builder().id(1L).email("aaa").build();
     private final Customer customer2 = Customer.builder().id(2L).email("bbb").build();
     private final Product product = Product.builder().id(1L).build();
@@ -76,7 +76,7 @@ class ReviewServiceTest {
         ArgumentCaptor<Review> captor = ArgumentCaptor.forClass(Review.class);
 
         // when
-        reviewService.writeReview(customer, 1L, form);
+        reviewService.writeReview(customer, 1L, form,  null);
 
         // then
         verify(reviewRepository).save(captor.capture());
@@ -97,7 +97,7 @@ class ReviewServiceTest {
 
         // when
         CustomException exception = assertThrows(CustomException.class, () ->
-            reviewService.writeReview(customer2, 1L, form));
+            reviewService.writeReview(customer2, 1L, form, null));
 
         // then
         assertEquals(ErrorCode.REVIEW_WRITER_NOT_QUALIFIED, exception.getErrorCode());
@@ -116,7 +116,7 @@ class ReviewServiceTest {
         ArgumentCaptor<Review> captor = ArgumentCaptor.forClass(Review.class);
 
         // when
-        reviewService.editReview(customer, 1L, form);
+        reviewService.editReview(customer, 1L, form, null);
 
         // then
         verify(reviewRepository).save(captor.capture());
@@ -135,7 +135,7 @@ class ReviewServiceTest {
 
         // when
         CustomException exception = assertThrows(CustomException.class, () ->
-            reviewService.editReview(customer, 1L, form));
+            reviewService.editReview(customer, 1L, form, null));
 
         // then
         assertEquals(ErrorCode.REVIEW_NOT_FOUND, exception.getErrorCode());
@@ -150,7 +150,7 @@ class ReviewServiceTest {
 
         // when
         CustomException exception = assertThrows(CustomException.class, () ->
-            reviewService.editReview(customer2, 1L, form));
+            reviewService.editReview(customer2, 1L, form, null));
 
         // then
         assertEquals(ErrorCode.REVIEW_EDITOR_NOT_MATCHED, exception.getErrorCode());

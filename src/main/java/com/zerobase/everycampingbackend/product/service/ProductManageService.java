@@ -18,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @Service
@@ -29,11 +30,11 @@ public class ProductManageService {
     private final StaticImageService staticImageService;
 
     @Transactional
-    public void addProduct(Seller seller, ProductManageForm form) throws IOException {
+    public void addProduct(Seller seller, ProductManageForm form, MultipartFile image, MultipartFile detailImage) throws IOException {
         log.info("상품명 (" + form.getName() + ") 추가 시도");
 
-        S3Path imagePath = staticImageService.saveImage(form.getImage());
-        S3Path detailImagePath = staticImageService.saveImage(form.getDetailImage());
+        S3Path imagePath = staticImageService.saveImage(image);
+        S3Path detailImagePath = staticImageService.saveImage(detailImage);
 
         productRepository.save(Product.of(form, seller, imagePath, detailImagePath));
 
@@ -41,15 +42,15 @@ public class ProductManageService {
     }
 
     @Transactional
-    public void updateProduct(Seller seller, long productId, ProductManageForm form) throws IOException {
+    public void updateProduct(Seller seller, long productId, ProductManageForm form, MultipartFile image, MultipartFile detailImage) throws IOException {
         Product product = getProductById(productId);
 
         validateProductSeller(seller, product);
 
         log.info("상품명 (" + form.getName() + ") 수정 시도");
 
-        S3Path imagePath = staticImageService.editImage(product.getImagePath(), form.getImage());
-        S3Path detailImagePath = staticImageService.editImage(product.getImagePath(), form.getDetailImage());
+        S3Path imagePath = staticImageService.editImage(product.getImagePath(), image);
+        S3Path detailImagePath = staticImageService.editImage(product.getImagePath(), detailImage);
 
         product.setOf(form, imagePath, detailImagePath);
 
