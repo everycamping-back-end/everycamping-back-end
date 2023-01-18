@@ -4,24 +4,25 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.zerobase.everycampingbackend.common.exception.CustomException;
-import com.zerobase.everycampingbackend.common.exception.ErrorCode;
-import com.zerobase.everycampingbackend.order.domain.dto.OrderProductByCustomerDto;
-import com.zerobase.everycampingbackend.order.domain.entity.OrderProduct;
-import com.zerobase.everycampingbackend.order.domain.entity.Orders;
-import com.zerobase.everycampingbackend.order.domain.form.OrderForm;
-import com.zerobase.everycampingbackend.order.domain.form.OrderForm.OrderProductForm;
-import com.zerobase.everycampingbackend.order.domain.form.SearchOrderByCustomerForm;
-import com.zerobase.everycampingbackend.order.domain.repository.OrderProductRepository;
-import com.zerobase.everycampingbackend.order.domain.repository.OrdersRepository;
-import com.zerobase.everycampingbackend.order.type.OrderStatus;
-import com.zerobase.everycampingbackend.product.domain.entity.Product;
-import com.zerobase.everycampingbackend.product.domain.repository.ProductRepository;
-import com.zerobase.everycampingbackend.product.type.ProductCategory;
-import com.zerobase.everycampingbackend.user.domain.entity.Customer;
-import com.zerobase.everycampingbackend.user.domain.entity.Seller;
-import com.zerobase.everycampingbackend.user.domain.repository.CustomerRepository;
-import com.zerobase.everycampingbackend.user.domain.repository.SellerRepository;
+import com.zerobase.everycampingbackend.exception.CustomException;
+import com.zerobase.everycampingbackend.exception.ErrorCode;
+import com.zerobase.everycampingbackend.domain.order.dto.OrderProductByCustomerDto;
+import com.zerobase.everycampingbackend.domain.order.entity.OrderProduct;
+import com.zerobase.everycampingbackend.domain.order.entity.Orders;
+import com.zerobase.everycampingbackend.domain.order.form.OrderForm;
+import com.zerobase.everycampingbackend.domain.order.form.OrderForm.OrderProductForm;
+import com.zerobase.everycampingbackend.domain.order.form.SearchOrderByCustomerForm;
+import com.zerobase.everycampingbackend.domain.order.repository.OrderProductRepository;
+import com.zerobase.everycampingbackend.domain.order.repository.OrdersRepository;
+import com.zerobase.everycampingbackend.domain.order.service.OrderService;
+import com.zerobase.everycampingbackend.domain.order.type.OrderStatus;
+import com.zerobase.everycampingbackend.domain.product.entity.Product;
+import com.zerobase.everycampingbackend.domain.product.repository.ProductRepository;
+import com.zerobase.everycampingbackend.domain.product.type.ProductCategory;
+import com.zerobase.everycampingbackend.domain.user.entity.Customer;
+import com.zerobase.everycampingbackend.domain.user.entity.Seller;
+import com.zerobase.everycampingbackend.domain.user.repository.CustomerRepository;
+import com.zerobase.everycampingbackend.domain.user.repository.SellerRepository;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -235,8 +236,7 @@ class OrdersServiceTest {
             .email(email)
             .build();
 
-        Customer saved = customerRepository.save(customer);
-        return saved;
+        return customerRepository.save(customer);
     }
 
     private Seller createSeller() {
