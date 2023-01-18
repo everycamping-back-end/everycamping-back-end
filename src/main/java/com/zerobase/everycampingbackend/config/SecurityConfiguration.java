@@ -21,7 +21,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private static final String[] AUTH_IGNORELIST = {
         "/swagger-resources/**",
         "/swagger-ui/**",
-        "/v2/api-docs",
+        "/v3/api-docs",
         "/webjars/**"
     };
 
