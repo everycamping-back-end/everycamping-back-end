@@ -47,7 +47,11 @@ public class OrderProduct extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
-    private Integer amount;
+    private Integer amount; //총액
+
+    private String productNameSnapshot; // 주문 시 상품명
+    private Integer stockPriceSnapshot; // 주문 시 개당 가격
+    private String imageUriSnapshot; // 주문 시 이미지
 
     public static OrderProduct of(Orders orders, Product product, Integer quantity) {
 
@@ -57,6 +61,9 @@ public class OrderProduct extends BaseEntity {
             .status(OrderStatus.COMPLETE)
             .quantity(quantity)
             .amount(quantity * product.getPrice())
+            .productNameSnapshot(product.getName())
+            .stockPriceSnapshot(product.getPrice())
+            .imageUriSnapshot(product.getImageUri())
             .build();
     }
 }
