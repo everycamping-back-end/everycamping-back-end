@@ -23,7 +23,7 @@ public class CartService {
     private final CartRepository cartRepository;
 
     @Transactional
-    public void createCart(Customer customer, Long productId, Integer quantity) {
+    public void addToCart(Customer customer, Long productId, Integer quantity) {
 
         Optional<CartProduct> cartProduct = cartRepository.findByCustomerIdAndProductId(
             customer.getId(), productId);
