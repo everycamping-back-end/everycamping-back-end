@@ -1,6 +1,6 @@
 package com.zerobase.everycampingbackend.domain.user.service;
 
-import com.zerobase.everycampingbackend.common.authkey.AuthCodeService;
+import com.zerobase.everycampingbackend.common.authcode.AuthCodeService;
 import com.zerobase.everycampingbackend.domain.auth.issuer.JwtIssuer;
 import com.zerobase.everycampingbackend.domain.auth.model.JwtDto;
 import com.zerobase.everycampingbackend.domain.auth.model.UserType;

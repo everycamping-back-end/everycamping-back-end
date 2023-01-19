@@ -1,4 +1,4 @@
-package com.zerobase.everycampingbackend.common.authkey;
+package com.zerobase.everycampingbackend.common.authcode;
 
 import com.zerobase.everycampingbackend.domain.mail.MailClient;
 import com.zerobase.everycampingbackend.domain.mail.MailForm;
