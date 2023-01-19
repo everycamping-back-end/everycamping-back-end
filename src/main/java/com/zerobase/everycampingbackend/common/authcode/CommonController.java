@@ -1,4 +1,4 @@
-package com.zerobase.everycampingbackend.common.authkey;
+package com.zerobase.everycampingbackend.common.authcode;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,14 +14,14 @@ public class CommonController {
     private final AuthCodeService authCodeService;
 
     @PostMapping("/auth-request")
-    public ResponseEntity<?> authCodeRequest(@RequestBody String email){
-        authCodeService.authCodeRequest(email);
+    public ResponseEntity<?> authCodeRequest(@RequestBody AuthCodeForm form){
+        authCodeService.authCodeRequest(form.getEmail());
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/auth-verify")
-    public ResponseEntity<?> authCodeVerify(@RequestBody String email, @RequestBody String code){
-        authCodeService.authCodeVerify(email, code);
+    public ResponseEntity<?> authCodeVerify(@RequestBody AuthCodeForm form){
+        authCodeService.authCodeVerify(form.getEmail(), form.getCode());
         return ResponseEntity.ok().build();
     }
 }
