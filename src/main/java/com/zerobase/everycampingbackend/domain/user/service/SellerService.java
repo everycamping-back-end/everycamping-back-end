@@ -1,15 +1,16 @@
 package com.zerobase.everycampingbackend.domain.user.service;
 
+import com.zerobase.everycampingbackend.common.authkey.AuthCodeService;
 import com.zerobase.everycampingbackend.domain.auth.issuer.JwtIssuer;
 import com.zerobase.everycampingbackend.domain.auth.model.JwtDto;
 import com.zerobase.everycampingbackend.domain.auth.model.UserType;
 import com.zerobase.everycampingbackend.domain.auth.service.CustomUserDetailsService;
-import com.zerobase.everycampingbackend.exception.CustomException;
-import com.zerobase.everycampingbackend.exception.ErrorCode;
 import com.zerobase.everycampingbackend.domain.user.entity.Seller;
-import com.zerobase.everycampingbackend.domain.user.repository.SellerRepository;
 import com.zerobase.everycampingbackend.domain.user.form.SignInForm;
 import com.zerobase.everycampingbackend.domain.user.form.SignUpForm;
+import com.zerobase.everycampingbackend.domain.user.repository.SellerRepository;
+import com.zerobase.everycampingbackend.exception.CustomException;
+import com.zerobase.everycampingbackend.exception.ErrorCode;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
@@ -27,11 +28,15 @@ public class SellerService implements CustomUserDetailsService {
     private final JwtIssuer jwtIssuer;
     private final PasswordEncoder passwordEncoder;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final AuthCodeService authCodeService;
 
     public void signUp(SignUpForm form) {
         if (sellerRepository.existsByEmail(form.getEmail().toLowerCase(Locale.ROOT))) {
             throw new CustomException(ErrorCode.EMAIL_BEING_USED);
         }
+
+        authCodeService.authCodeRequest(form.getEmail());
+
         sellerRepository.save(Seller.from(form, passwordEncoder));
     }
 
