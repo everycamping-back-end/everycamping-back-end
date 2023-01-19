@@ -27,10 +27,10 @@ public class CartController {
     private final CartService cartService;
 
     @PostMapping("/add/{productId}")
-    public ResponseEntity<?> createCarts(@AuthenticationPrincipal Customer customer,
+    public ResponseEntity<?> addToCart(@AuthenticationPrincipal Customer customer,
         @PathVariable Long productId, @RequestBody @Valid @Min(1) Integer quantity) {
 
-        cartService.createCart(customer, productId, quantity);
+        cartService.addToCart(customer, productId, quantity);
         return ResponseEntity.ok().build();
     }
 
