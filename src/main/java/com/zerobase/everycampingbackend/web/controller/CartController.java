@@ -1,10 +1,11 @@
 package com.zerobase.everycampingbackend.web.controller;
 
 import com.zerobase.everycampingbackend.domain.cart.dto.CartProductDto;
+import com.zerobase.everycampingbackend.domain.cart.form.AddToCartForm;
+import com.zerobase.everycampingbackend.domain.cart.form.UpdateQuantityForm;
 import com.zerobase.everycampingbackend.domain.cart.service.CartService;
 import com.zerobase.everycampingbackend.domain.user.entity.Customer;
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,9 +29,9 @@ public class CartController {
 
     @PostMapping("/add/{productId}")
     public ResponseEntity<?> addToCart(@AuthenticationPrincipal Customer customer,
-        @PathVariable Long productId, @RequestBody @Valid @Min(1) Integer quantity) {
+        @PathVariable Long productId, @RequestBody @Valid AddToCartForm form) {
 
-        cartService.addToCart(customer, productId, quantity);
+        cartService.addToCart(customer, productId, form.getQuantity());
         return ResponseEntity.ok().build();
     }
 
@@ -43,9 +44,9 @@ public class CartController {
 
     @PatchMapping("/{productId}")
     public ResponseEntity<?> updateQuantity(@AuthenticationPrincipal Customer customer,
-        @PathVariable Long productId, @RequestBody @Valid @Min(1) Integer updateQuantity) {
+        @PathVariable Long productId, @RequestBody @Valid UpdateQuantityForm form) {
 
-        cartService.updateQuantity(customer, productId, updateQuantity);
+        cartService.updateQuantity(customer, productId, form.getUpdateQuantity());
         return ResponseEntity.ok().build();
     }
 
