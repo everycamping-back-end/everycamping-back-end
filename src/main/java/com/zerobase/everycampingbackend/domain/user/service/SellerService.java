@@ -5,9 +5,11 @@ import com.zerobase.everycampingbackend.domain.auth.model.JwtDto;
 import com.zerobase.everycampingbackend.domain.auth.model.UserType;
 import com.zerobase.everycampingbackend.domain.auth.service.CustomUserDetailsService;
 import com.zerobase.everycampingbackend.domain.redis.RedisClient;
+import com.zerobase.everycampingbackend.domain.user.dto.SellerDto;
 import com.zerobase.everycampingbackend.domain.user.entity.Seller;
 import com.zerobase.everycampingbackend.domain.user.form.SignInForm;
 import com.zerobase.everycampingbackend.domain.user.form.SignUpForm;
+import com.zerobase.everycampingbackend.domain.user.form.UserInfoForm;
 import com.zerobase.everycampingbackend.domain.user.repository.SellerRepository;
 import com.zerobase.everycampingbackend.exception.CustomException;
 import com.zerobase.everycampingbackend.exception.ErrorCode;
@@ -48,6 +50,18 @@ public class SellerService implements CustomUserDetailsService {
 
     public void signOut(String email) {
         deleteRefreshToken(email);
+    }
+
+    public void updateInfo(Seller seller, UserInfoForm form) {
+        seller.setNickName(form.getNickName());
+        seller.setPhone(form.getPhoneNumber());
+        seller.setAddress(form.getAddress());
+        seller.setZipcode(form.getZipcode());
+        sellerRepository.save(seller);
+    }
+
+    public SellerDto getInfo(Seller seller){
+        return SellerDto.from(seller);
     }
 
     @Override
