@@ -1,10 +1,10 @@
 package com.zerobase.everycampingbackend.domain.user.service;
 
-import com.zerobase.everycampingbackend.common.authcode.AuthCodeService;
 import com.zerobase.everycampingbackend.domain.auth.issuer.JwtIssuer;
 import com.zerobase.everycampingbackend.domain.auth.model.JwtDto;
 import com.zerobase.everycampingbackend.domain.auth.model.UserType;
 import com.zerobase.everycampingbackend.domain.auth.service.CustomUserDetailsService;
+import com.zerobase.everycampingbackend.domain.redis.RedisClient;
 import com.zerobase.everycampingbackend.domain.user.entity.Seller;
 import com.zerobase.everycampingbackend.domain.user.form.SignInForm;
 import com.zerobase.everycampingbackend.domain.user.form.SignUpForm;
@@ -12,9 +12,7 @@ import com.zerobase.everycampingbackend.domain.user.repository.SellerRepository;
 import com.zerobase.everycampingbackend.exception.CustomException;
 import com.zerobase.everycampingbackend.exception.ErrorCode;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,18 +22,16 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class SellerService implements CustomUserDetailsService {
 
+    public static final String RT_REDIS_INDEX = "RT-SELLER";
     private final SellerRepository sellerRepository;
     private final JwtIssuer jwtIssuer;
     private final PasswordEncoder passwordEncoder;
-    private final RedisTemplate<String, Object> redisTemplate;
-    private final AuthCodeService authCodeService;
+    private final RedisClient redisClient;
 
     public void signUp(SignUpForm form) {
         if (sellerRepository.existsByEmail(form.getEmail().toLowerCase(Locale.ROOT))) {
             throw new CustomException(ErrorCode.EMAIL_BEING_USED);
         }
-
-        authCodeService.authCodeRequest(form.getEmail());
 
         sellerRepository.save(Seller.from(form, passwordEncoder));
     }
@@ -78,15 +74,14 @@ public class SellerService implements CustomUserDetailsService {
 
     @Override
     public String getRefreshToken(String email) {
-        return (String) redisTemplate.opsForValue().get("RT-SELLER:" + email);
+        return redisClient.getValue(RT_REDIS_INDEX, email);
     }
 
     private void putRefreshToken(String email, String token) {
-        redisTemplate.opsForValue()
-            .set("RT-SELLER:" + email, token, JwtIssuer.EXPIRE_TIME * 2, TimeUnit.MILLISECONDS);
+        redisClient.putValue(RT_REDIS_INDEX, email, token, JwtIssuer.EXPIRE_TIME * 2);
     }
 
     private void deleteRefreshToken(String email) {
-        redisTemplate.delete("RT-SELLER:" + email);
+        redisClient.deleteValue(RT_REDIS_INDEX, email);
     }
 }
