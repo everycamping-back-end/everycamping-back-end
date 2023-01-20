@@ -30,6 +30,8 @@ public class OrderProductByCustomerDto {
     private Integer quantity; //주문수량
     private Integer amount; // 총 금액
     private OrderStatus status; //주문 상태
+    private String address; //배송지 주소
+    private String phone; //수령자 전화번호
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime createdAt; // 주문 일자
