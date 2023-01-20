@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
@@ -20,17 +21,17 @@ public class QuestionController {
     @MessageMapping("/questions/{questionRoomId}")
     @SendTo("/topic/questions/{questionRoomId}")
     public MessageForm questionChat(@DestinationVariable String questionRoomId, MessageForm messageForm) {
-        log.info("Question:: Message from " + questionRoomId + ", content : " + messageForm.getContent());
+        log.info("Question:: Message from " + questionRoomId + ", content : " + messageForm);
         messageForm.setQuestionRoomId(questionRoomId);
         messageForm.setCreatedAt(LocalDateTime.now());
         questionService.addQuestionMessage(messageForm);
         return messageForm;
     }
 
-//    @PostMapping("/questions")
-//    public String createQuestionRoom() {
-//        String id = questionService.generateQuestionRoom();
-//        log.info(id);
-//        return id;
-//    }
+    @PostMapping("/questions")
+    public String createQuestionRoom() {
+        String id = questionService.generateQuestionRoom();
+        log.info(id);
+        return id;
+    }
 }

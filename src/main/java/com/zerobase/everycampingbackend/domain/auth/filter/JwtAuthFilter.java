@@ -25,6 +25,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
         FilterChain filterChain) throws ServletException, IOException {
 
+        System.out.println(request.getRequestURL().toString());
+        boolean isWebSocketHandShakingRequest = request.getRequestURL().toString().contains("websocket");
+        if (isWebSocketHandShakingRequest) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String token = resolveTokenFromRequest(request);
 
         if(StringUtils.hasText(token) && jwtAuthenticationProvider.validateToken(token)){

@@ -35,6 +35,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         , "/sellers/signin"
         , "/sellers/signup"
         , "/sellers/reissue"
+        , "/websocket/**"
+        , "/questions"
         , "/commons/**"
 
         //테스트
