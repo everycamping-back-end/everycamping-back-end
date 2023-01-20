@@ -46,6 +46,8 @@ public class OrderProductRepositoryImpl implements OrderProductRepositoryCustom 
 
         List<OrderProductByCustomerDto> list = queryFactory
             .select(Projections.fields(OrderProductByCustomerDto.class,
+                orders.address,
+                orders.phone,
                 orderProduct.product.id.as("productId"),
                 orderProduct.productNameSnapshot,
                 orderProduct.stockPriceSnapshot,
