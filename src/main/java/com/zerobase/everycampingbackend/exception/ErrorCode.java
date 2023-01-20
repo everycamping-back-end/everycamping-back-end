@@ -38,7 +38,9 @@ public enum ErrorCode {
   TOKEN_STILL_ALIVE(HttpStatus.BAD_REQUEST, "재발급 대상 토큰이 아닙니다."),
   TOKEN_NOT_ALIVE(HttpStatus.BAD_REQUEST, "재발급 대상 토큰입니다."),
 
-  NOT_AUTHORISED(HttpStatus.UNAUTHORIZED, "권한이 없습니다.")
+  NOT_AUTHORISED(HttpStatus.UNAUTHORIZED, "권한이 없습니다."),
+
+  AUTH_CODE_NOT_VALID(HttpStatus.UNAUTHORIZED, "유효하지 않은 인증코드입니다."),
 
   ;
 

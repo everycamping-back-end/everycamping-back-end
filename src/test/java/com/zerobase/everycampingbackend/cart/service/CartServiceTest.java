@@ -64,7 +64,7 @@ class CartServiceTest {
 
         //when
         CustomException ex = (CustomException) assertThrows(RuntimeException.class, () -> {
-            cartService.createCart(customer, productId, quantity);
+            cartService.addToCart(customer, productId, quantity);
         });
 
         //then
@@ -85,7 +85,7 @@ class CartServiceTest {
 
         //when
         CustomException ex = (CustomException) assertThrows(RuntimeException.class, () -> {
-            cartService.createCart(customer, productId, quantity);
+            cartService.addToCart(customer, productId, quantity);
         });
 
         //then
@@ -102,7 +102,7 @@ class CartServiceTest {
         Integer quantity = 5;
 
         //when
-        cartService.createCart(customer, productId, quantity);
+        cartService.addToCart(customer, productId, quantity);
 
         //then
         PageRequest pageRequest = PageRequest.of(0, 5);
@@ -228,7 +228,7 @@ class CartServiceTest {
     }
 
     private void addToCart(Customer customer, Long productId, Integer quantity) {
-        cartService.createCart(customer, productId, quantity);
+        cartService.addToCart(customer, productId, quantity);
     }
 
     private Long createProduct(String name, int stock, ProductCategory category) {

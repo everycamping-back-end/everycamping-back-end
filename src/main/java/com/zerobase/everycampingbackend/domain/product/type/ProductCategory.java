@@ -4,5 +4,7 @@ public enum ProductCategory {
     TENT,
     TABLE,
     CHAIR,
-    MAT
+    MAT,
+    COOK,
+    ACCESSORY
 }

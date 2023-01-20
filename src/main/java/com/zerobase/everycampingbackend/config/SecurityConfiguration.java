@@ -37,6 +37,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         , "/sellers/reissue"
         , "/websocket/**"
         , "/questions"
+        , "/commons/**"
 
         //테스트
         , "/test/**"
