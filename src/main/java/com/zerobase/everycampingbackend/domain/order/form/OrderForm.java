@@ -14,6 +14,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class OrderForm {
 
+    @NotNull
+    private String address;
+    @NotNull
+    private String phone;
+
     private List<OrderProductForm> orderProductFormList;
 
     @Getter
