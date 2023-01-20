@@ -31,5 +31,7 @@ public class Orders extends BaseEntity {
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
-
+    private String address;
+    private String phone;
+    
 }

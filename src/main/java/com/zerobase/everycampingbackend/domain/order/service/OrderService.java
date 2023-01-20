@@ -36,6 +36,8 @@ public class OrderService {
 
         Orders orders = ordersRepository.save(Orders.builder()
             .customer(customer)
+            .address(form.getAddress())
+            .phone(form.getPhone())
             .build());
 
         form.getOrderProductFormList().forEach(f -> orderProduct(orders, f));
