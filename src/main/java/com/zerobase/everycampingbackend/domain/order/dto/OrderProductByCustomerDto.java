@@ -1,6 +1,8 @@
 package com.zerobase.everycampingbackend.domain.order.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.zerobase.everycampingbackend.domain.order.entity.OrderProduct;
 import com.zerobase.everycampingbackend.domain.order.type.OrderStatus;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
@@ -15,21 +17,35 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderProductByCustomerDto {
-
     //상품 관련정보
     private Long productId;
-    private String productName;
-    private Integer stockPrice;
-    private String imagePath;
+
+    //스냅샷
+    private String productNameSnapshot; // 주문 시 상품명
+    private Integer stockPriceSnapshot; // 주문 시 개당 가격
+    private String imageUriSnapshot; // 주문 시 상품 이미지 url
 
     //주문 관련정보
     private Long orderProductId;
-    private Integer quantity;
-    private Integer amount;
-    private OrderStatus status;
-    private LocalDateTime createdAt;
+    private Integer quantity; //주문수량
+    private Integer amount; // 총 금액
+    private OrderStatus status; //주문 상태
 
-    //판매자 관련 정보
-    private Long sellerId;
-    private String sellerNickName;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    private LocalDateTime createdAt; // 주문 일자
+
+    public static OrderProductByCustomerDto from(OrderProduct orderProduct) {
+
+        return OrderProductByCustomerDto.builder()
+            .productId(orderProduct.getProduct().getId())
+            .productNameSnapshot(orderProduct.getProductNameSnapshot())
+            .stockPriceSnapshot(orderProduct.getStockPriceSnapshot())
+            .imageUriSnapshot(orderProduct.getImageUriSnapshot())
+            .orderProductId(orderProduct.getId())
+            .quantity(orderProduct.getQuantity())
+            .amount(orderProduct.getAmount())
+            .status(orderProduct.getStatus())
+            .createdAt(orderProduct.getCreatedAt())
+            .build();
+    }
 }
