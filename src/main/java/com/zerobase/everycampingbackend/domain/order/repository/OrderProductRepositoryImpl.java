@@ -61,7 +61,7 @@ public class OrderProductRepositoryImpl implements OrderProductRepositoryCustom 
 
             .where(
                 orders.customer.id.eq(customerId),
-                likeProductName(form.getProductName()),
+                likeProductNameSnapShot(form.getProductName()),
                 goe(form.getStartDate()),
                 loe(form.getEndDate())
             )
@@ -183,6 +183,14 @@ public class OrderProductRepositoryImpl implements OrderProductRepositoryCustom 
         }
 
         return product.name.like("%" + name + "%");
+    }
+
+    private BooleanExpression likeProductNameSnapShot(String name) {
+        if (StringUtils.isNullOrEmpty(name)) {
+            return null;
+        }
+
+        return orderProduct.productNameSnapshot.like("%" + name + "%");
     }
 
     private BooleanExpression goe(Date startDate) {
