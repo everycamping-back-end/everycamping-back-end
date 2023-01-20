@@ -10,16 +10,16 @@ import org.springframework.stereotype.Component;
 public class RedisClient {
     private final RedisTemplate<String, Object> redisTemplate;
 
-    public String getRefreshToken(String index, String key) {
+    public String getValue(String index, String key) {
         return (String) redisTemplate.opsForValue().get(index + ":" + key);
     }
 
-    public void putRefreshToken(String index, String key, String value, long ttl) {
+    public void putValue(String index, String key, String value, long ttl) {
         redisTemplate.opsForValue()
             .set(index + ":" + key, value, ttl, TimeUnit.MILLISECONDS);
     }
 
-    public void deleteRefreshToken(String index, String key) {
+    public void deleteValue(String index, String key) {
         redisTemplate.delete(index + ":" + key);
     }
 }

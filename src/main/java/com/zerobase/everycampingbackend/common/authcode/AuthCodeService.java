@@ -18,14 +18,14 @@ public class AuthCodeService {
 
     public void authCodeRequest(String email) {
         String code = getRandomCode();
-        redisClient.putRefreshToken("AUTHCODE", email, code, 1000 * 60 * 10);
+        redisClient.putValue("AUTHCODE", email, code, 1000 * 60 * 10);
 
         mailClient.sendMail(generateEmailForm(email, code));
     }
 
     public void authCodeRequest(MailForm form) {
         String code = getRandomCode();
-        redisClient.putRefreshToken("AUTHCODE", form.getTo(), code, 1000 * 60 * 10);
+        redisClient.putValue("AUTHCODE", form.getTo(), code, 1000 * 60 * 10);
 
         mailClient.sendMail(form);
     }
@@ -43,9 +43,9 @@ public class AuthCodeService {
     }
 
     public void authCodeVerify(String email, String code) {
-        if(!code.equals(redisClient.getRefreshToken("AUTHCODE", email))){
+        if(!code.equals(redisClient.getValue("AUTHCODE", email))){
             throw new CustomException(ErrorCode.AUTH_CODE_NOT_VALID);
         }
-        redisClient.deleteRefreshToken("AUTHCODE", email);
+        redisClient.deleteValue("AUTHCODE", email);
     }
 }
