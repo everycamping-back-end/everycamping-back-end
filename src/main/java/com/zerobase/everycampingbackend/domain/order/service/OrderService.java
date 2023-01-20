@@ -76,15 +76,11 @@ public class OrderService {
             .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUNT));
 
         if(!orderProduct.getOrders().getCustomer().getId().equals(customer.getId())) {
-            throw new CustomException(ErrorCode.NOT_AUTHORISED);
+            throw new CustomException(ErrorCode.ORDER_CHANGE_STATUS_NOT_AUTHORISED);
         }
 
-        if(orderProduct.getStatus().equals(OrderStatus.CONFIRM)) {
-            throw new CustomException(ErrorCode.ORDER_ALREADY_CONFIRMED);
-        }
-
-        if(orderProduct.getStatus().equals(OrderStatus.CANCEL)) {
-            throw new CustomException(ErrorCode.ORDER_ALREADY_CANCELED);
+        if(!orderProduct.getStatus().equals(OrderStatus.COMPLETE)) {
+            throw new CustomException(ErrorCode.ORDER_ALREADY_CONFIRMED_OR_CANCELED);
         }
 
         orderProduct.setStatus(OrderStatus.CONFIRM);
@@ -97,15 +93,11 @@ public class OrderService {
             .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUNT));
 
         if(!orderProduct.getOrders().getCustomer().getId().equals(customer.getId())) {
-            throw new CustomException(ErrorCode.NOT_AUTHORISED);
+            throw new CustomException(ErrorCode.ORDER_CHANGE_STATUS_NOT_AUTHORISED);
         }
 
-        if(orderProduct.getStatus().equals(OrderStatus.CONFIRM)) {
-            throw new CustomException(ErrorCode.ORDER_ALREADY_CONFIRMED);
-        }
-
-        if(orderProduct.getStatus().equals(OrderStatus.CANCEL)) {
-            throw new CustomException(ErrorCode.ORDER_ALREADY_CANCELED);
+        if(!orderProduct.getStatus().equals(OrderStatus.COMPLETE)) {
+            throw new CustomException(ErrorCode.ORDER_ALREADY_CONFIRMED_OR_CANCELED);
         }
 
         orderProduct.getProduct().setStock(
