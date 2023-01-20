@@ -5,9 +5,11 @@ import com.zerobase.everycampingbackend.domain.auth.model.JwtDto;
 import com.zerobase.everycampingbackend.domain.auth.model.UserType;
 import com.zerobase.everycampingbackend.domain.auth.service.CustomUserDetailsService;
 import com.zerobase.everycampingbackend.domain.redis.RedisClient;
+import com.zerobase.everycampingbackend.domain.user.dto.CustomerDto;
 import com.zerobase.everycampingbackend.domain.user.entity.Customer;
 import com.zerobase.everycampingbackend.domain.user.form.SignInForm;
 import com.zerobase.everycampingbackend.domain.user.form.SignUpForm;
+import com.zerobase.everycampingbackend.domain.user.form.UserInfoForm;
 import com.zerobase.everycampingbackend.domain.user.repository.CustomerRepository;
 import com.zerobase.everycampingbackend.exception.CustomException;
 import com.zerobase.everycampingbackend.exception.ErrorCode;
@@ -50,6 +52,18 @@ public class CustomerService implements CustomUserDetailsService {
         deleteRefreshToken(email);
     }
 
+    public void updateInfo(Customer customer, UserInfoForm form) {
+        customer.setNickName(form.getNickName());
+        customer.setPhone(form.getPhoneNumber());
+        customer.setAddress(form.getAddress());
+        customer.setZipcode(form.getZipcode());
+        customerRepository.save(customer);
+    }
+
+    public CustomerDto getInfo(Customer customer){
+        return CustomerDto.from(customer);
+    }
+
     @Override
     public JwtDto issueJwt(String email, Long id) {
         JwtDto jwtDto = jwtIssuer.createToken(email, id, UserType.CUSTOMER.name());
@@ -84,7 +98,4 @@ public class CustomerService implements CustomUserDetailsService {
     private void deleteRefreshToken(String email) {
         redisClient.deleteValue(RT_REDIS_KEY, email);
     }
-
-
-
 }
