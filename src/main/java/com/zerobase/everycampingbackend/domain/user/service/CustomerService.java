@@ -7,6 +7,7 @@ import com.zerobase.everycampingbackend.domain.auth.service.CustomUserDetailsSer
 import com.zerobase.everycampingbackend.domain.redis.RedisClient;
 import com.zerobase.everycampingbackend.domain.user.dto.CustomerDto;
 import com.zerobase.everycampingbackend.domain.user.entity.Customer;
+import com.zerobase.everycampingbackend.domain.user.form.PasswordForm;
 import com.zerobase.everycampingbackend.domain.user.form.SignInForm;
 import com.zerobase.everycampingbackend.domain.user.form.SignUpForm;
 import com.zerobase.everycampingbackend.domain.user.form.UserInfoForm;
@@ -62,6 +63,14 @@ public class CustomerService implements CustomUserDetailsService {
 
     public CustomerDto getInfo(Customer customer){
         return CustomerDto.from(customer);
+    }
+
+    public void updatePassword(Customer customer, PasswordForm form) {
+        if(!passwordEncoder.matches(form.getOldPassword(), customer.getPassword())){
+            throw new CustomException(ErrorCode.USER_NOT_AUTHORIZED);
+        }
+        customer.setPassword(passwordEncoder.encode(form.getNewPassword()));
+        customerRepository.save(customer);
     }
 
     @Override
