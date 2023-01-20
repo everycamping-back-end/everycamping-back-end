@@ -1,5 +1,7 @@
 package com.zerobase.everycampingbackend.domain.user.service;
 
+import static com.zerobase.everycampingbackend.domain.auth.issuer.JwtIssuer.REFRESH_EXPIRE_TIME;
+
 import com.zerobase.everycampingbackend.domain.auth.issuer.JwtIssuer;
 import com.zerobase.everycampingbackend.domain.auth.model.JwtDto;
 import com.zerobase.everycampingbackend.domain.auth.model.UserType;
@@ -101,7 +103,7 @@ public class CustomerService implements CustomUserDetailsService {
     }
 
     private void putRefreshToken(String email, String token) {
-        redisClient.putValue(RT_REDIS_KEY, email, token, JwtIssuer.EXPIRE_TIME * 2);
+        redisClient.putValue(RT_REDIS_KEY, email, token, REFRESH_EXPIRE_TIME);
     }
 
     private void deleteRefreshToken(String email) {
