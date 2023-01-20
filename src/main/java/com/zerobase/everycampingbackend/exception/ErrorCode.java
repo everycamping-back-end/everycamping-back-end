@@ -23,6 +23,7 @@ public enum ErrorCode {
   LOGIN_CHECK_FAIL(HttpStatus.BAD_REQUEST, "일치하는 정보가 없습니다."),
   USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "존재하지 않는 회원입니다."),
   EMAIL_BEING_USED(HttpStatus.BAD_REQUEST, "사용중인 이메일입니다."),
+  USER_NOT_AUTHORIZED(HttpStatus.UNAUTHORIZED, "수정 권한이 없습니다."),
 
 
   PRODUCT_NOT_FOUND(HttpStatus.BAD_REQUEST, "상품을 찾을 수 없습니다."),

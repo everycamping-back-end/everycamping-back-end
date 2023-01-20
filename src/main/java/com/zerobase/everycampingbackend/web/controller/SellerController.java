@@ -4,6 +4,7 @@ import com.zerobase.everycampingbackend.domain.auth.model.JwtDto;
 import com.zerobase.everycampingbackend.domain.auth.service.JwtReissueService;
 import com.zerobase.everycampingbackend.domain.user.dto.SellerDto;
 import com.zerobase.everycampingbackend.domain.user.entity.Seller;
+import com.zerobase.everycampingbackend.domain.user.form.PasswordForm;
 import com.zerobase.everycampingbackend.domain.user.form.SignInForm;
 import com.zerobase.everycampingbackend.domain.user.form.SignUpForm;
 import com.zerobase.everycampingbackend.domain.user.form.UserInfoForm;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -58,5 +60,12 @@ public class SellerController {
     @GetMapping("/info")
     public ResponseEntity<SellerDto> getInfo(@AuthenticationPrincipal Seller seller){
         return ResponseEntity.ok(sellerService.getInfo(seller));
+    }
+
+    @PatchMapping("/password")
+    public ResponseEntity<?> updatePassword(@AuthenticationPrincipal Seller seller,
+        @RequestBody PasswordForm form){
+        sellerService.updatePassword(seller, form);
+        return ResponseEntity.ok().build();
     }
 }
