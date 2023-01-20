@@ -55,7 +55,7 @@ public class OrderController {
     public ResponseEntity<Page<OrderProductBySellerDto>> getOrdersBySeller(
         @AuthenticationPrincipal Seller seller,
         @ModelAttribute SearchOrderBySellerForm form,
-        Pageable pageable) {
+        @PageableDefault(sort="createdAt", direction = Direction.DESC) Pageable pageable) {
 
         return ResponseEntity.ok(orderService.getOrdersBySeller(form, seller.getId(), pageable));
     }

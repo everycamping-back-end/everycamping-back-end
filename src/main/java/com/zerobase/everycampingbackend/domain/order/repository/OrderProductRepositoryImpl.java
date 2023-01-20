@@ -4,8 +4,6 @@ package com.zerobase.everycampingbackend.domain.order.repository;
 import static com.zerobase.everycampingbackend.domain.order.entity.QOrderProduct.orderProduct;
 import static com.zerobase.everycampingbackend.domain.order.entity.QOrders.orders;
 import static com.zerobase.everycampingbackend.domain.product.entity.QProduct.product;
-import static com.zerobase.everycampingbackend.domain.user.entity.QCustomer.customer;
-import static com.zerobase.everycampingbackend.domain.user.entity.QSeller.seller;
 import static org.springframework.util.ObjectUtils.isEmpty;
 
 import com.querydsl.core.types.Order;
@@ -81,34 +79,38 @@ public class OrderProductRepositoryImpl implements OrderProductRepositoryCustom 
     public Page<OrderProductBySellerDto> searchBySeller(SearchOrderBySellerForm form, Long sellerId,
         Pageable pageable) {
 
+        List<OrderSpecifier> orderByList = getAllOrderSpecifiers(pageable);
+
         List<OrderProductBySellerDto> list = queryFactory
             .select(Projections.fields(OrderProductBySellerDto.class,
+
+                orderProduct.productNameSnapshot,
+                orderProduct.stockPriceSnapshot,
+                orderProduct.imageUriSnapshot,
                 product.id.as("productId"),
-                product.name.as("productName"),
-                product.price.as("stockPrice"),
-                product.imagePath.as("imagePath"),
+
                 orderProduct.id.as("orderProductId"),
+                orders.address,
+                orders.phone,
                 orderProduct.quantity,
                 orderProduct.amount,
                 orderProduct.status,
                 orderProduct.createdAt,
-                customer.id.as("customerId"),
-                customer.nickName.as("customerNickName")))
+
+                orders.customer.id.as("customerId")))
 
             .from(orderProduct)
             .innerJoin(orderProduct.orders, orders)
-            .innerJoin(orders.customer, customer)
             .innerJoin(orderProduct.product, product)
-            .innerJoin(product.seller, seller)
 
             .where(
-                seller.id.eq(sellerId),
-                likeProductName(form.getProductName()),
+                product.seller.id.eq(sellerId),
+                likeProductNameSnapShot(form.getProductName()),
                 goe(form.getStartDate()),
                 loe(form.getEndDate())
             )
 
-            .orderBy(orderProduct.createdAt.desc())
+            .orderBy(orderByList.toArray(OrderSpecifier[]::new))
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
             .fetch();
@@ -120,7 +122,7 @@ public class OrderProductRepositoryImpl implements OrderProductRepositoryCustom 
 
     private List<OrderSpecifier> getAllOrderSpecifiers(Pageable pageable) {
 
-        List<OrderSpecifier> ORDERS = new ArrayList<>();
+        List<OrderSpecifier> orderByList = new ArrayList<>();
 
         if (!isEmpty(pageable.getSort())) {
             for (Sort.Order order : pageable.getSort()) {
@@ -129,17 +131,17 @@ public class OrderProductRepositoryImpl implements OrderProductRepositoryCustom 
                     case "amount":
                         OrderSpecifier<?> orderAmount = QueryDslUtil.getSortedColumn(direction,
                             orderProduct.amount, "amount");
-                        ORDERS.add(orderAmount);
+                        orderByList.add(orderAmount);
                         break;
                     case "createdAt":
                         OrderSpecifier<?> orderCreatedAt = QueryDslUtil.getSortedColumn(direction,
                             orderProduct.createdAt, "createdAt");
-                        ORDERS.add(orderCreatedAt);
+                        orderByList.add(orderCreatedAt);
                         break;
                     case "status":
                         OrderSpecifier<?> orderStatus = QueryDslUtil.getSortedColumn(direction,
                             orderProduct.status, "status");
-                        ORDERS.add(orderStatus);
+                        orderByList.add(orderStatus);
                         break;
                     default:
                         break;
@@ -147,7 +149,7 @@ public class OrderProductRepositoryImpl implements OrderProductRepositoryCustom 
             }
         }
 
-        return ORDERS;
+        return orderByList;
     }
 
 
@@ -156,11 +158,10 @@ public class OrderProductRepositoryImpl implements OrderProductRepositoryCustom 
             .select(orderProduct.count())
             .from(orderProduct)
             .innerJoin(orderProduct.orders, orders)
-            .innerJoin(orders.customer, customer)
 
             .where(
-                customer.id.eq(customerId),
-                likeProductName(form.getProductName()),
+                orders.customer.id.eq(customerId),
+                likeProductNameSnapShot(form.getProductName()),
                 goe(form.getStartDate()),
                 loe(form.getEndDate())
             );
@@ -171,9 +172,8 @@ public class OrderProductRepositoryImpl implements OrderProductRepositoryCustom 
             .select(orderProduct.count())
             .from(orderProduct)
             .innerJoin(orderProduct.product, product)
-            .innerJoin(product.seller, seller)
             .where(
-                seller.id.eq(sellerId),
+                product.seller.id.eq(sellerId),
                 goe(form.getStartDate()),
                 loe(form.getEndDate())
             );
