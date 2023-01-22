@@ -30,8 +30,10 @@ public class Orders extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")
     private Customer customer;
-
-    private String address;
-    private String phone;
+    
+    private String name; //수령인 이름
+    private String address; //수령 주소
+    private String phone; // 수령자 전화번호
+    private String request; //주문 요청사항
     
 }
