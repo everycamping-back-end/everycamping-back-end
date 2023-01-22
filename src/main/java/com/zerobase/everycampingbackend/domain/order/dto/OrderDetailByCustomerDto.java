@@ -55,20 +55,11 @@ public class OrderDetailByCustomerDto {
         //주문 관련정보
         private Integer quantity; //주문수량
         private OrderStatus status; //주문 상태
-    }
 
-//    public static OrderDetailByCustomerDto from(OrderProduct orderProduct) {
-//
-//        return OrderDetailByCustomerDto.builder()
-//            .productId(orderProduct.getProduct().getId())
-//            .productNameSnapshot(orderProduct.getProductNameSnapshot())
-//            .stockPriceSnapshot(orderProduct.getStockPriceSnapshot())
-//            .imageUriSnapshot(orderProduct.getImageUriSnapshot())
-//            .orderProductId(orderProduct.getId())
-//            .quantity(orderProduct.getQuantity())
-//            .amount(orderProduct.getAmount())
-//            .status(orderProduct.getStatus())
-//            .createdAt(orderProduct.getCreatedAt())
-//            .build();
-//    }
+        //판매자 관련정보
+        private Long sellerId;
+        private String sellerNickName;
+        private String sellerEmail;
+        private String sellerPhone;
+    }
 }
