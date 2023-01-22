@@ -43,6 +43,8 @@ public enum ErrorCode {
 
   AUTH_CODE_NOT_VALID(HttpStatus.UNAUTHORIZED, "유효하지 않은 인증코드입니다."),
 
+  WRONG_OAUTH2_PROVIDER(HttpStatus.BAD_REQUEST, "잘못된 소셜로그인 공급자입니다."),
+
   ;
 
 
