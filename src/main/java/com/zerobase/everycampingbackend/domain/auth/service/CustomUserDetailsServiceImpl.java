@@ -1,8 +1,8 @@
 package com.zerobase.everycampingbackend.domain.auth.service;
 
-import com.zerobase.everycampingbackend.domain.auth.model.JwtDto;
-import com.zerobase.everycampingbackend.domain.auth.model.UserType;
-import com.zerobase.everycampingbackend.domain.auth.model.UserVo;
+import com.zerobase.everycampingbackend.domain.auth.dto.JwtDto;
+import com.zerobase.everycampingbackend.domain.auth.type.UserType;
+import com.zerobase.everycampingbackend.domain.auth.dto.UserVo;
 import com.zerobase.everycampingbackend.domain.user.service.CustomerService;
 import com.zerobase.everycampingbackend.domain.user.service.SellerService;
 import java.util.HashMap;

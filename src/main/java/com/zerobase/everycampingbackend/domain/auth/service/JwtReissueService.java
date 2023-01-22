@@ -1,8 +1,8 @@
 package com.zerobase.everycampingbackend.domain.auth.service;
 
 import com.zerobase.everycampingbackend.domain.auth.issuer.JwtIssuer;
-import com.zerobase.everycampingbackend.domain.auth.model.JwtDto;
-import com.zerobase.everycampingbackend.domain.auth.model.UserVo;
+import com.zerobase.everycampingbackend.domain.auth.dto.JwtDto;
+import com.zerobase.everycampingbackend.domain.auth.dto.UserVo;
 import com.zerobase.everycampingbackend.domain.auth.provider.JwtAuthenticationProvider;
 import com.zerobase.everycampingbackend.exception.CustomException;
 import com.zerobase.everycampingbackend.exception.ErrorCode;

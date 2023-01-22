@@ -2,7 +2,7 @@ package com.zerobase.everycampingbackend.domain.auth.service;
 
 import com.zerobase.everycampingbackend.domain.auth.dto.CustomOAuth2User;
 import com.zerobase.everycampingbackend.domain.auth.dto.OAuthAttributes;
-import com.zerobase.everycampingbackend.domain.auth.model.UserType;
+import com.zerobase.everycampingbackend.domain.auth.type.UserType;
 import java.util.Collections;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
