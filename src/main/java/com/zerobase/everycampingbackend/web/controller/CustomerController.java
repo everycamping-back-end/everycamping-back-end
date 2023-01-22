@@ -1,20 +1,25 @@
 package com.zerobase.everycampingbackend.web.controller;
 
 
-import com.zerobase.everycampingbackend.domain.auth.model.JwtDto;
+import com.zerobase.everycampingbackend.domain.auth.dto.CustomOAuth2User;
+import com.zerobase.everycampingbackend.domain.auth.dto.OAuthAttributes;
+import com.zerobase.everycampingbackend.domain.auth.dto.JwtDto;
 import com.zerobase.everycampingbackend.domain.auth.service.JwtReissueService;
 import com.zerobase.everycampingbackend.domain.user.dto.CustomerDto;
-import com.zerobase.everycampingbackend.domain.user.form.PasswordForm;
-import com.zerobase.everycampingbackend.domain.user.form.UserInfoForm;
-import com.zerobase.everycampingbackend.domain.user.service.CustomerService;
 import com.zerobase.everycampingbackend.domain.user.entity.Customer;
+import com.zerobase.everycampingbackend.domain.user.form.PasswordForm;
 import com.zerobase.everycampingbackend.domain.user.form.SignInForm;
 import com.zerobase.everycampingbackend.domain.user.form.SignUpForm;
+import com.zerobase.everycampingbackend.domain.user.form.UserInfoForm;
+import com.zerobase.everycampingbackend.domain.user.service.CustomerService;
+import java.io.IOException;
+import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,6 +46,20 @@ public class CustomerController {
         return ResponseEntity.ok(customerService.signIn(form));
     }
 
+    @GetMapping("/signin/social/{provider}")
+    public void customerSocialSignIn(@PathVariable String provider,
+        HttpServletResponse response) throws IOException {
+        response.sendRedirect("/oauth2/authorization/" + provider);
+    }
+
+    @GetMapping("/social/authorized")
+    public ResponseEntity<JwtDto> customerSocialAuthorized(
+        @AuthenticationPrincipal CustomOAuth2User user) {
+        OAuthAttributes attributes = user.getOAuthAttributes();
+        return ResponseEntity.ok(
+            customerService.socialSignIn(attributes.getEmail(), attributes.getName()));
+    }
+
     @GetMapping("/signout")
     public ResponseEntity<?> customerSignOut(@AuthenticationPrincipal Customer customer) {
         customerService.signOut(customer.getEmail());
@@ -60,13 +79,13 @@ public class CustomerController {
     }
 
     @GetMapping("/info")
-    public ResponseEntity<CustomerDto> getInfo(@AuthenticationPrincipal Customer customer){
+    public ResponseEntity<CustomerDto> getInfo(@AuthenticationPrincipal Customer customer) {
         return ResponseEntity.ok(customerService.getInfo(customer));
     }
 
     @PatchMapping("/password")
     public ResponseEntity<?> updatePassword(@AuthenticationPrincipal Customer customer,
-        @RequestBody PasswordForm form){
+        @RequestBody PasswordForm form) {
         customerService.updatePassword(customer, form);
         return ResponseEntity.ok().build();
     }

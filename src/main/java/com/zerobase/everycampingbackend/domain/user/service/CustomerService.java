@@ -3,8 +3,8 @@ package com.zerobase.everycampingbackend.domain.user.service;
 import static com.zerobase.everycampingbackend.domain.auth.issuer.JwtIssuer.REFRESH_EXPIRE_TIME;
 
 import com.zerobase.everycampingbackend.domain.auth.issuer.JwtIssuer;
-import com.zerobase.everycampingbackend.domain.auth.model.JwtDto;
-import com.zerobase.everycampingbackend.domain.auth.model.UserType;
+import com.zerobase.everycampingbackend.domain.auth.dto.JwtDto;
+import com.zerobase.everycampingbackend.domain.auth.type.UserType;
 import com.zerobase.everycampingbackend.domain.auth.service.CustomUserDetailsService;
 import com.zerobase.everycampingbackend.domain.redis.RedisClient;
 import com.zerobase.everycampingbackend.domain.user.dto.CustomerDto;
@@ -47,6 +47,13 @@ public class CustomerService implements CustomUserDetailsService {
         if (!passwordEncoder.matches(form.getPassword(), customer.getPassword())) {
             throw new CustomException(ErrorCode.LOGIN_CHECK_FAIL);
         }
+
+        return issueJwt(customer.getEmail(), customer.getId());
+    }
+
+    public JwtDto socialSignIn(String email, String nickname) {
+        Customer customer = customerRepository.findByEmail(email)
+            .orElse(customerRepository.save(Customer.of(email, nickname)));
 
         return issueJwt(customer.getEmail(), customer.getId());
     }
