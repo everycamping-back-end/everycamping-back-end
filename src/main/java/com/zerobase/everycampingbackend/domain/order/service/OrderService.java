@@ -1,5 +1,6 @@
 package com.zerobase.everycampingbackend.domain.order.service;
 
+import com.zerobase.everycampingbackend.domain.order.dto.OrderByCustomerDto;
 import com.zerobase.everycampingbackend.domain.order.dto.OrderProductByCustomerDto;
 import com.zerobase.everycampingbackend.domain.order.dto.OrderProductBySellerDto;
 import com.zerobase.everycampingbackend.domain.order.entity.OrderProduct;
@@ -68,7 +69,14 @@ public class OrderService {
             OrderProduct.of(orders, product, orderProductForm.getQuantity()));
     }
 
-    public Page<OrderProductByCustomerDto> getOrdersByCustomer(SearchOrderByCustomerForm form,
+    public Page<OrderByCustomerDto> getOrdersByCustomer(Long customerId, Pageable pageable) {
+        Page<Orders> ordersPage = ordersRepository.findAllByCustomerId(customerId,
+            pageable);
+
+        return ordersPage.map(OrderByCustomerDto::from);
+    }
+
+    public Page<OrderProductByCustomerDto> getOrdersDetailByCustomer(SearchOrderByCustomerForm form,
         Long customerId, Pageable pageable) {
         return orderProductRepository.searchByCustomer(form, customerId, pageable);
     }

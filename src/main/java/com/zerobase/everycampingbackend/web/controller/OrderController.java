@@ -48,7 +48,7 @@ public class OrderController {
         @ModelAttribute SearchOrderByCustomerForm form,
         @PageableDefault(sort="createdAt", direction = Direction.DESC) Pageable pageable) {
 
-        return ResponseEntity.ok(orderService.getOrdersByCustomer(form, customer.getId(), pageable));
+        return ResponseEntity.ok(orderService.getOrdersDetailByCustomer(form, customer.getId(), pageable));
     }
 
     @GetMapping("/seller")
