@@ -35,5 +35,9 @@ public class Orders extends BaseEntity {
     private String address; //수령 주소
     private String phone; // 수령자 전화번호
     private String request; //주문 요청사항
+
+    private String representProductName; // 대표 주문 상품
+    private Integer orderProductCount; //주문 상품(종류) 개수
+    private Integer totalAmount; //총 금액
     
 }

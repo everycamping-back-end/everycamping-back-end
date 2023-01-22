@@ -1,7 +1,5 @@
 package com.zerobase.everycampingbackend.domain.order.service;
 
-import com.zerobase.everycampingbackend.exception.CustomException;
-import com.zerobase.everycampingbackend.exception.ErrorCode;
 import com.zerobase.everycampingbackend.domain.order.dto.OrderProductByCustomerDto;
 import com.zerobase.everycampingbackend.domain.order.dto.OrderProductBySellerDto;
 import com.zerobase.everycampingbackend.domain.order.entity.OrderProduct;
@@ -16,6 +14,8 @@ import com.zerobase.everycampingbackend.domain.order.type.OrderStatus;
 import com.zerobase.everycampingbackend.domain.product.entity.Product;
 import com.zerobase.everycampingbackend.domain.product.service.ProductService;
 import com.zerobase.everycampingbackend.domain.user.entity.Customer;
+import com.zerobase.everycampingbackend.exception.CustomException;
+import com.zerobase.everycampingbackend.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,6 +40,8 @@ public class OrderService {
             .address(form.getAddress())
             .phone(form.getPhone())
             .request(form.getRequest())
+            .orderProductCount(form.getOrderProductFormList().size())
+            .totalAmount(0)
             .build());
 
         form.getOrderProductFormList().forEach(f -> orderProduct(orders, f));
@@ -54,8 +56,13 @@ public class OrderService {
         if (product.getStock() < orderProductForm.getQuantity()) {
             throw new CustomException(ErrorCode.PRODUCT_NOT_ENOUGH_STOCK);
         }
+        if (orders.getRepresentProductName() == null) {
+            orders.setRepresentProductName(product.getName());
+        }
 
-        product.setStock(product.getStock() - orderProductForm.getQuantity()); //더티체킹
+        orders.setTotalAmount(
+            orders.getTotalAmount() + orderProductForm.getQuantity() * product.getPrice());
+        product.setStock(product.getStock() - orderProductForm.getQuantity());
 
         orderProductRepository.save(
             OrderProduct.of(orders, product, orderProductForm.getQuantity()));
@@ -77,11 +84,11 @@ public class OrderService {
         OrderProduct orderProduct = orderProductRepository.findById(orderProductId)
             .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUNT));
 
-        if(!orderProduct.getOrders().getCustomer().getId().equals(customer.getId())) {
+        if (!orderProduct.getOrders().getCustomer().getId().equals(customer.getId())) {
             throw new CustomException(ErrorCode.ORDER_CHANGE_STATUS_NOT_AUTHORISED);
         }
 
-        if(!orderProduct.getStatus().equals(OrderStatus.COMPLETE)) {
+        if (!orderProduct.getStatus().equals(OrderStatus.COMPLETE)) {
             throw new CustomException(ErrorCode.ORDER_ALREADY_CONFIRMED_OR_CANCELED);
         }
 
@@ -94,11 +101,11 @@ public class OrderService {
         OrderProduct orderProduct = orderProductRepository.findById(orderProductId)
             .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUNT));
 
-        if(!orderProduct.getOrders().getCustomer().getId().equals(customer.getId())) {
+        if (!orderProduct.getOrders().getCustomer().getId().equals(customer.getId())) {
             throw new CustomException(ErrorCode.ORDER_CHANGE_STATUS_NOT_AUTHORISED);
         }
 
-        if(!orderProduct.getStatus().equals(OrderStatus.COMPLETE)) {
+        if (!orderProduct.getStatus().equals(OrderStatus.COMPLETE)) {
             throw new CustomException(ErrorCode.ORDER_ALREADY_CONFIRMED_OR_CANCELED);
         }
 

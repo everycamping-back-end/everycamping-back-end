@@ -4,14 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.zerobase.everycampingbackend.exception.CustomException;
-import com.zerobase.everycampingbackend.exception.ErrorCode;
-import com.zerobase.everycampingbackend.domain.order.dto.OrderProductByCustomerDto;
 import com.zerobase.everycampingbackend.domain.order.entity.OrderProduct;
 import com.zerobase.everycampingbackend.domain.order.entity.Orders;
 import com.zerobase.everycampingbackend.domain.order.form.OrderForm;
 import com.zerobase.everycampingbackend.domain.order.form.OrderForm.OrderProductForm;
-import com.zerobase.everycampingbackend.domain.order.form.SearchOrderByCustomerForm;
 import com.zerobase.everycampingbackend.domain.order.repository.OrderProductRepository;
 import com.zerobase.everycampingbackend.domain.order.repository.OrdersRepository;
 import com.zerobase.everycampingbackend.domain.order.service.OrderService;
@@ -23,14 +19,14 @@ import com.zerobase.everycampingbackend.domain.user.entity.Customer;
 import com.zerobase.everycampingbackend.domain.user.entity.Seller;
 import com.zerobase.everycampingbackend.domain.user.repository.CustomerRepository;
 import com.zerobase.everycampingbackend.domain.user.repository.SellerRepository;
+import com.zerobase.everycampingbackend.exception.CustomException;
+import com.zerobase.everycampingbackend.exception.ErrorCode;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.TestPropertySource;
 
 @SpringBootTest
@@ -99,6 +95,9 @@ class OrdersServiceTest {
         assertEquals("김세종", orders.getName());
         assertEquals("대구시 남구", orders.getAddress());
         assertEquals("01086352083", orders.getPhone());
+
+        assertEquals("텐트1", orders.getRepresentProductName());
+        assertEquals(1500+800, orders.getTotalAmount());
 
         OrderProduct orderProduct1 = orderProductRepository.findAll().get(0);
         OrderProduct orderProduct2 = orderProductRepository.findAll().get(1);
