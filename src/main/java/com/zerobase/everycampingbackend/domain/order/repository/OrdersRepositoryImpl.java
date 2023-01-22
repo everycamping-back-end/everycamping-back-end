@@ -12,8 +12,6 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.zerobase.everycampingbackend.domain.order.dto.OrderDetailByCustomerDto;
 import com.zerobase.everycampingbackend.domain.order.dto.OrderDetailByCustomerDto.OrderProductDto;
-import com.zerobase.everycampingbackend.domain.product.entity.QProduct;
-import com.zerobase.everycampingbackend.domain.user.entity.QSeller;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -28,9 +26,9 @@ public class OrdersRepositoryImpl implements OrdersRepositoryCustom {
     public OrderDetailByCustomerDto getOrderDetailByCustomer(Long orderId) {
 
         List<OrderDetailByCustomerDto> list = queryFactory.selectFrom(orders)
-            .join(orderProduct).on(orderProduct.orders.id.eq(orders.id))
-            .join(orderProduct.product, product)
-            .join(product.seller, seller)
+            .innerJoin(orderProduct).on(orderProduct.orders.id.eq(orders.id))
+            .innerJoin(orderProduct.product, product)
+            .innerJoin(product.seller, seller)
             .where(orders.id.eq(orderId))
             .transform(
                 groupBy(orders.id).list(

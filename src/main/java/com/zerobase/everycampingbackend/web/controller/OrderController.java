@@ -2,10 +2,13 @@ package com.zerobase.everycampingbackend.web.controller;
 
 import com.zerobase.everycampingbackend.domain.order.dto.OrderByCustomerDto;
 import com.zerobase.everycampingbackend.domain.order.dto.OrderDetailByCustomerDto;
+import com.zerobase.everycampingbackend.domain.order.dto.OrderProductBySellerDto;
+import com.zerobase.everycampingbackend.domain.order.form.GetOrderProductBySellerForm;
 import com.zerobase.everycampingbackend.domain.order.form.GetOrdersByCustomerForm;
 import com.zerobase.everycampingbackend.domain.order.form.OrderForm;
 import com.zerobase.everycampingbackend.domain.order.service.OrderService;
 import com.zerobase.everycampingbackend.domain.user.entity.Customer;
+import com.zerobase.everycampingbackend.domain.user.entity.Seller;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -57,14 +60,14 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getOrdersDetailByCustomer(orderId, customer.getId()));
     }
 
-//    @GetMapping("/seller")
-//    public ResponseEntity<Page<OrderProductBySellerDto>> getOrdersBySeller(
-//        @AuthenticationPrincipal Seller seller,
-//        @ModelAttribute SearchOrderBySellerForm form,
-//        @PageableDefault(sort="createdAt", direction = Direction.DESC) Pageable pageable) {
-//
-//        return ResponseEntity.ok(orderService.getOrdersBySeller(form, seller.getId(), pageable));
-//    }
+    @GetMapping("/seller")
+    public ResponseEntity<Page<OrderProductBySellerDto>> getOrdersBySeller(
+        @AuthenticationPrincipal Seller seller,
+        @ModelAttribute GetOrderProductBySellerForm form,
+        @PageableDefault(sort="createdAt", direction = Direction.DESC) Pageable pageable) {
+
+        return ResponseEntity.ok(orderService.getOrderProductBySeller(form, seller.getId(), pageable));
+    }
 
     @PatchMapping("/{orderProductId}/confirm")
     public ResponseEntity<?> confirm(@AuthenticationPrincipal Customer customer,

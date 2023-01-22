@@ -2,8 +2,10 @@ package com.zerobase.everycampingbackend.domain.order.service;
 
 import com.zerobase.everycampingbackend.domain.order.dto.OrderByCustomerDto;
 import com.zerobase.everycampingbackend.domain.order.dto.OrderDetailByCustomerDto;
+import com.zerobase.everycampingbackend.domain.order.dto.OrderProductBySellerDto;
 import com.zerobase.everycampingbackend.domain.order.entity.OrderProduct;
 import com.zerobase.everycampingbackend.domain.order.entity.Orders;
+import com.zerobase.everycampingbackend.domain.order.form.GetOrderProductBySellerForm;
 import com.zerobase.everycampingbackend.domain.order.form.GetOrdersByCustomerForm;
 import com.zerobase.everycampingbackend.domain.order.form.OrderForm;
 import com.zerobase.everycampingbackend.domain.order.form.OrderForm.OrderProductForm;
@@ -107,10 +109,10 @@ public class OrderService {
         return ordersRepository.getOrderDetailByCustomer(orderId);
     }
 
-//    public Page<OrderProductBySellerDto> getOrdersBySeller(SearchOrderBySellerForm form,
-//        Long sellerId, Pageable pageable) {
-//        return orderProductRepository.searchBySeller(form, sellerId, pageable);
-//    }
+    public Page<OrderProductBySellerDto> getOrderProductBySeller(GetOrderProductBySellerForm form,
+        Long sellerId, Pageable pageable) {
+        return orderProductRepository.getOrderProductBySeller(form, sellerId, pageable);
+    }
 
     @Transactional
     public void confirm(Customer customer, Long orderProductId) {
