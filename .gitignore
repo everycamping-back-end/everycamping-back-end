@@ -38,6 +38,7 @@ out/
 
 ### secret ###
 myDatabaseInfo.properties
+oauth2.properties
 
 ### log ###
 *.log

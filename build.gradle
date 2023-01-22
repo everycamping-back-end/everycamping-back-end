@@ -27,6 +27,7 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.apache.commons:commons-lang3:3.12.0'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
     // queryDSL
     implementation 'com.querydsl:querydsl-jpa:5.0.0'

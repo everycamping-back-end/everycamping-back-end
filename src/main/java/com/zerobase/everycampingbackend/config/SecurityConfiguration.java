@@ -2,6 +2,7 @@ package com.zerobase.everycampingbackend.config;
 
 import com.zerobase.everycampingbackend.domain.auth.filter.JwtAuthFilter;
 import com.zerobase.everycampingbackend.domain.auth.model.UserType;
+import com.zerobase.everycampingbackend.domain.auth.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -18,6 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final JwtAuthFilter jwtAuthFilter;
+    private final CustomOAuth2UserService customOAuth2UserService;
 
     private static final String[] AUTH_IGNORELIST = {
         "/swagger-resources/**",
@@ -30,6 +32,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         "/"
         //계정 관련
         , "/customers/signin"
+        , "/customers/signin/social/**"
         , "/customers/signup"
         , "/customers/reissue"
         , "/sellers/signin"
@@ -57,6 +60,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
+            .formLogin().disable()
             .httpBasic().disable()
             .csrf().disable()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -68,6 +72,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/sellers/**").hasRole(UserType.SELLER.name())
             .anyRequest().hasAnyRole(UserType.CUSTOMER.name(), UserType.SELLER.name(), UserType.ADMIN.name())
             .and()
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+            .logout().logoutSuccessUrl("/")
+            .and()
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+            .oauth2Login().userInfoEndpoint().userService(customOAuth2UserService)
+            .and()
+            .defaultSuccessUrl("/login/authorized");
     }
 }
