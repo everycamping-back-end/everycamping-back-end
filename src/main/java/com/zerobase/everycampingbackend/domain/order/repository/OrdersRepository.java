@@ -6,7 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface OrdersRepository extends JpaRepository<Orders, Long> {
+public interface OrdersRepository extends JpaRepository<Orders, Long>, OrdersRepositoryCustom {
 
     Page<Orders> findAllByCustomerIdAndCreatedAtBetween(Long customerId, Pageable pageable,
         LocalDateTime start, LocalDateTime end);

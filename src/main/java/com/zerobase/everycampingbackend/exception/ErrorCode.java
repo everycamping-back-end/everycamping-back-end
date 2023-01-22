@@ -18,6 +18,7 @@ public enum ErrorCode {
   ORDER_NOT_FOUNT(HttpStatus.NOT_FOUND, "존재하지 않는 주문입니다."),
   ORDER_ALREADY_CONFIRMED_OR_CANCELED(HttpStatus.BAD_REQUEST, "이미 확정/취소된 주문입니다."),
   ORDER_CHANGE_STATUS_NOT_AUTHORISED(HttpStatus.UNAUTHORIZED, "확정/취소 권한이 없습니다."),
+  ORDER_SELECT_NOT_AUTHORISED(HttpStatus.UNAUTHORIZED, "주문 상세조회 권한이 없습니다."),
 
 
   LOGIN_CHECK_FAIL(HttpStatus.BAD_REQUEST, "일치하는 정보가 없습니다."),

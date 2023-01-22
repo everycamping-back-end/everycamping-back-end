@@ -1,15 +1,12 @@
 package com.zerobase.everycampingbackend.domain.order.service;
 
 import com.zerobase.everycampingbackend.domain.order.dto.OrderByCustomerDto;
-import com.zerobase.everycampingbackend.domain.order.dto.OrderProductByCustomerDto;
-import com.zerobase.everycampingbackend.domain.order.dto.OrderProductBySellerDto;
+import com.zerobase.everycampingbackend.domain.order.dto.OrderDetailByCustomerDto;
 import com.zerobase.everycampingbackend.domain.order.entity.OrderProduct;
 import com.zerobase.everycampingbackend.domain.order.entity.Orders;
 import com.zerobase.everycampingbackend.domain.order.form.GetOrdersByCustomerForm;
 import com.zerobase.everycampingbackend.domain.order.form.OrderForm;
 import com.zerobase.everycampingbackend.domain.order.form.OrderForm.OrderProductForm;
-import com.zerobase.everycampingbackend.domain.order.form.SearchOrderByCustomerForm;
-import com.zerobase.everycampingbackend.domain.order.form.SearchOrderBySellerForm;
 import com.zerobase.everycampingbackend.domain.order.repository.OrderProductRepository;
 import com.zerobase.everycampingbackend.domain.order.repository.OrdersRepository;
 import com.zerobase.everycampingbackend.domain.order.type.OrderStatus;
@@ -98,15 +95,22 @@ public class OrderService {
         return ordersPage.map(OrderByCustomerDto::from);
     }
 
-    public Page<OrderProductByCustomerDto> getOrdersDetailByCustomer(SearchOrderByCustomerForm form,
-        Long customerId, Pageable pageable) {
-        return orderProductRepository.searchByCustomer(form, customerId, pageable);
+    public OrderDetailByCustomerDto getOrdersDetailByCustomer(Long orderId, Long customerId) {
+
+        Orders orders = ordersRepository.findById(orderId)
+            .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUNT));
+
+        if(!orders.getCustomer().getId().equals(customerId)) {
+            throw new CustomException(ErrorCode.ORDER_SELECT_NOT_AUTHORISED);
+        }
+
+        return ordersRepository.getOrderDetailByCustomer(orderId);
     }
 
-    public Page<OrderProductBySellerDto> getOrdersBySeller(SearchOrderBySellerForm form,
-        Long sellerId, Pageable pageable) {
-        return orderProductRepository.searchBySeller(form, sellerId, pageable);
-    }
+//    public Page<OrderProductBySellerDto> getOrdersBySeller(SearchOrderBySellerForm form,
+//        Long sellerId, Pageable pageable) {
+//        return orderProductRepository.searchBySeller(form, sellerId, pageable);
+//    }
 
     @Transactional
     public void confirm(Customer customer, Long orderProductId) {

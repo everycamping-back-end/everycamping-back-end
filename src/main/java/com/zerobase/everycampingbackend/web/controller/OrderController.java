@@ -1,13 +1,11 @@
 package com.zerobase.everycampingbackend.web.controller;
 
 import com.zerobase.everycampingbackend.domain.order.dto.OrderByCustomerDto;
-import com.zerobase.everycampingbackend.domain.order.dto.OrderProductBySellerDto;
-import com.zerobase.everycampingbackend.domain.order.form.OrderForm;
-import com.zerobase.everycampingbackend.domain.order.form.SearchOrderBySellerForm;
+import com.zerobase.everycampingbackend.domain.order.dto.OrderDetailByCustomerDto;
 import com.zerobase.everycampingbackend.domain.order.form.GetOrdersByCustomerForm;
+import com.zerobase.everycampingbackend.domain.order.form.OrderForm;
 import com.zerobase.everycampingbackend.domain.order.service.OrderService;
 import com.zerobase.everycampingbackend.domain.user.entity.Customer;
-import com.zerobase.everycampingbackend.domain.user.entity.Seller;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -51,23 +49,22 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getOrdersByCustomer(form, customer.getId(), pageable));
     }
 
-//    @GetMapping("/customer")
-//    public ResponseEntity<Page<OrderProductByCustomerDto>> getOrdersByCustomer(
-//        @AuthenticationPrincipal Customer customer,
-//        @ModelAttribute SearchOrderByCustomerForm form,
+    @GetMapping("/customer/{orderId}")
+    public ResponseEntity<OrderDetailByCustomerDto> getOrdersDetailByCustomer(
+        @AuthenticationPrincipal Customer customer,
+        @PathVariable @NotNull Long orderId) {
+
+        return ResponseEntity.ok(orderService.getOrdersDetailByCustomer(orderId, customer.getId()));
+    }
+
+//    @GetMapping("/seller")
+//    public ResponseEntity<Page<OrderProductBySellerDto>> getOrdersBySeller(
+//        @AuthenticationPrincipal Seller seller,
+//        @ModelAttribute SearchOrderBySellerForm form,
 //        @PageableDefault(sort="createdAt", direction = Direction.DESC) Pageable pageable) {
 //
-//        return ResponseEntity.ok(orderService.getOrdersDetailByCustomer(form, customer.getId(), pageable));
+//        return ResponseEntity.ok(orderService.getOrdersBySeller(form, seller.getId(), pageable));
 //    }
-
-    @GetMapping("/seller")
-    public ResponseEntity<Page<OrderProductBySellerDto>> getOrdersBySeller(
-        @AuthenticationPrincipal Seller seller,
-        @ModelAttribute SearchOrderBySellerForm form,
-        @PageableDefault(sort="createdAt", direction = Direction.DESC) Pageable pageable) {
-
-        return ResponseEntity.ok(orderService.getOrdersBySeller(form, seller.getId(), pageable));
-    }
 
     @PatchMapping("/{orderProductId}/confirm")
     public ResponseEntity<?> confirm(@AuthenticationPrincipal Customer customer,
