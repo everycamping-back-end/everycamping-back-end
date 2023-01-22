@@ -1,4 +1,4 @@
-package com.zerobase.everycampingbackend.domain.auth.model;
+package com.zerobase.everycampingbackend.domain.auth.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

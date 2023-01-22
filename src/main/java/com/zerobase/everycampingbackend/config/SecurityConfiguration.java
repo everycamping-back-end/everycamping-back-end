@@ -1,7 +1,7 @@
 package com.zerobase.everycampingbackend.config;
 
 import com.zerobase.everycampingbackend.domain.auth.filter.JwtAuthFilter;
-import com.zerobase.everycampingbackend.domain.auth.model.UserType;
+import com.zerobase.everycampingbackend.domain.auth.type.UserType;
 import com.zerobase.everycampingbackend.domain.auth.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;

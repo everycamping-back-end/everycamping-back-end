@@ -1,6 +1,6 @@
 package com.zerobase.everycampingbackend.domain.auth.service;
 
-import com.zerobase.everycampingbackend.domain.auth.model.JwtDto;
+import com.zerobase.everycampingbackend.domain.auth.dto.JwtDto;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 public interface CustomUserDetailsService extends UserDetailsService {

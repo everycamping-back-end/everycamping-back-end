@@ -1,6 +1,6 @@
 package com.zerobase.everycampingbackend.web.controller;
 
-import com.zerobase.everycampingbackend.domain.auth.model.JwtDto;
+import com.zerobase.everycampingbackend.domain.auth.dto.JwtDto;
 import com.zerobase.everycampingbackend.domain.auth.service.JwtReissueService;
 import com.zerobase.everycampingbackend.domain.user.dto.SellerDto;
 import com.zerobase.everycampingbackend.domain.user.entity.Seller;

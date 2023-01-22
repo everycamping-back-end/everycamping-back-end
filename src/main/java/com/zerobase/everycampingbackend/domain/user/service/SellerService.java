@@ -3,8 +3,8 @@ package com.zerobase.everycampingbackend.domain.user.service;
 import static com.zerobase.everycampingbackend.domain.auth.issuer.JwtIssuer.REFRESH_EXPIRE_TIME;
 
 import com.zerobase.everycampingbackend.domain.auth.issuer.JwtIssuer;
-import com.zerobase.everycampingbackend.domain.auth.model.JwtDto;
-import com.zerobase.everycampingbackend.domain.auth.model.UserType;
+import com.zerobase.everycampingbackend.domain.auth.dto.JwtDto;
+import com.zerobase.everycampingbackend.domain.auth.type.UserType;
 import com.zerobase.everycampingbackend.domain.auth.service.CustomUserDetailsService;
 import com.zerobase.everycampingbackend.domain.redis.RedisClient;
 import com.zerobase.everycampingbackend.domain.user.dto.SellerDto;

@@ -1,4 +1,4 @@
-package com.zerobase.everycampingbackend.domain.auth.model;
+package com.zerobase.everycampingbackend.domain.auth.dto;
 
 import javax.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
