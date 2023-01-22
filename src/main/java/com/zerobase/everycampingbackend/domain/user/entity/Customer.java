@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -33,7 +34,9 @@ public class Customer extends BaseEntity implements UserDetails {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @Column(nullable = false)
   private String email;    // 이메일
+  @Column(nullable = false)
   private String nickName; // 닉네임
   private String password; // 패스워드
   private String address;  // 주소
@@ -48,6 +51,13 @@ public class Customer extends BaseEntity implements UserDetails {
         .password(passwordEncoder.encode(form.getPassword()))
         .nickName(form.getNickName())
         .phone(form.getPhoneNumber())
+        .build();
+  }
+
+  public static Customer of(String email, String nickName) {
+    return Customer.builder()
+        .email(email.toLowerCase(Locale.ROOT))
+        .nickName(nickName)
         .build();
   }
 
