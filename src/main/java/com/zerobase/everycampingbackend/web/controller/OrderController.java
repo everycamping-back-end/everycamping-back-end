@@ -1,10 +1,10 @@
 package com.zerobase.everycampingbackend.web.controller;
 
-import com.zerobase.everycampingbackend.domain.order.dto.OrderProductByCustomerDto;
+import com.zerobase.everycampingbackend.domain.order.dto.OrderByCustomerDto;
 import com.zerobase.everycampingbackend.domain.order.dto.OrderProductBySellerDto;
 import com.zerobase.everycampingbackend.domain.order.form.OrderForm;
-import com.zerobase.everycampingbackend.domain.order.form.SearchOrderByCustomerForm;
 import com.zerobase.everycampingbackend.domain.order.form.SearchOrderBySellerForm;
+import com.zerobase.everycampingbackend.domain.order.form.GetOrdersByCustomerForm;
 import com.zerobase.everycampingbackend.domain.order.service.OrderService;
 import com.zerobase.everycampingbackend.domain.user.entity.Customer;
 import com.zerobase.everycampingbackend.domain.user.entity.Seller;
@@ -43,13 +43,22 @@ public class OrderController {
     }
 
     @GetMapping("/customer")
-    public ResponseEntity<Page<OrderProductByCustomerDto>> getOrdersByCustomer(
+    public ResponseEntity<Page<OrderByCustomerDto>> getOrdersByCustomer(
         @AuthenticationPrincipal Customer customer,
-        @ModelAttribute SearchOrderByCustomerForm form,
+        @ModelAttribute GetOrdersByCustomerForm form,
         @PageableDefault(sort="createdAt", direction = Direction.DESC) Pageable pageable) {
 
-        return ResponseEntity.ok(orderService.getOrdersDetailByCustomer(form, customer.getId(), pageable));
+        return ResponseEntity.ok(orderService.getOrdersByCustomer(form, customer.getId(), pageable));
     }
+
+//    @GetMapping("/customer")
+//    public ResponseEntity<Page<OrderProductByCustomerDto>> getOrdersByCustomer(
+//        @AuthenticationPrincipal Customer customer,
+//        @ModelAttribute SearchOrderByCustomerForm form,
+//        @PageableDefault(sort="createdAt", direction = Direction.DESC) Pageable pageable) {
+//
+//        return ResponseEntity.ok(orderService.getOrdersDetailByCustomer(form, customer.getId(), pageable));
+//    }
 
     @GetMapping("/seller")
     public ResponseEntity<Page<OrderProductBySellerDto>> getOrdersBySeller(

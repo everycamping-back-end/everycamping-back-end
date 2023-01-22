@@ -5,6 +5,7 @@ import com.zerobase.everycampingbackend.domain.order.dto.OrderProductByCustomerD
 import com.zerobase.everycampingbackend.domain.order.dto.OrderProductBySellerDto;
 import com.zerobase.everycampingbackend.domain.order.entity.OrderProduct;
 import com.zerobase.everycampingbackend.domain.order.entity.Orders;
+import com.zerobase.everycampingbackend.domain.order.form.GetOrdersByCustomerForm;
 import com.zerobase.everycampingbackend.domain.order.form.OrderForm;
 import com.zerobase.everycampingbackend.domain.order.form.OrderForm.OrderProductForm;
 import com.zerobase.everycampingbackend.domain.order.form.SearchOrderByCustomerForm;
@@ -17,12 +18,17 @@ import com.zerobase.everycampingbackend.domain.product.service.ProductService;
 import com.zerobase.everycampingbackend.domain.user.entity.Customer;
 import com.zerobase.everycampingbackend.exception.CustomException;
 import com.zerobase.everycampingbackend.exception.ErrorCode;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderService {
@@ -69,9 +75,25 @@ public class OrderService {
             OrderProduct.of(orders, product, orderProductForm.getQuantity()));
     }
 
-    public Page<OrderByCustomerDto> getOrdersByCustomer(Long customerId, Pageable pageable) {
-        Page<Orders> ordersPage = ordersRepository.findAllByCustomerId(customerId,
-            pageable);
+    public Page<OrderByCustomerDto> getOrdersByCustomer(GetOrdersByCustomerForm form,
+        Long customerId, Pageable pageable) {
+
+        if (form.getEndDate() == null && form.getStartDate() == null) {
+            Page<Orders> ordersPage = ordersRepository.findAllByCustomerId(customerId,
+                pageable);
+
+            return ordersPage.map(OrderByCustomerDto::from);
+        }
+
+        LocalDateTime start = form.getStartDate() == null ? null
+            : form.getStartDate().toInstant().atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+        LocalDateTime end = form.getEndDate() == null ? null
+            : form.getEndDate().toInstant().atZone(ZoneId.systemDefault())
+                .toLocalDateTime().with(LocalTime.MAX);
+
+        Page<Orders> ordersPage = ordersRepository.findAllByCustomerIdAndCreatedAtBetween(customerId,
+            pageable,start,end);
 
         return ordersPage.map(OrderByCustomerDto::from);
     }

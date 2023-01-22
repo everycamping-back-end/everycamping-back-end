@@ -23,6 +23,7 @@ public class OrderForm {
 
     private String request;
 
+    @NotNull
     private List<OrderProductForm> orderProductFormList;
 
     @Getter

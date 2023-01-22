@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.zerobase.everycampingbackend.domain.order.dto.OrderByCustomerDto;
 import com.zerobase.everycampingbackend.domain.order.entity.OrderProduct;
 import com.zerobase.everycampingbackend.domain.order.entity.Orders;
+import com.zerobase.everycampingbackend.domain.order.form.GetOrdersByCustomerForm;
 import com.zerobase.everycampingbackend.domain.order.form.OrderForm;
 import com.zerobase.everycampingbackend.domain.order.form.OrderForm.OrderProductForm;
 import com.zerobase.everycampingbackend.domain.order.repository.OrderProductRepository;
@@ -187,9 +188,10 @@ class OrdersServiceTest {
         orderService.order(customer, orderForm);
 
         PageRequest pageRequest = PageRequest.of(0, 5);
+        GetOrdersByCustomerForm form = GetOrdersByCustomerForm.builder().build();
 
         //when
-        Page<OrderByCustomerDto> result = orderService.getOrdersByCustomer(
+        Page<OrderByCustomerDto> result = orderService.getOrdersByCustomer(form,
             customer.getId(), pageRequest);
 
         //then
