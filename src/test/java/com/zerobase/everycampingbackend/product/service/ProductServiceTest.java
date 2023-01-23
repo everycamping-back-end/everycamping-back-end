@@ -3,8 +3,6 @@ package com.zerobase.everycampingbackend.product.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.zerobase.everycampingbackend.exception.CustomException;
-import com.zerobase.everycampingbackend.exception.ErrorCode;
 import com.zerobase.everycampingbackend.domain.product.dto.ProductDetailDto;
 import com.zerobase.everycampingbackend.domain.product.dto.ProductDto;
 import com.zerobase.everycampingbackend.domain.product.entity.Product;
@@ -14,6 +12,8 @@ import com.zerobase.everycampingbackend.domain.product.service.ProductService;
 import com.zerobase.everycampingbackend.domain.product.type.ProductCategory;
 import com.zerobase.everycampingbackend.domain.user.entity.Seller;
 import com.zerobase.everycampingbackend.domain.user.repository.SellerRepository;
+import com.zerobase.everycampingbackend.exception.CustomException;
+import com.zerobase.everycampingbackend.exception.ErrorCode;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,8 +21,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -113,7 +113,7 @@ class ProductServiceTest {
         PageRequest pageRequest = PageRequest.of(0, 5);
         form.setName("상품");
         // when
-        Page<ProductDto> result = productService.getProducts(form, pageRequest);
+        Slice<ProductDto> result = productService.getProducts(form, pageRequest);
 
         // then
         assertEquals(3, result.getSize());
@@ -129,7 +129,7 @@ class ProductServiceTest {
         PageRequest pageRequest = PageRequest.of(0, 5);
         form.setCategory(ProductCategory.TENT);
         // when
-        Page<ProductDto> result = productService.getProducts(form, pageRequest);
+        Slice<ProductDto> result = productService.getProducts(form, pageRequest);
 
         // then
         assertEquals(2, result.getSize());
@@ -145,10 +145,10 @@ class ProductServiceTest {
 
         // when
         form.setTags(List.of("우리집"));
-        Page<ProductDto> result = productService.getProducts(form, pageRequest);
+        Slice<ProductDto> result = productService.getProducts(form, pageRequest);
 
         form.setTags(List.of("럭셔리"));
-        Page<ProductDto> result2 = productService.getProducts(form, pageRequest);
+        Slice<ProductDto> result2 = productService.getProducts(form, pageRequest);
 
         // then
         assertEquals(2, result.getSize());
@@ -167,7 +167,7 @@ class ProductServiceTest {
         form.setName("상품");
         form.setCategory(ProductCategory.TENT);
         // when
-        Page<ProductDto> result = productService.getProducts(form, pageRequest);
+        Slice<ProductDto> result = productService.getProducts(form, pageRequest);
 
         // then
         assertEquals(1, result.getSize());
