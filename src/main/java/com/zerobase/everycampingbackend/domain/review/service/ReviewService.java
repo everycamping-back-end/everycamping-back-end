@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
@@ -63,6 +64,10 @@ public class ReviewService {
         }
 
         S3Path s3Path = staticImageService.editImage(review.getImagePath(), image);
+        if(ObjectUtils.isEmpty(image)){
+            s3Path.setImageUri(review.getImageUri());
+            s3Path.setImagePath(review.getImagePath());
+        }
 
         Integer oldScore = review.getScore();
         review.setOf(form, s3Path);
