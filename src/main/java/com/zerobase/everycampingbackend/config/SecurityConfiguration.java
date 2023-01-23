@@ -1,9 +1,11 @@
 package com.zerobase.everycampingbackend.config;
 
 import com.zerobase.everycampingbackend.domain.auth.filter.JwtAuthFilter;
-import com.zerobase.everycampingbackend.domain.auth.type.UserType;
 import com.zerobase.everycampingbackend.domain.auth.service.CustomOAuth2UserService;
+import com.zerobase.everycampingbackend.domain.auth.type.UserType;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -12,6 +14,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @RequiredArgsConstructor
 @EnableWebSecurity
@@ -63,6 +68,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .formLogin().disable()
             .httpBasic().disable()
             .csrf().disable()
+            .cors().configurationSource(corsConfigurationSource())
+            .and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
             .authorizeRequests()
@@ -78,5 +85,19 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .oauth2Login().userInfoEndpoint().userService(customOAuth2UserService)
             .and()
             .defaultSuccessUrl("/login/authorized");
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        configuration.setAllowedOriginPatterns(List.of("*"));
+        configuration.addAllowedMethod("*");
+        configuration.addAllowedHeader("*");
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }

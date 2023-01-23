@@ -27,9 +27,9 @@ public class ReviewController {
 
     private final ReviewService reviewService;
 
-    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(value = "/{productId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> writeReview(@AuthenticationPrincipal Customer customer,
-        @RequestPart Long productId,
+        @PathVariable Long productId,
         @RequestPart ReviewForm form, MultipartFile image)
         throws IOException {
         reviewService.writeReview(customer, productId, form, image);
