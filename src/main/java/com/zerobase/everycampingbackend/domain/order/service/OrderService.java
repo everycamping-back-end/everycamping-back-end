@@ -3,6 +3,7 @@ package com.zerobase.everycampingbackend.domain.order.service;
 import com.zerobase.everycampingbackend.domain.order.dto.OrderByCustomerDto;
 import com.zerobase.everycampingbackend.domain.order.dto.OrderDetailByCustomerDto;
 import com.zerobase.everycampingbackend.domain.order.dto.OrderProductBySellerDto;
+import com.zerobase.everycampingbackend.domain.order.dto.OrderProductDetailBySellerDto;
 import com.zerobase.everycampingbackend.domain.order.entity.OrderProduct;
 import com.zerobase.everycampingbackend.domain.order.entity.Orders;
 import com.zerobase.everycampingbackend.domain.order.form.GetOrderProductBySellerForm;
@@ -20,6 +21,7 @@ import com.zerobase.everycampingbackend.exception.ErrorCode;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -91,28 +93,52 @@ public class OrderService {
             : form.getEndDate().toInstant().atZone(ZoneId.systemDefault())
                 .toLocalDateTime().with(LocalTime.MAX);
 
-        Page<Orders> ordersPage = ordersRepository.findAllByCustomerIdAndCreatedAtBetween(customerId,
-            pageable,start,end);
+        Page<Orders> ordersPage = ordersRepository.findAllByCustomerIdAndCreatedAtBetween(
+            customerId,
+            pageable, start, end);
 
         return ordersPage.map(OrderByCustomerDto::from);
     }
 
     public OrderDetailByCustomerDto getOrdersDetailByCustomer(Long orderId, Long customerId) {
 
-        Orders orders = ordersRepository.findById(orderId)
-            .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUNT));
+        List<OrderDetailByCustomerDto> list = ordersRepository.getOrderDetailByCustomer(
+            orderId);
+        if(list.isEmpty()) {
+            throw new CustomException(ErrorCode.ORDER_NOT_FOUNT);
+        }
 
-        if(!orders.getCustomer().getId().equals(customerId)) {
+        OrderDetailByCustomerDto dto = list.get(0);
+        if(!dto.getCustomerId().equals(customerId)) {
             throw new CustomException(ErrorCode.ORDER_SELECT_NOT_AUTHORISED);
         }
 
-        return ordersRepository.getOrderDetailByCustomer(orderId);
+        return dto;
     }
 
     public Page<OrderProductBySellerDto> getOrderProductBySeller(GetOrderProductBySellerForm form,
         Long sellerId, Pageable pageable) {
-        return orderProductRepository.getOrderProductBySeller(form, sellerId, pageable);
+        return orderProductRepository.getOrderProductsBySeller(form, sellerId, pageable);
     }
+
+    public OrderProductDetailBySellerDto getOrderProductDetailBySeller(Long orderProductId,
+        Long sellerId) {
+
+        List<OrderProductDetailBySellerDto> list = orderProductRepository.getOrderProductDetailBySeller(
+            orderProductId);
+
+        if(list.isEmpty()) {
+            throw new CustomException(ErrorCode.ORDER_PRODUCT_NOT_FOUNT);
+        }
+
+        OrderProductDetailBySellerDto dto = list.get(0);
+
+        if(!sellerId.equals(dto.getSellerId())) {
+            throw new CustomException(ErrorCode.ORDER_PRODUCT_SELECT_NOT_AUTHORISED);
+        }
+        return dto;
+    }
+
 
     @Transactional
     public void confirm(Customer customer, Long orderProductId) {

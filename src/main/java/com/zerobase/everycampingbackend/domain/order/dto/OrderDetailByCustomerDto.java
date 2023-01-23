@@ -30,6 +30,8 @@ public class OrderDetailByCustomerDto {
     private String phone; //수령자 전화번호
     private String request; //주문 요청사항
 
+    private Long customerId;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime createdAt; // 주문 일자
 

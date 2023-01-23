@@ -3,6 +3,7 @@ package com.zerobase.everycampingbackend.web.controller;
 import com.zerobase.everycampingbackend.domain.order.dto.OrderByCustomerDto;
 import com.zerobase.everycampingbackend.domain.order.dto.OrderDetailByCustomerDto;
 import com.zerobase.everycampingbackend.domain.order.dto.OrderProductBySellerDto;
+import com.zerobase.everycampingbackend.domain.order.dto.OrderProductDetailBySellerDto;
 import com.zerobase.everycampingbackend.domain.order.form.GetOrderProductBySellerForm;
 import com.zerobase.everycampingbackend.domain.order.form.GetOrdersByCustomerForm;
 import com.zerobase.everycampingbackend.domain.order.form.OrderForm;
@@ -61,12 +62,21 @@ public class OrderController {
     }
 
     @GetMapping("/seller")
-    public ResponseEntity<Page<OrderProductBySellerDto>> getOrdersBySeller(
+    public ResponseEntity<Page<OrderProductBySellerDto>> getOrderProductBySeller(
         @AuthenticationPrincipal Seller seller,
         @ModelAttribute GetOrderProductBySellerForm form,
         @PageableDefault(sort="createdAt", direction = Direction.DESC) Pageable pageable) {
 
         return ResponseEntity.ok(orderService.getOrderProductBySeller(form, seller.getId(), pageable));
+    }
+
+    @GetMapping("/seller/{orderProductId}")
+    public ResponseEntity<OrderProductDetailBySellerDto> getOrderProductDetailBySeller(
+        @AuthenticationPrincipal Seller seller,
+        @PathVariable @NotNull Long orderProductId) {
+
+        return ResponseEntity.ok(
+            orderService.getOrderProductDetailBySeller(orderProductId, seller.getId()));
     }
 
     @PatchMapping("/{orderProductId}/confirm")

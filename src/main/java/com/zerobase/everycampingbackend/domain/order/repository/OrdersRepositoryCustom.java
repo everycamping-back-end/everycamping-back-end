@@ -1,8 +1,9 @@
 package com.zerobase.everycampingbackend.domain.order.repository;
 
 import com.zerobase.everycampingbackend.domain.order.dto.OrderDetailByCustomerDto;
+import java.util.List;
 
 public interface OrdersRepositoryCustom {
 
-    OrderDetailByCustomerDto getOrderDetailByCustomer(Long orderId);
+    List<OrderDetailByCustomerDto> getOrderDetailByCustomer(Long orderId);
 }

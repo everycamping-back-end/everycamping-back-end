@@ -23,9 +23,9 @@ public class OrdersRepositoryImpl implements OrdersRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public OrderDetailByCustomerDto getOrderDetailByCustomer(Long orderId) {
+    public List<OrderDetailByCustomerDto> getOrderDetailByCustomer(Long orderId) {
 
-        List<OrderDetailByCustomerDto> list = queryFactory.selectFrom(orders)
+        return queryFactory.selectFrom(orders)
             .innerJoin(orderProduct).on(orderProduct.orders.id.eq(orders.id))
             .innerJoin(orderProduct.product, product)
             .innerJoin(product.seller, seller)
@@ -46,10 +46,9 @@ public class OrdersRepositoryImpl implements OrdersRepositoryCustom {
                         orders.orderProductCount
                         , orders.totalAmount, orders.name, orders.address, orders.phone,
                         orders.request
+                        , orders.customer.id
                         , orders.createdAt
                     ))
             );
-
-        return list.get(0);
     }
 }

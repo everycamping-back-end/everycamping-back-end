@@ -2,7 +2,9 @@ package com.zerobase.everycampingbackend.domain.order.repository;
 
 
 import static com.zerobase.everycampingbackend.domain.order.entity.QOrderProduct.orderProduct;
+import static com.zerobase.everycampingbackend.domain.order.entity.QOrders.orders;
 import static com.zerobase.everycampingbackend.domain.product.entity.QProduct.product;
+import static com.zerobase.everycampingbackend.domain.user.entity.QCustomer.customer;
 import static org.springframework.util.ObjectUtils.isEmpty;
 
 import com.querydsl.core.types.Order;
@@ -14,6 +16,7 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.zerobase.everycampingbackend.common.QueryDslUtil;
 import com.zerobase.everycampingbackend.domain.order.dto.OrderProductBySellerDto;
+import com.zerobase.everycampingbackend.domain.order.dto.OrderProductDetailBySellerDto;
 import com.zerobase.everycampingbackend.domain.order.form.GetOrderProductBySellerForm;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -34,7 +37,7 @@ public class OrderProductRepositoryImpl implements OrderProductRepositoryCustom 
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<OrderProductBySellerDto> getOrderProductBySeller(GetOrderProductBySellerForm form,
+    public Page<OrderProductBySellerDto> getOrderProductsBySeller(GetOrderProductBySellerForm form,
         Long sellerId, Pageable pageable) {
 
         List<OrderSpecifier> orderByList = getAllOrderSpecifiers(pageable);
@@ -71,49 +74,46 @@ public class OrderProductRepositoryImpl implements OrderProductRepositoryCustom 
         return PageableExecutionUtils.getPage(list, pageable, countQuery::fetchOne);
     }
 
-//    @Override
-//    public Page<OrderProductBySellerDto> searchBySeller(SearchOrderBySellerForm form, Long sellerId,
-//        Pageable pageable) {
-//
-//        List<OrderSpecifier> orderByList = getAllOrderSpecifiers(pageable);
-//
-//        List<OrderProductBySellerDto> list = queryFactory
-//            .select(Projections.fields(OrderProductBySellerDto.class,
-//
-//                orderProduct.productNameSnapshot,
-//                orderProduct.stockPriceSnapshot,
-//                orderProduct.imageUriSnapshot,
-//                product.id.as("productId"),
-//
-//                orderProduct.id.as("orderProductId"),
-//                orders.address,
-//                orders.phone,
-//                orderProduct.quantity,
-//                orderProduct.amount,
-//                orderProduct.status,
-//                orderProduct.createdAt,
-//
-//                orders.customer.id.as("customerId")))
-//
-//            .from(orderProduct)
-//            .innerJoin(orderProduct.orders, orders)
-//            .innerJoin(orderProduct.product, product)
-//
-//            .where(
-//                product.seller.id.eq(sellerId),
-//                likeProductNameSnapShot(form.getProductName()),
-//                goe(form.getStartDate()),
-//                loe(form.getEndDate())
-//            )
-//
-//            .orderBy(orderByList.toArray(OrderSpecifier[]::new))
-//            .offset(pageable.getOffset())
-//            .limit(pageable.getPageSize())
-//            .fetch();
-//
-//        JPAQuery<Long> countQuery = getBySellerCount(form, sellerId);
-//        return PageableExecutionUtils.getPage(list, pageable, countQuery::fetchOne);
-//    }
+    @Override
+    public List<OrderProductDetailBySellerDto> getOrderProductDetailBySeller(Long orderProductId) {
+
+        return queryFactory
+            .select(Projections.fields(OrderProductDetailBySellerDto.class,
+
+                orderProduct.id.as("orderProductId"),
+                product.id.as("productId"),
+                orderProduct.productNameSnapshot,
+                orderProduct.stockPriceSnapshot,
+                orderProduct.imageUriSnapshot,
+                orderProduct.quantity,
+                orderProduct.amount,
+
+                orders.name.as("receiverName"),
+                orders.address.as("receiverAddress"),
+                orders.phone.as("receiverPhone"),
+                orders.request,
+
+                customer.id.as("customerId"),
+                customer.email.as("customerEmail"),
+                customer.nickName.as("customerNickName"),
+                customer.phone.as("customerPhone"),
+
+                orderProduct.createdAt,
+                orderProduct.status,
+
+                product.seller.id.as("sellerId")
+                ))
+
+            .from(orderProduct)
+            .innerJoin(orderProduct.orders, orders)
+            .innerJoin(orders.customer, customer)
+            .innerJoin(orderProduct.product, product)
+
+            .where(
+                orderProduct.id.eq(orderProductId)
+            )
+            .fetch();
+    }
 
     private List<OrderSpecifier> getAllOrderSpecifiers(Pageable pageable) {
 
