@@ -1,5 +1,6 @@
 package com.zerobase.everycampingbackend.domain.review.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.zerobase.everycampingbackend.domain.review.entity.Review;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
@@ -17,7 +18,9 @@ public class ReviewDto {
     private Integer score;
     private String text;
     private String imageUri;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime createdAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime modifiedAt;
 
     public static ReviewDto from(Review review){
