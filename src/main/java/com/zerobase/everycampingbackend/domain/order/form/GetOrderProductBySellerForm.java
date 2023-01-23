@@ -7,19 +7,20 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.lang.Nullable;
 
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SearchOrderBySellerForm {
+public class GetOrderProductBySellerForm {
 
-    private String productName;
-
+    @Nullable
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date startDate;
 
+    @Nullable
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date endDate;
 }
