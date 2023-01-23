@@ -5,13 +5,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class CustomerDto {
+    private Long id;
     private String email;
     private String nickName;
     private String address;
@@ -20,6 +20,7 @@ public class CustomerDto {
 
     public static CustomerDto from(Customer customer){
         return CustomerDto.builder()
+            .id(customer.getId())
             .email(customer.getEmail())
             .nickName(customer.getNickName())
             .address(customer.getAddress())

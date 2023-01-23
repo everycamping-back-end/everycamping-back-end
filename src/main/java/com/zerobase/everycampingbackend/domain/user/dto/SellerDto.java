@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class SellerDto {
+    private Long id;
     private String email;
     private String nickName;
     private String address;
@@ -19,6 +20,7 @@ public class SellerDto {
 
     public static SellerDto from(Seller seller){
         return SellerDto.builder()
+            .id(seller.getId())
             .email(seller.getEmail())
             .nickName(seller.getNickName())
             .address(seller.getAddress())
