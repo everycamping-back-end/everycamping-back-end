@@ -82,9 +82,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .logout().logoutSuccessUrl("/")
             .and()
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-            .oauth2Login().userInfoEndpoint().userService(customOAuth2UserService)
-            .and()
-            .defaultSuccessUrl("/login/authorized");
+            .oauth2Login(e -> e
+                .userInfoEndpoint().userService(customOAuth2UserService)
+                .and()
+                .defaultSuccessUrl("/login/authorized")
+            );
     }
 
     @Bean
