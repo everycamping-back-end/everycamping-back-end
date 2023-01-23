@@ -1,12 +1,12 @@
 package com.zerobase.everycampingbackend.web.controller;
 
-import com.zerobase.everycampingbackend.domain.product.service.ProductService;
 import com.zerobase.everycampingbackend.domain.product.dto.ProductDetailDto;
 import com.zerobase.everycampingbackend.domain.product.dto.ProductDto;
 import com.zerobase.everycampingbackend.domain.product.form.ProductSearchForm;
+import com.zerobase.everycampingbackend.domain.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -22,7 +22,7 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping
-    public ResponseEntity<Page<ProductDto>> searchProduct(@ModelAttribute ProductSearchForm form, Pageable pageable){
+    public ResponseEntity<Slice<ProductDto>> searchProduct(@ModelAttribute ProductSearchForm form, Pageable pageable){
         return ResponseEntity.ok(productService.getProducts(form, pageable));
     }
 

@@ -1,16 +1,16 @@
 package com.zerobase.everycampingbackend.domain.product.service;
 
-import com.zerobase.everycampingbackend.exception.CustomException;
-import com.zerobase.everycampingbackend.exception.ErrorCode;
 import com.zerobase.everycampingbackend.domain.product.dto.ProductDetailDto;
 import com.zerobase.everycampingbackend.domain.product.dto.ProductDto;
 import com.zerobase.everycampingbackend.domain.product.entity.Product;
 import com.zerobase.everycampingbackend.domain.product.form.ProductSearchForm;
 import com.zerobase.everycampingbackend.domain.product.repository.ProductRepository;
+import com.zerobase.everycampingbackend.exception.CustomException;
+import com.zerobase.everycampingbackend.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,9 +26,9 @@ public class ProductService {
             .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND)));
     }
 
-    public Page<ProductDto> getProducts(ProductSearchForm form, Pageable pageable){
+    public Slice<ProductDto> getProducts(ProductSearchForm form, Pageable pageable){
         long start = System.currentTimeMillis();
-        Page<ProductDto> result = productRepository.searchAll(form, pageable);
+        Slice<ProductDto> result = productRepository.searchAll(form, pageable);
         long end = System.currentTimeMillis();
         log.info("검색 수행 : " + (end - start) + "ms 소요");
         return result;
