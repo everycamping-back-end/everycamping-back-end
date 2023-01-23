@@ -4,14 +4,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.zerobase.everycampingbackend.exception.CustomException;
-import com.zerobase.everycampingbackend.exception.ErrorCode;
-import com.zerobase.everycampingbackend.domain.order.dto.OrderProductByCustomerDto;
+import com.zerobase.everycampingbackend.domain.order.dto.OrderByCustomerDto;
 import com.zerobase.everycampingbackend.domain.order.entity.OrderProduct;
 import com.zerobase.everycampingbackend.domain.order.entity.Orders;
+import com.zerobase.everycampingbackend.domain.order.form.GetOrdersByCustomerForm;
 import com.zerobase.everycampingbackend.domain.order.form.OrderForm;
 import com.zerobase.everycampingbackend.domain.order.form.OrderForm.OrderProductForm;
-import com.zerobase.everycampingbackend.domain.order.form.SearchOrderByCustomerForm;
 import com.zerobase.everycampingbackend.domain.order.repository.OrderProductRepository;
 import com.zerobase.everycampingbackend.domain.order.repository.OrdersRepository;
 import com.zerobase.everycampingbackend.domain.order.service.OrderService;
@@ -23,6 +21,8 @@ import com.zerobase.everycampingbackend.domain.user.entity.Customer;
 import com.zerobase.everycampingbackend.domain.user.entity.Seller;
 import com.zerobase.everycampingbackend.domain.user.repository.CustomerRepository;
 import com.zerobase.everycampingbackend.domain.user.repository.SellerRepository;
+import com.zerobase.everycampingbackend.exception.CustomException;
+import com.zerobase.everycampingbackend.exception.ErrorCode;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -72,15 +72,21 @@ class OrdersServiceTest {
         Long productId1 = createProduct("텐트1", 300, 5, ProductCategory.TENT);
         Long productId2 = createProduct("텐트2", 200, 5, ProductCategory.TENT);
 
-        OrderProductForm form1 = OrderProductForm.builder().productId(productId1)
+        OrderProductForm form1 = OrderProductForm.builder()
+            .productId(productId1)
             .quantity(5)
             .build();
 
-        OrderProductForm form2 = OrderProductForm.builder().productId(productId2)
+        OrderProductForm form2 = OrderProductForm.builder()
+            .productId(productId2)
             .quantity(4)
             .build();
 
         OrderForm orderForm = OrderForm.builder()
+            .name("김세종")
+            .address("대구시 남구")
+            .phone("01086352083")
+            .request("빠른 배송 바랍니다.")
             .orderProductFormList(List.of(form1, form2))
             .build();
 
@@ -90,6 +96,12 @@ class OrdersServiceTest {
         //then
         Orders orders = ordersRepository.findAll().get(0);
         assertEquals(customer.getId(), orders.getCustomer().getId());
+        assertEquals("김세종", orders.getName());
+        assertEquals("대구시 남구", orders.getAddress());
+        assertEquals("01086352083", orders.getPhone());
+
+        assertEquals("텐트1", orders.getRepresentProductName());
+        assertEquals(1500+800, orders.getTotalAmount());
 
         OrderProduct orderProduct1 = orderProductRepository.findAll().get(0);
         OrderProduct orderProduct2 = orderProductRepository.findAll().get(1);
@@ -127,6 +139,10 @@ class OrdersServiceTest {
             .build();
 
         OrderForm orderForm = OrderForm.builder()
+            .name("김세종")
+            .address("대구시 남구")
+            .phone("01086352083")
+            .request("빠른 배송 바랍니다.")
             .orderProductFormList(List.of(form1, form2))
             .build();
 
@@ -145,7 +161,7 @@ class OrdersServiceTest {
     }
 
     @Test
-    @DisplayName("고객 주문 조회 성공 - 전체 조회")
+    @DisplayName("고객 주문목록 조회 성공")
     void getOrdersByCustomerSuccess() throws Exception {
 
         //given
@@ -162,27 +178,27 @@ class OrdersServiceTest {
             .build();
 
         OrderForm orderForm = OrderForm.builder()
+            .name("김세종")
+            .address("대구시 남구")
+            .phone("01086352083")
+            .request("빠른 배송 바랍니다.")
             .orderProductFormList(List.of(form1, form2))
             .build();
 
         orderService.order(customer, orderForm);
 
-        SearchOrderByCustomerForm form = SearchOrderByCustomerForm.builder().build();
         PageRequest pageRequest = PageRequest.of(0, 5);
+        GetOrdersByCustomerForm form = GetOrdersByCustomerForm.builder().build();
 
         //when
-        Page<OrderProductByCustomerDto> result = orderService.getOrdersByCustomer(form,
+        Page<OrderByCustomerDto> result = orderService.getOrdersByCustomer(form,
             customer.getId(), pageRequest);
 
         //then
-        OrderProductByCustomerDto dto1 = result.getContent().get(0);
-        OrderProductByCustomerDto dto2 = result.getContent().get(1);
+        OrderByCustomerDto dto = result.getContent().get(0);
 
-        assertEquals(productId2, dto1.getProductId());
-        assertEquals(productId1, dto2.getProductId());
-        assertEquals("텐트2", dto1.getProductName());
-        assertEquals("텐트1", dto2.getProductName());
-
+        assertEquals(2, dto.getOrderProductCount());
+        assertEquals(1500+800, dto.getTotalAmount());
     }
 
     @Test

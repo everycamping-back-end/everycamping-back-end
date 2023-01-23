@@ -4,6 +4,7 @@ package com.zerobase.everycampingbackend.domain.order.repository;
 import static com.zerobase.everycampingbackend.domain.order.entity.QOrderProduct.orderProduct;
 import static com.zerobase.everycampingbackend.domain.order.entity.QOrders.orders;
 import static com.zerobase.everycampingbackend.domain.product.entity.QProduct.product;
+import static com.zerobase.everycampingbackend.domain.user.entity.QCustomer.customer;
 import static org.springframework.util.ObjectUtils.isEmpty;
 
 import com.querydsl.core.types.Order;
@@ -14,10 +15,9 @@ import com.querydsl.core.util.StringUtils;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.zerobase.everycampingbackend.common.QueryDslUtil;
-import com.zerobase.everycampingbackend.domain.order.dto.OrderProductByCustomerDto;
 import com.zerobase.everycampingbackend.domain.order.dto.OrderProductBySellerDto;
-import com.zerobase.everycampingbackend.domain.order.form.SearchOrderByCustomerForm;
-import com.zerobase.everycampingbackend.domain.order.form.SearchOrderBySellerForm;
+import com.zerobase.everycampingbackend.domain.order.dto.OrderProductDetailBySellerDto;
+import com.zerobase.everycampingbackend.domain.order.form.GetOrderProductBySellerForm;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -37,75 +37,30 @@ public class OrderProductRepositoryImpl implements OrderProductRepositoryCustom 
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<OrderProductByCustomerDto> searchByCustomer(SearchOrderByCustomerForm form,
-        Long customerId, Pageable pageable) {
-
-        List<OrderSpecifier> orderByList = getAllOrderSpecifiers(pageable);
-
-        List<OrderProductByCustomerDto> list = queryFactory
-            .select(Projections.fields(OrderProductByCustomerDto.class,
-                orders.address,
-                orders.phone,
-                orderProduct.product.id.as("productId"),
-                orderProduct.productNameSnapshot,
-                orderProduct.stockPriceSnapshot,
-                orderProduct.imageUriSnapshot,
-                orderProduct.id.as("orderProductId"),
-                orderProduct.quantity,
-                orderProduct.amount,
-                orderProduct.status,
-                orderProduct.createdAt))
-
-            .from(orderProduct)
-            .innerJoin(orderProduct.orders, orders)
-
-            .where(
-                orders.customer.id.eq(customerId),
-                likeProductNameSnapShot(form.getProductName()),
-                goe(form.getStartDate()),
-                loe(form.getEndDate())
-            )
-
-            .orderBy(orderByList.toArray(OrderSpecifier[]::new))
-            .offset(pageable.getOffset())
-            .limit(pageable.getPageSize())
-            .fetch();
-
-        JPAQuery<Long> countQuery = getByCustomerCount(form, customerId);
-        return PageableExecutionUtils.getPage(list, pageable, countQuery::fetchOne);
-    }
-
-    @Override
-    public Page<OrderProductBySellerDto> searchBySeller(SearchOrderBySellerForm form, Long sellerId,
-        Pageable pageable) {
+    public Page<OrderProductBySellerDto> getOrderProductsBySeller(GetOrderProductBySellerForm form,
+        Long sellerId, Pageable pageable) {
 
         List<OrderSpecifier> orderByList = getAllOrderSpecifiers(pageable);
 
         List<OrderProductBySellerDto> list = queryFactory
             .select(Projections.fields(OrderProductBySellerDto.class,
 
-                orderProduct.productNameSnapshot,
-                orderProduct.stockPriceSnapshot,
-                orderProduct.imageUriSnapshot,
+                orderProduct.id.as("orderProductId"),
                 product.id.as("productId"),
 
-                orderProduct.id.as("orderProductId"),
-                orders.address,
-                orders.phone,
+                orderProduct.productNameSnapshot,
+                orderProduct.stockPriceSnapshot,
                 orderProduct.quantity,
                 orderProduct.amount,
-                orderProduct.status,
-                orderProduct.createdAt,
 
-                orders.customer.id.as("customerId")))
+                orderProduct.createdAt,
+                orderProduct.status))
 
             .from(orderProduct)
-            .innerJoin(orderProduct.orders, orders)
             .innerJoin(orderProduct.product, product)
 
             .where(
                 product.seller.id.eq(sellerId),
-                likeProductNameSnapShot(form.getProductName()),
                 goe(form.getStartDate()),
                 loe(form.getEndDate())
             )
@@ -117,7 +72,47 @@ public class OrderProductRepositoryImpl implements OrderProductRepositoryCustom 
 
         JPAQuery<Long> countQuery = getBySellerCount(form, sellerId);
         return PageableExecutionUtils.getPage(list, pageable, countQuery::fetchOne);
+    }
 
+    @Override
+    public List<OrderProductDetailBySellerDto> getOrderProductDetailBySeller(Long orderProductId) {
+
+        return queryFactory
+            .select(Projections.fields(OrderProductDetailBySellerDto.class,
+
+                orderProduct.id.as("orderProductId"),
+                product.id.as("productId"),
+                orderProduct.productNameSnapshot,
+                orderProduct.stockPriceSnapshot,
+                orderProduct.imageUriSnapshot,
+                orderProduct.quantity,
+                orderProduct.amount,
+
+                orders.name.as("receiverName"),
+                orders.address.as("receiverAddress"),
+                orders.phone.as("receiverPhone"),
+                orders.request,
+
+                customer.id.as("customerId"),
+                customer.email.as("customerEmail"),
+                customer.nickName.as("customerNickName"),
+                customer.phone.as("customerPhone"),
+
+                orderProduct.createdAt,
+                orderProduct.status,
+
+                product.seller.id.as("sellerId")
+                ))
+
+            .from(orderProduct)
+            .innerJoin(orderProduct.orders, orders)
+            .innerJoin(orders.customer, customer)
+            .innerJoin(orderProduct.product, product)
+
+            .where(
+                orderProduct.id.eq(orderProductId)
+            )
+            .fetch();
     }
 
     private List<OrderSpecifier> getAllOrderSpecifiers(Pageable pageable) {
@@ -152,22 +147,7 @@ public class OrderProductRepositoryImpl implements OrderProductRepositoryCustom 
         return orderByList;
     }
 
-
-    private JPAQuery<Long> getByCustomerCount(SearchOrderByCustomerForm form, Long customerId) {
-        return queryFactory
-            .select(orderProduct.count())
-            .from(orderProduct)
-            .innerJoin(orderProduct.orders, orders)
-
-            .where(
-                orders.customer.id.eq(customerId),
-                likeProductNameSnapShot(form.getProductName()),
-                goe(form.getStartDate()),
-                loe(form.getEndDate())
-            );
-    }
-
-    private JPAQuery<Long> getBySellerCount(SearchOrderBySellerForm form, Long sellerId) {
+    private JPAQuery<Long> getBySellerCount(GetOrderProductBySellerForm form, Long sellerId) {
         return queryFactory
             .select(orderProduct.count())
             .from(orderProduct)
