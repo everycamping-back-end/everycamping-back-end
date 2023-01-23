@@ -88,7 +88,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                     orderByList.add(QueryDslUtil.getSortedColumn(direction,
                         product.price, "price"));
                 } else {
-                    orderByList.add(QueryDslUtil.getSortedColumn(direction,
+                    orderByList.add(QueryDslUtil.getSortedColumn(Order.DESC,
                         product.id, "id"));
                 }
             }
