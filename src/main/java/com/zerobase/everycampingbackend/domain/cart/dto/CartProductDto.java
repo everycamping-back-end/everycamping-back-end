@@ -16,7 +16,7 @@ public class CartProductDto {
 
     private Long productId; //상품 id
     private String name; //상품 이름
-    private String imagePath;
+    private String imageUri;
     private Integer price; //상품 가격
     private Boolean onSale; //판매여부
     private Integer quantity; //장바구니 등록 수량
@@ -26,7 +26,7 @@ public class CartProductDto {
         return CartProductDto.builder()
             .productId(cartProduct.getProduct().getId())
             .name(cartProduct.getProduct().getName())
-            .imagePath(cartProduct.getProduct().getImagePath())
+            .imageUri(cartProduct.getProduct().getImageUri())
             .price(cartProduct.getProduct().getPrice())
             .onSale(cartProduct.getProduct().isOnSale())
             .quantity(cartProduct.getQuantity())
