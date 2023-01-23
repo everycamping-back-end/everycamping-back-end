@@ -18,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
@@ -50,7 +51,16 @@ public class ProductManageService {
         log.info("상품명 (" + form.getName() + ") 수정 시도");
 
         S3Path imagePath = staticImageService.editImage(product.getImagePath(), image);
+        if(ObjectUtils.isEmpty(image)) {
+            imagePath.setImageUri(product.getImageUri());
+            imagePath.setImagePath(product.getImagePath());
+        }
+
         S3Path detailImagePath = staticImageService.editImage(product.getImagePath(), detailImage);
+        if(ObjectUtils.isEmpty(detailImage)){
+            detailImagePath.setImageUri(product.getDetailImageUri());
+            detailImagePath.setImagePath(product.getDetailImagePath());
+        }
 
         product.setOf(form, imagePath, detailImagePath);
 
