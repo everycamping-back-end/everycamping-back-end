@@ -32,8 +32,8 @@ public class ProductManageController {
 
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> addProduct(@AuthenticationPrincipal Seller seller,
-        @RequestPart @Valid ProductManageForm form, @RequestPart MultipartFile image,
-        @RequestPart MultipartFile detailImage) throws IOException {
+        @RequestPart @Valid ProductManageForm form, @RequestPart(required = false) MultipartFile image,
+        @RequestPart(required = false) MultipartFile detailImage) throws IOException {
         productManageService.addProduct(seller, form, image, detailImage);
         return ResponseEntity.ok().build();
     }
@@ -41,8 +41,8 @@ public class ProductManageController {
     @PutMapping(value = "/{productId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> updateProduct(@AuthenticationPrincipal Seller seller,
         @PathVariable Long productId,
-        @RequestPart @Valid ProductManageForm form, @RequestPart MultipartFile image,
-        @RequestPart MultipartFile detailImage) throws IOException {
+        @RequestPart @Valid ProductManageForm form, @RequestPart(required = false) MultipartFile image,
+        @RequestPart(required = false) MultipartFile detailImage) throws IOException {
         productManageService.updateProduct(seller, productId, form, image, detailImage);
         return ResponseEntity.ok().build();
     }
