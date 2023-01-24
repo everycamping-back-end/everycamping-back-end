@@ -2,10 +2,11 @@ package com.zerobase.everycampingbackend.domain.user.service;
 
 import static com.zerobase.everycampingbackend.domain.auth.issuer.JwtIssuer.REFRESH_EXPIRE_TIME;
 
-import com.zerobase.everycampingbackend.domain.auth.issuer.JwtIssuer;
+import com.zerobase.everycampingbackend.domain.admin.service.SellerRequestService;
 import com.zerobase.everycampingbackend.domain.auth.dto.JwtDto;
-import com.zerobase.everycampingbackend.domain.auth.type.UserType;
+import com.zerobase.everycampingbackend.domain.auth.issuer.JwtIssuer;
 import com.zerobase.everycampingbackend.domain.auth.service.CustomUserDetailsService;
+import com.zerobase.everycampingbackend.domain.auth.type.UserType;
 import com.zerobase.everycampingbackend.domain.redis.RedisClient;
 import com.zerobase.everycampingbackend.domain.user.dto.SellerDto;
 import com.zerobase.everycampingbackend.domain.user.entity.Seller;
@@ -32,13 +33,16 @@ public class SellerService implements CustomUserDetailsService {
     private final JwtIssuer jwtIssuer;
     private final PasswordEncoder passwordEncoder;
     private final RedisClient redisClient;
+    private final SellerRequestService sellerRequestService;
 
     public void signUp(SignUpForm form) {
         if (sellerRepository.existsByEmail(form.getEmail().toLowerCase(Locale.ROOT))) {
             throw new CustomException(ErrorCode.EMAIL_BEING_USED);
         }
 
-        sellerRepository.save(Seller.from(form, passwordEncoder));
+        Seller seller = Seller.from(form, passwordEncoder);
+        sellerRepository.save(seller);
+        sellerRequestService.applySellerRequest(seller);
     }
 
     public JwtDto signIn(SignInForm form) {
