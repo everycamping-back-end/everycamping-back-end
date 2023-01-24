@@ -40,6 +40,7 @@ public class Seller extends BaseEntity implements UserDetails {
   private String address;  // 주소
   private String zipcode;  // 우편번호
   private String phone;    // 연락처
+  private boolean confirmed; // 판매 허가 여부
 
   private LocalDateTime deleteAt;  // 탈퇴일
 
@@ -49,6 +50,7 @@ public class Seller extends BaseEntity implements UserDetails {
         .password(passwordEncoder.encode(form.getPassword()))
         .nickName(form.getNickName())
         .phone(form.getPhoneNumber())
+        .confirmed(false)
         .build();
   }
 
