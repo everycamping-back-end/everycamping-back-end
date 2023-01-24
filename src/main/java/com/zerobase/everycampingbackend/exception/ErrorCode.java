@@ -48,6 +48,10 @@ public enum ErrorCode {
 
   WRONG_OAUTH2_PROVIDER(HttpStatus.BAD_REQUEST, "잘못된 소셜로그인 공급자입니다."),
 
+  SELLER_REQUEST_NOT_FOUND(HttpStatus.NOT_FOUND, "판매자 신청 정보를 찾을 수 없습니다."),
+
+  ACCESS_INVALID(HttpStatus.BAD_REQUEST, "허용되지 않은 접근입니다."),
+
   ;
 
 

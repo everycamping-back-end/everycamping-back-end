@@ -3,6 +3,7 @@ package com.zerobase.everycampingbackend.domain.auth.service;
 import com.zerobase.everycampingbackend.domain.auth.dto.JwtDto;
 import com.zerobase.everycampingbackend.domain.auth.type.UserType;
 import com.zerobase.everycampingbackend.domain.auth.dto.UserVo;
+import com.zerobase.everycampingbackend.domain.user.service.AdminService;
 import com.zerobase.everycampingbackend.domain.user.service.CustomerService;
 import com.zerobase.everycampingbackend.domain.user.service.SellerService;
 import java.util.HashMap;
@@ -19,12 +20,14 @@ public class CustomUserDetailsServiceImpl implements CustomUserDetailsService {
 
     private final CustomerService customerService;
     private final SellerService sellerService;
+    private final AdminService adminService;
     private final Map<String, CustomUserDetailsService> map = new HashMap<>();
 
     @PostConstruct
     public void init() {
         map.put(UserType.CUSTOMER.name(), customerService);
         map.put(UserType.SELLER.name(), sellerService);
+        map.put(UserType.ADMIN.name(), adminService);
     }
 
     public UserDetails loadUserByUsername(String key, String email) throws UsernameNotFoundException{
