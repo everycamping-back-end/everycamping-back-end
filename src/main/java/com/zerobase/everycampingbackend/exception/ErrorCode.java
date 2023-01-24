@@ -51,6 +51,7 @@ public enum ErrorCode {
   SELLER_REQUEST_NOT_FOUND(HttpStatus.NOT_FOUND, "판매자 신청 정보를 찾을 수 없습니다."),
 
   ACCESS_INVALID(HttpStatus.BAD_REQUEST, "허용되지 않은 접근입니다."),
+  SELLER_NOT_CONFIRMED(HttpStatus.UNAUTHORIZED, "판매 기능이 허가되지 않은 판매자입니다."),
 
   ;
 

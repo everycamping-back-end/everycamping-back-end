@@ -1,5 +1,6 @@
 package com.zerobase.everycampingbackend.config;
 
+import com.zerobase.everycampingbackend.domain.auth.entrypoint.CustomBasicAuthenticationEntryPoint;
 import com.zerobase.everycampingbackend.domain.auth.filter.JwtAuthFilter;
 import com.zerobase.everycampingbackend.domain.auth.service.CustomOAuth2UserService;
 import com.zerobase.everycampingbackend.domain.auth.type.UserType;
@@ -46,6 +47,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         , "/websocket/**"
         , "/questions"
         , "/commons/**"
+        , "/admins/signup"
+        , "/admins/signin"
+        , "/admins/reissue"
 
         //테스트
         , "/test/**"
@@ -76,7 +80,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers(AUTH_WHITELIST).permitAll()
             .antMatchers(HttpMethod.GET, AUTH_ALLOW_GET_LIST).permitAll()
             .antMatchers("/admin/**").hasRole(UserType.ADMIN.name())
-            .antMatchers("/sellers/**").hasRole(UserType.SELLER.name())
+            .antMatchers("/sellers/**", "/manage/products/**").hasRole(UserType.SELLER.name())
+            .antMatchers("/customers/**").hasRole(UserType.CUSTOMER.name())
             .anyRequest().hasAnyRole(UserType.CUSTOMER.name(), UserType.SELLER.name(), UserType.ADMIN.name())
             .and()
             .logout().logoutSuccessUrl("/")
@@ -86,7 +91,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .userInfoEndpoint().userService(customOAuth2UserService)
                 .and()
                 .defaultSuccessUrl("/login/authorized")
-            );
+            )
+            .exceptionHandling()
+            .authenticationEntryPoint(authenticationEntryPoint());
+    }
+
+    @Bean
+    public CustomBasicAuthenticationEntryPoint authenticationEntryPoint() {
+        return new CustomBasicAuthenticationEntryPoint();
     }
 
     @Bean

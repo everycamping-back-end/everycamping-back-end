@@ -34,6 +34,8 @@ public class ProductManageService {
     public void addProduct(Seller seller, ProductManageForm form, MultipartFile image, MultipartFile detailImage) throws IOException {
         log.info("상품명 (" + form.getName() + ") 추가 시도");
 
+        validateSeller(seller);
+
         S3Path imagePath = staticImageService.saveImage(image);
         S3Path detailImagePath = staticImageService.saveImage(detailImage);
 
@@ -109,5 +111,11 @@ public class ProductManageService {
     public Page<ProductDto> getProductPage(Seller seller, Pageable pageable) {
         return productRepository.findAllBySeller(seller, pageable)
             .map(ProductDto::from);
+    }
+
+    public void validateSeller(Seller seller){
+        if(!seller.isConfirmed()){
+            throw new CustomException(ErrorCode.SELLER_NOT_CONFIRMED);
+        }
     }
 }
