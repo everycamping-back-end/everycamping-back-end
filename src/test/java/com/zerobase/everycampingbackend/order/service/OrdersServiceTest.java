@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.zerobase.everycampingbackend.domain.cart.entity.CartProduct;
+import com.zerobase.everycampingbackend.domain.cart.repository.CartRepository;
 import com.zerobase.everycampingbackend.domain.order.dto.OrderByCustomerDto;
 import com.zerobase.everycampingbackend.domain.order.entity.OrderProduct;
 import com.zerobase.everycampingbackend.domain.order.entity.Orders;
@@ -56,12 +58,16 @@ class OrdersServiceTest {
     @Autowired
     SellerRepository sellerRepository;
 
+    @Autowired
+    CartRepository cartRepository;
+
     @AfterEach
     void clean() {
-        orderProductRepository.deleteAll();
-        ordersRepository.deleteAll();
-        customerRepository.deleteAll();
-        productRepository.deleteAll();
+        cartRepository.deleteAllInBatch();
+        orderProductRepository.deleteAllInBatch();
+        ordersRepository.deleteAllInBatch();
+        customerRepository.deleteAllInBatch();
+        productRepository.deleteAllInBatch();
     }
 
     @Test
@@ -70,16 +76,22 @@ class OrdersServiceTest {
 
         //given
         Customer customer = createCustomer("ksj2083@naver.com");
-        Long productId1 = createProduct("텐트1", 300, 5, ProductCategory.TENT);
-        Long productId2 = createProduct("텐트2", 200, 5, ProductCategory.TENT);
+
+        Product product1 = createProduct("텐트1", 300, 5, ProductCategory.TENT);
+        Product product2 = createProduct("텐트2", 200, 5, ProductCategory.TENT);
+        Product product3 = createProduct("텐트3", 100, 5, ProductCategory.TENT);
+
+        addToCart(product1, customer, 5);
+        addToCart(product2, customer, 4);
+        addToCart(product3, customer, 5);
 
         OrderProductForm form1 = OrderProductForm.builder()
-            .productId(productId1)
+            .productId(product1.getId())
             .quantity(5)
             .build();
 
         OrderProductForm form2 = OrderProductForm.builder()
-            .productId(productId2)
+            .productId(product2.getId())
             .quantity(4)
             .build();
 
@@ -106,20 +118,24 @@ class OrdersServiceTest {
 
         OrderProduct orderProduct1 = orderProductRepository.findAll().get(0);
         OrderProduct orderProduct2 = orderProductRepository.findAll().get(1);
-        Product product1 = productRepository.findById(productId1).orElseThrow();
-        Product product2 = productRepository.findById(productId2).orElseThrow();
+        Product realProduct1 = productRepository.findById(product1.getId()).orElseThrow();
+        Product realProduct2 = productRepository.findById(product2.getId()).orElseThrow();
 
-        assertEquals(productId1, orderProduct1.getProduct().getId());
+        assertEquals(realProduct1.getId(), orderProduct1.getProduct().getId());
         assertEquals(5, orderProduct1.getQuantity());
         assertEquals(300 * 5, orderProduct1.getAmount());
         assertEquals(orders.getId(), orderProduct1.getOrders().getId());
-        assertEquals(product1.getStock(), 0);
+        assertEquals(0,realProduct1.getStock());
 
-        assertEquals(productId2, orderProduct2.getProduct().getId());
+        assertEquals(realProduct2.getId(), orderProduct2.getProduct().getId());
         assertEquals(4, orderProduct2.getQuantity());
         assertEquals(200 * 4, orderProduct2.getAmount());
         assertEquals(orders.getId(), orderProduct2.getOrders().getId());
-        assertEquals(product2.getStock(), 1);
+        assertEquals(1,realProduct2.getStock());
+
+        List<CartProduct> cartProductList = cartRepository.findAll();
+        assertEquals(1,cartProductList.size());
+        assertEquals(product3.getId(), cartProductList.get(0).getProduct().getId());
     }
 
     @Test
@@ -128,8 +144,8 @@ class OrdersServiceTest {
 
         //given
         Customer customer = createCustomer("ksj2083@naver.com");
-        Long productId1 = createProduct("텐트1", 300, 5, ProductCategory.TENT);
-        Long productId2 = createProduct("텐트2", 200, 5, ProductCategory.TENT);
+        Long productId1 = createProduct("텐트1", 300, 5, ProductCategory.TENT).getId();
+        Long productId2 = createProduct("텐트2", 200, 5, ProductCategory.TENT).getId();
 
         OrderProductForm form1 = OrderProductForm.builder().productId(productId1)
             .quantity(5)
@@ -167,8 +183,8 @@ class OrdersServiceTest {
 
         //given
         Customer customer = createCustomer("ksj2083@naver.com");
-        Long productId1 = createProduct("텐트1", 300, 10, ProductCategory.TENT);
-        Long productId2 = createProduct("텐트2", 200, 10, ProductCategory.TENT);
+        Long productId1 = createProduct("텐트1", 300, 10, ProductCategory.TENT).getId();
+        Long productId2 = createProduct("텐트2", 200, 10, ProductCategory.TENT).getId();
 
         OrderProductForm form1 = OrderProductForm.builder().productId(productId1)
             .quantity(5)
@@ -209,7 +225,7 @@ class OrdersServiceTest {
         //given
         Customer customer = createCustomer("ksj2083@naver.com");
 
-        Long productId1 = createProduct("텐트1", 300, 10, ProductCategory.TENT);
+        Long productId1 = createProduct("텐트1", 300, 10, ProductCategory.TENT).getId();
 
         OrderProductForm form1 = OrderProductForm.builder().productId(productId1)
             .quantity(5)
@@ -235,7 +251,7 @@ class OrdersServiceTest {
     }
 
 
-    private Long createProduct(String name, int price, int stock, ProductCategory category) {
+    private Product createProduct(String name, int price, int stock, ProductCategory category) {
         Product product = Product.builder()
             .name(name)
             .category(category)
@@ -246,7 +262,7 @@ class OrdersServiceTest {
             .build();
 
         Product saved = productRepository.save(product);
-        return saved.getId();
+        return saved;
     }
 
     private Customer createCustomer(String email) {
@@ -265,5 +281,15 @@ class OrdersServiceTest {
             .build();
 
         return sellerRepository.save(seller);
+    }
+
+    private CartProduct addToCart(Product product, Customer customer, Integer quantity) {
+        CartProduct cartProduct = CartProduct.builder()
+            .product(product)
+            .customer(customer)
+            .quantity(quantity)
+            .build();
+
+        return cartRepository.save(cartProduct);
     }
 }
