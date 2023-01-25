@@ -23,6 +23,7 @@ import com.zerobase.everycampingbackend.domain.user.repository.CustomerRepositor
 import com.zerobase.everycampingbackend.domain.user.repository.SellerRepository;
 import com.zerobase.everycampingbackend.exception.CustomException;
 import com.zerobase.everycampingbackend.exception.ErrorCode;
+import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -230,6 +231,7 @@ class OrdersServiceTest {
         OrderProduct result = orderProductRepository.findAll().get(0);
         assertEquals(result.getId(), orderProductId);
         assertEquals(result.getStatus(), OrderStatus.CONFIRM);
+        assertEquals(LocalDate.now(), result.getConfirmedAt().toLocalDate());
     }
 
 
@@ -250,6 +252,7 @@ class OrdersServiceTest {
     private Customer createCustomer(String email) {
         Customer customer = Customer.builder()
             .email(email)
+            .nickName("고객닉네임")
             .build();
 
         return customerRepository.save(customer);

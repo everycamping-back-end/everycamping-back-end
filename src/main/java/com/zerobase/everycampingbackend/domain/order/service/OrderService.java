@@ -155,6 +155,7 @@ public class OrderService {
         }
 
         orderProduct.setStatus(OrderStatus.CONFIRM);
+        orderProduct.setConfirmedAt(LocalDateTime.now());
     }
 
     @Transactional

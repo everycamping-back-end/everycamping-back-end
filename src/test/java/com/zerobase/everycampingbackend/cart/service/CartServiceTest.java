@@ -245,6 +245,7 @@ class CartServiceTest {
     private Customer createCustomer(String email) {
         Customer customer = Customer.builder()
             .email(email)
+            .nickName("nickName")
             .build();
 
         Customer saved = customerRepository.save(customer);
