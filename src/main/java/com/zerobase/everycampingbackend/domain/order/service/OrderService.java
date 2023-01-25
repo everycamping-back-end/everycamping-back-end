@@ -1,5 +1,6 @@
 package com.zerobase.everycampingbackend.domain.order.service;
 
+import com.zerobase.everycampingbackend.domain.cart.service.CartService;
 import com.zerobase.everycampingbackend.domain.order.dto.OrderByCustomerDto;
 import com.zerobase.everycampingbackend.domain.order.dto.OrderDetailByCustomerDto;
 import com.zerobase.everycampingbackend.domain.order.dto.OrderProductBySellerDto;
@@ -21,6 +22,7 @@ import com.zerobase.everycampingbackend.exception.ErrorCode;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +39,7 @@ public class OrderService {
     private final ProductService productService;
     private final OrdersRepository ordersRepository;
     private final OrderProductRepository orderProductRepository;
+    private final CartService cartService;
 
 
     @Transactional
@@ -52,7 +55,13 @@ public class OrderService {
             .totalAmount(0)
             .build());
 
-        form.getOrderProductFormList().forEach(f -> orderProduct(orders, f));
+        List<Long> productIdList = new ArrayList<>();
+        form.getOrderProductFormList().forEach(f ->{
+            orderProduct(orders, f);
+            productIdList.add(f.getProductId());
+        });
+
+        cartService.deleteCartProductsIfExist(customer, productIdList);
     }
 
     private void orderProduct(Orders orders, OrderProductForm orderProductForm) {
@@ -155,6 +164,7 @@ public class OrderService {
         }
 
         orderProduct.setStatus(OrderStatus.CONFIRM);
+        orderProduct.setConfirmedAt(LocalDateTime.now());
     }
 
     @Transactional

@@ -4,6 +4,7 @@ import com.zerobase.everycampingbackend.domain.product.dto.ProductDetailDto;
 import com.zerobase.everycampingbackend.domain.product.dto.ProductDto;
 import com.zerobase.everycampingbackend.domain.product.form.ProductSearchForm;
 import com.zerobase.everycampingbackend.domain.product.service.ProductService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -29,5 +30,10 @@ public class ProductController {
     @GetMapping("/{productId}")
     public ResponseEntity<ProductDetailDto> getProductDetail(@PathVariable Long productId){
         return ResponseEntity.ok(productService.getProductDetail(productId));
+    }
+
+    @GetMapping("/categories")
+    public ResponseEntity<List<String>> getCategories() {
+        return ResponseEntity.ok(productService.getCategories());
     }
 }

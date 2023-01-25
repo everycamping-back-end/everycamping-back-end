@@ -3,6 +3,7 @@ package com.zerobase.everycampingbackend.domain.order.entity;
 import com.zerobase.everycampingbackend.common.BaseEntity;
 import com.zerobase.everycampingbackend.domain.order.type.OrderStatus;
 import com.zerobase.everycampingbackend.domain.product.entity.Product;
+import java.time.LocalDateTime;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -52,6 +53,8 @@ public class OrderProduct extends BaseEntity {
     private String productNameSnapshot; // 주문 시 상품명
     private Integer stockPriceSnapshot; // 주문 시 개당 가격
     private String imageUriSnapshot; // 주문 시 이미지
+
+    private LocalDateTime confirmedAt; // 주문확정 일자
 
     public static OrderProduct of(Orders orders, Product product, Integer quantity) {
 

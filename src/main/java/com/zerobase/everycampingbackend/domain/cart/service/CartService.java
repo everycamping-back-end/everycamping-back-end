@@ -8,7 +8,9 @@ import com.zerobase.everycampingbackend.exception.ErrorCode;
 import com.zerobase.everycampingbackend.domain.product.entity.Product;
 import com.zerobase.everycampingbackend.domain.product.service.ProductService;
 import com.zerobase.everycampingbackend.domain.user.entity.Customer;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,7 +29,7 @@ public class CartService {
 
         Optional<CartProduct> cartProduct = cartRepository.findByCustomerIdAndProductId(
             customer.getId(), productId);
-        if(cartProduct.isPresent()) {
+        if (cartProduct.isPresent()) {
             throw new CustomException(ErrorCode.CART_PRODUCT_ALREADY_ADDED);
         }
 
@@ -71,17 +73,30 @@ public class CartService {
         if (cartProduct.getProduct().getStock() < updateQuantity) {
             throw new CustomException(ErrorCode.PRODUCT_NOT_ENOUGH_STOCK);
         }
-
         cartProduct.setQuantity(updateQuantity);
     }
 
-    @Transactional
     public void deleteCartProduct(Customer customer, Long productId) {
-        //로그인한 Customer 관련 로직 추가 예정
 
-        CartProduct cartProduct = cartRepository.findByCustomerIdAndProductId(customer.getId(), productId)
+        CartProduct cartProduct = cartRepository.findByCustomerIdAndProductId(customer.getId(),
+                productId)
             .orElseThrow(() -> new CustomException(ErrorCode.CART_PRODUCT_NOT_FOUND));
 
         cartRepository.delete(cartProduct);
+    }
+
+    public void deleteCartProductsIfExist(Customer customer, List<Long> productIdList) {
+
+        List<CartProduct> cartProductList = cartRepository.findAllByCustomerId(customer.getId());
+
+        List<CartProduct> delTarget = cartProductList.stream()
+            .filter(e -> productIdList.contains(e.getProduct().getId()))
+            .collect(Collectors.toList());
+
+        if (delTarget.isEmpty()) {
+            return;
+        }
+
+        cartRepository.deleteAllInBatch(delTarget);
     }
 }

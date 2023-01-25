@@ -5,8 +5,12 @@ import com.zerobase.everycampingbackend.domain.product.dto.ProductDto;
 import com.zerobase.everycampingbackend.domain.product.entity.Product;
 import com.zerobase.everycampingbackend.domain.product.form.ProductSearchForm;
 import com.zerobase.everycampingbackend.domain.product.repository.ProductRepository;
+import com.zerobase.everycampingbackend.domain.product.type.ProductCategory;
 import com.zerobase.everycampingbackend.exception.CustomException;
 import com.zerobase.everycampingbackend.exception.ErrorCode;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -61,6 +65,10 @@ public class ProductService {
         }
 
         productRepository.save(product);
+    }
+    public List<String> getCategories() {
+        return Stream.of(ProductCategory.values()).map(Enum::name)
+            .collect(Collectors.toList());
     }
 
     public Product getProductById(Long productId){
