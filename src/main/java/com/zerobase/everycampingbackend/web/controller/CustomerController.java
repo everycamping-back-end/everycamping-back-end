@@ -1,8 +1,6 @@
 package com.zerobase.everycampingbackend.web.controller;
 
 
-import com.zerobase.everycampingbackend.domain.auth.dto.CustomOAuth2User;
-import com.zerobase.everycampingbackend.domain.auth.dto.OAuthAttributes;
 import com.zerobase.everycampingbackend.domain.auth.dto.JwtDto;
 import com.zerobase.everycampingbackend.domain.auth.service.JwtReissueService;
 import com.zerobase.everycampingbackend.domain.user.dto.CustomerDto;
@@ -29,7 +27,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/customers")
 @RequiredArgsConstructor
-
 public class CustomerController {
 
     private final CustomerService customerService;
@@ -52,13 +49,12 @@ public class CustomerController {
         response.sendRedirect("/oauth2/authorization/" + provider);
     }
 
-    @GetMapping("/social/authorized")
-    public ResponseEntity<JwtDto> customerSocialAuthorized(
-        @AuthenticationPrincipal CustomOAuth2User user) {
-        OAuthAttributes attributes = user.getOAuthAttributes();
-        return ResponseEntity.ok(
-            customerService.socialSignIn(attributes.getEmail(), attributes.getName()));
-    }
+//    @PostMapping("/signin/social/{provider}")
+//    public ResponseEntity<JwtDto> customerSocialSignIn(@PathVariable String provider,
+//        @RequestBody SocialSignInForm form) {
+//        return ResponseEntity.ok(
+//            customerService.socialSignIn(form));
+//    }
 
     @GetMapping("/signout")
     public ResponseEntity<?> customerSignOut(@AuthenticationPrincipal Customer customer) {
