@@ -22,6 +22,9 @@ public enum ErrorCode {
   ORDER_SELECT_NOT_AUTHORISED(HttpStatus.UNAUTHORIZED, "주문 상세조회 권한이 없습니다."),
   ORDER_PRODUCT_SELECT_NOT_AUTHORISED(HttpStatus.UNAUTHORIZED, "주문상품 상세조회 권한이 없습니다."),
 
+  SETTLEMENT_NOT_FOUNT(HttpStatus.NOT_FOUND, "존재하지 않는 정산입니다."),
+  SETTLEMENT_SELECT_NOT_AUTHORISED(HttpStatus.UNAUTHORIZED, "정산 조회 권한이 없습니다."),
+
 
   LOGIN_CHECK_FAIL(HttpStatus.NOT_FOUND, "일치하는 정보가 없습니다."),
   USER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 회원입니다."),

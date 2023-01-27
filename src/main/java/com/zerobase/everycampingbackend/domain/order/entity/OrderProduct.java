@@ -3,6 +3,7 @@ package com.zerobase.everycampingbackend.domain.order.entity;
 import com.zerobase.everycampingbackend.common.BaseEntity;
 import com.zerobase.everycampingbackend.domain.order.type.OrderStatus;
 import com.zerobase.everycampingbackend.domain.product.entity.Product;
+import com.zerobase.everycampingbackend.domain.settlement.entity.DailySettlement;
 import java.time.LocalDateTime;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -32,16 +33,16 @@ public class OrderProduct extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "Orders_id")
+    @JoinColumn(name = "orders_id")
     private Orders orders;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
     private Product product;
 
-//  @ManyToOne(fetch = FetchType.LAZY)
-//  @JoinColumn(name = "settlement_id")
-//  private Settlement settlement;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "dailySettlement_id")
+    private DailySettlement dailySettlement;
 
     Integer quantity;
 
