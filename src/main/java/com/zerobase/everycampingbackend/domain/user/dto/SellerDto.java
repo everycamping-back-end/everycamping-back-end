@@ -17,6 +17,7 @@ public class SellerDto {
     private String address;
     private String zipcode;
     private String phoneNumber;
+    private boolean confirmed;
 
     public static SellerDto from(Seller seller){
         return SellerDto.builder()
@@ -26,6 +27,7 @@ public class SellerDto {
             .address(seller.getAddress())
             .zipcode(seller.getZipcode())
             .phoneNumber(seller.getPhone())
+            .confirmed(seller.isConfirmed())
             .build();
     }
 }
