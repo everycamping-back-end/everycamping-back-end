@@ -2,10 +2,10 @@ package com.zerobase.everycampingbackend.domain.user.service;
 
 import static com.zerobase.everycampingbackend.domain.auth.issuer.JwtIssuer.REFRESH_EXPIRE_TIME;
 
-import com.zerobase.everycampingbackend.domain.auth.issuer.JwtIssuer;
 import com.zerobase.everycampingbackend.domain.auth.dto.JwtDto;
-import com.zerobase.everycampingbackend.domain.auth.type.UserType;
+import com.zerobase.everycampingbackend.domain.auth.issuer.JwtIssuer;
 import com.zerobase.everycampingbackend.domain.auth.service.CustomUserDetailsService;
+import com.zerobase.everycampingbackend.domain.auth.type.UserType;
 import com.zerobase.everycampingbackend.domain.redis.RedisClient;
 import com.zerobase.everycampingbackend.domain.user.dto.CustomerDto;
 import com.zerobase.everycampingbackend.domain.user.entity.Customer;
@@ -17,6 +17,7 @@ import com.zerobase.everycampingbackend.domain.user.repository.CustomerRepositor
 import com.zerobase.everycampingbackend.exception.CustomException;
 import com.zerobase.everycampingbackend.exception.ErrorCode;
 import java.util.Locale;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -52,11 +53,22 @@ public class CustomerService implements CustomUserDetailsService {
     }
 
     public JwtDto socialSignIn(String email, String nickname) {
-        Customer customer = customerRepository.findByEmail(email)
-            .orElse(customerRepository.save(Customer.of(email, nickname)));
+        Optional<Customer> optionalCustomer = customerRepository.findByEmail(email);
+        Customer customer;
+        customer = optionalCustomer.orElseGet(
+            () -> customerRepository.save(Customer.of(email, nickname)));
 
         return issueJwt(customer.getEmail(), customer.getId());
     }
+
+//    public JwtDto socialSignIn(SocialSignInForm form) {
+//        Optional<Customer> optionalCustomer = customerRepository.findByEmail(form.getEmail());
+//        Customer customer;
+//        customer = optionalCustomer.orElseGet(
+//            () -> customerRepository.save(Customer.of(form.getEmail(), form.getNickName())));
+//
+//        return issueJwt(customer.getEmail(), customer.getId());
+//    }
 
     public void signOut(String email) {
         deleteRefreshToken(email);
