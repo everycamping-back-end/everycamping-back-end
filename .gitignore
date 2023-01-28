@@ -37,8 +37,8 @@ out/
 .vscode/
 
 ### secret ###
-myDatabaseInfo.properties
-oauth2.properties
+myDatabaseInfo.yml
+oauth2.yml
 
 ### log ###
 *.log
