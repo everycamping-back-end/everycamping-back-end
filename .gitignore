@@ -35,3 +35,14 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### secret ###
+myDatabaseInfo.yml
+oauth2.yml
+
+### log ###
+*.log
+*.gz
+
+### docker ###
+Dockerfile
