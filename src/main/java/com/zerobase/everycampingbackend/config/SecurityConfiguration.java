@@ -2,10 +2,7 @@ package com.zerobase.everycampingbackend.config;
 
 import com.zerobase.everycampingbackend.domain.auth.entrypoint.CustomBasicAuthenticationEntryPoint;
 import com.zerobase.everycampingbackend.domain.auth.filter.JwtAuthFilter;
-import com.zerobase.everycampingbackend.domain.auth.handler.OAuth2SuccessHandler;
-import com.zerobase.everycampingbackend.domain.auth.service.CustomOAuth2UserService;
 import com.zerobase.everycampingbackend.domain.auth.type.UserType;
-import com.zerobase.everycampingbackend.domain.user.service.CustomerService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -29,8 +26,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final JwtAuthFilter jwtAuthFilter;
-    private final CustomOAuth2UserService customOAuth2UserService;
-    private final CustomerService customerService;
 
     private static final String[] AUTH_IGNORELIST = {
         "/swagger-resources/**",
@@ -89,20 +84,22 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/customers/**").hasRole(UserType.CUSTOMER.name())
             .anyRequest().hasAnyRole(UserType.CUSTOMER.name(), UserType.SELLER.name(), UserType.ADMIN.name())
             .and()
+            .logout().logoutSuccessUrl("/")
+            .and()
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-            .oauth2Login(e -> e
-                .userInfoEndpoint().userService(customOAuth2UserService)
-                .and()
-                .successHandler(oAuth2SuccessHandler(customerService))
-            )
+//            .oauth2Login(e -> e
+//                .userInfoEndpoint().userService(customOAuth2UserService)
+//                .and()
+//                .successHandler(oAuth2SuccessHandler(customerService))
+//            )
             .exceptionHandling()
             .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
     }
 
-    @Bean
-    public OAuth2SuccessHandler oAuth2SuccessHandler(CustomerService customerService) {
-        return new OAuth2SuccessHandler(customerService);
-    }
+//    @Bean
+//    public OAuth2SuccessHandler oAuth2SuccessHandler(CustomerService customerService) {
+//        return new OAuth2SuccessHandler(customerService);
+//    }
 
     @Bean
     public CustomBasicAuthenticationEntryPoint authenticationEntryPoint() {
