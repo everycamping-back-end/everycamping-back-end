@@ -54,21 +54,11 @@ public class CustomerService implements CustomUserDetailsService {
 
     public JwtDto socialSignIn(String email, String nickname) {
         Optional<Customer> optionalCustomer = customerRepository.findByEmail(email);
-        Customer customer;
-        customer = optionalCustomer.orElseGet(
+        Customer customer = optionalCustomer.orElseGet(
             () -> customerRepository.save(Customer.of(email, nickname)));
 
         return issueJwt(customer.getEmail(), customer.getId());
     }
-
-//    public JwtDto socialSignIn(SocialSignInForm form) {
-//        Optional<Customer> optionalCustomer = customerRepository.findByEmail(form.getEmail());
-//        Customer customer;
-//        customer = optionalCustomer.orElseGet(
-//            () -> customerRepository.save(Customer.of(form.getEmail(), form.getNickName())));
-//
-//        return issueJwt(customer.getEmail(), customer.getId());
-//    }
 
     public void signOut(String email) {
         deleteRefreshToken(email);
@@ -88,7 +78,7 @@ public class CustomerService implements CustomUserDetailsService {
 
     public void updatePassword(Customer customer, PasswordForm form) {
         if(!passwordEncoder.matches(form.getOldPassword(), customer.getPassword())){
-            throw new CustomException(ErrorCode.USER_NOT_AUTHORIZED);
+            throw new CustomException(ErrorCode.USER_NOT_EDITOR);
         }
         customer.setPassword(passwordEncoder.encode(form.getNewPassword()));
         customerRepository.save(customer);

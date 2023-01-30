@@ -60,7 +60,7 @@ public class AdminService implements CustomUserDetailsService {
 
     public void updatePassword(Admin admin, PasswordForm form) {
         if(!passwordEncoder.matches(form.getOldPassword(), admin.getPassword())){
-            throw new CustomException(ErrorCode.USER_NOT_AUTHORIZED);
+            throw new CustomException(ErrorCode.USER_NOT_EDITOR);
         }
         admin.setPassword(passwordEncoder.encode(form.getNewPassword()));
         adminRepository.save(admin);

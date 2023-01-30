@@ -73,7 +73,7 @@ public class SellerService implements CustomUserDetailsService {
 
     public void updatePassword(Seller seller, PasswordForm form) {
         if(!passwordEncoder.matches(form.getOldPassword(), seller.getPassword())){
-            throw new CustomException(ErrorCode.USER_NOT_AUTHORIZED);
+            throw new CustomException(ErrorCode.USER_NOT_EDITOR);
         }
         seller.setPassword(passwordEncoder.encode(form.getNewPassword()));
         sellerRepository.save(seller);

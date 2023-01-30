@@ -3,7 +3,7 @@ package com.zerobase.everycampingbackend.domain.auth.handler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zerobase.everycampingbackend.domain.auth.dto.CustomOAuth2User;
 import com.zerobase.everycampingbackend.domain.auth.dto.JwtDto;
-import com.zerobase.everycampingbackend.domain.auth.dto.OAuthAttributes;
+import com.zerobase.everycampingbackend.domain.auth.dto.OAuth2Attributes;
 import com.zerobase.everycampingbackend.domain.user.service.CustomerService;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -28,7 +28,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         }
 
         CustomOAuth2User user = (CustomOAuth2User) authentication.getPrincipal();
-        OAuthAttributes attributes = user.getOAuthAttributes();
+        OAuth2Attributes attributes = user.getOAuth2Attributes();
 
         JwtDto jwt = customerService.socialSignIn(attributes.getEmail(), attributes.getName());
         ResponseEntity<JwtDto> responseEntity = ResponseEntity.ok(jwt);
