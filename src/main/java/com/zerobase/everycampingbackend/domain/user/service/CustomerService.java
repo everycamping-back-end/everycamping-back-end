@@ -78,7 +78,7 @@ public class CustomerService implements CustomUserDetailsService {
 
     public void updatePassword(Customer customer, PasswordForm form) {
         if(!passwordEncoder.matches(form.getOldPassword(), customer.getPassword())){
-            throw new CustomException(ErrorCode.USER_NOT_AUTHORIZED);
+            throw new CustomException(ErrorCode.USER_NOT_EDITOR);
         }
         customer.setPassword(passwordEncoder.encode(form.getNewPassword()));
         customerRepository.save(customer);

@@ -29,7 +29,9 @@ public enum ErrorCode {
   LOGIN_CHECK_FAIL(HttpStatus.NOT_FOUND, "일치하는 정보가 없습니다."),
   USER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 회원입니다."),
   EMAIL_BEING_USED(HttpStatus.BAD_REQUEST, "사용중인 이메일입니다."),
-  USER_NOT_AUTHORIZED(HttpStatus.UNAUTHORIZED, "수정 권한이 없습니다."),
+  USER_NOT_EDITOR(HttpStatus.UNAUTHORIZED, "수정 권한이 없습니다."),
+  ANONYMOUS_USER(HttpStatus.UNAUTHORIZED, "회원만 접근이 가능합니다."),
+  USER_NOT_AUTHORIZED(HttpStatus.UNAUTHORIZED, "접근 권한이 없습니다."),
 
 
   PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "상품을 찾을 수 없습니다."),
@@ -41,9 +43,9 @@ public enum ErrorCode {
   REVIEW_WRITER_NOT_QUALIFIED(HttpStatus.BAD_REQUEST, "리뷰 작성은 해당 상품을 구매한 고객만 가능합니다."),
   REVIEW_EDITOR_NOT_MATCHED(HttpStatus.UNAUTHORIZED, "리뷰 수정/삭제 권한이 없습니다."),
 
-  TOKEN_NOT_VALID(HttpStatus.FORBIDDEN, "유효하지 않은 토큰입니다."),
+  TOKEN_NOT_VALID(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
   TOKEN_STILL_ALIVE(HttpStatus.BAD_REQUEST, "재발급 대상 토큰이 아닙니다."),
-  TOKEN_NOT_ALIVE(HttpStatus.BAD_REQUEST, "재발급 대상 토큰입니다."),
+  TOKEN_NOT_ALIVE(HttpStatus.FORBIDDEN, "재발급 대상 토큰입니다."),
 
 
 
