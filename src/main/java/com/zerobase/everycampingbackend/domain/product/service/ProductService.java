@@ -42,12 +42,19 @@ public class ProductService {
     public void addReview(Product product, Integer score){
         product.setReviewCount(product.getReviewCount() + 1);
         product.setTotalScore(product.getTotalScore() + score);
+        product.setAvgScore((double) product.getTotalScore() / product.getReviewCount());
+
+        if(product.getTotalScore() < 0){
+            log.error("상품 내 리뷰 총점이 음수가 됨. 확인 요망.");
+        }
+
         productRepository.save(product);
     }
 
     @Transactional
     public void updateReview(Product product, Integer scoreDiff){
         product.setTotalScore(product.getTotalScore() + scoreDiff);
+        product.setAvgScore((double) product.getTotalScore() / product.getReviewCount());
 
         if(product.getTotalScore() < 0){
             log.error("상품 내 리뷰 총점이 음수가 됨. 확인 요망.");
@@ -58,7 +65,9 @@ public class ProductService {
 
     @Transactional
     public void deleteReview(Product product, Integer score){
+        product.setReviewCount(product.getReviewCount() - 1);
         product.setTotalScore(product.getTotalScore() - score);
+        product.setAvgScore((double) product.getTotalScore() / product.getReviewCount());
 
         if(product.getTotalScore() < 0){
             log.error("상품 내 리뷰 총점이 음수가 됨. 확인 요망.");
