@@ -10,7 +10,7 @@ spring:
             client-name: everycamping_local
             redirect-uri: http://localhost:8080/login/oauth2/code/kakao
             client-id: 6a63133c53698e10384dd44303eb211f
-            client-secret: XA8vIC09HMgrW3qH7ORQkW5QBF3chJd7
+            client-secret: ENC(3ndBjr92BG3lkkP9Ub9PQ/ENdIpatnPSqwyUD6saHBciawvZmpdkEd/NvpoT8vxo)
 
 ---
 spring:
@@ -25,5 +25,5 @@ spring:
             client-name: everycamping
             redirect-uri: http://ec2-43-200-2-48.ap-northeast-2.compute.amazonaws.com/login/oauth2/code/kakao
             client-id: 8a492f4e90c6809876f7aad15c3be2ee
-            client-secret: 37CAo9C8uHyvROFDta82ExMDqsalbt30
+            client-secret: ENC(C/zUCHyzuX3QCq0+xYrSs4n8ieMB+xoad8F5RUxLlBSXsYPEhm/05NyY+ambkvsc)
 
