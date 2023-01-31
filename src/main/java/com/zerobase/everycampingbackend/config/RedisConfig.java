@@ -18,9 +18,17 @@ public class RedisConfig {
 
     @Value("${spring.redis.host}")
     private String host;
-
     @Value("${spring.redis.port}")
     private int port;
+
+//    @Value("${spring.redis.sentinel.master}")
+//    private String master;
+//    @Value("${spring.redis.sentinel.port1}")
+//    private int port1;
+//    @Value("${spring.redis.sentinel.port2}")
+//    private int port2;
+//    @Value("${spring.redis.sentinel.port3}")
+//    private int port3;
 
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
@@ -37,10 +45,21 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisConnectionFactory redisConnectionFactory() {
+    public RedisConnectionFactory redisConnectionFactoryLocal() {
         RedisStandaloneConfiguration conf = new RedisStandaloneConfiguration();
         conf.setHostName(host);
         conf.setPort(port);
         return new LettuceConnectionFactory(conf);
     }
+
+//    @Bean
+//    @Profile("prod")
+//    public RedisConnectionFactory redisConnectionFactoryProd() {
+//        RedisSentinelConfiguration conf = new RedisSentinelConfiguration()
+//            .master(master)
+//            .sentinel(host, port1)
+//            .sentinel(host, port2)
+//            .sentinel(host, port3);
+//        return new LettuceConnectionFactory(conf);
+//    }
 }

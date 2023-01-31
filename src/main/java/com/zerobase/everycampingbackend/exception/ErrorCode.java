@@ -45,7 +45,7 @@ public enum ErrorCode {
 
   TOKEN_NOT_VALID(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
   TOKEN_STILL_ALIVE(HttpStatus.BAD_REQUEST, "재발급 대상 토큰이 아닙니다."),
-  TOKEN_NOT_ALIVE(HttpStatus.FORBIDDEN, "재발급 대상 토큰입니다."),
+  TOKEN_NOT_ALIVE(HttpStatus.NOT_ACCEPTABLE, "재발급 대상 토큰입니다."),
 
 
 

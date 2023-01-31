@@ -9,6 +9,7 @@ import com.zerobase.everycampingbackend.exception.ErrorCode;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -26,8 +27,7 @@ public class JwtReissueService {
         UserVo userVo = jwtIssuer.getUserVo(claims);
         String role = jwtAuthenticationProvider.getRoleFromClaims(claims);
 
-        if (!tokens.getRefreshToken()
-            .equals(customUserDetailsService.getRefreshToken(role, userVo.getEmail()))) {
+        if (ObjectUtils.isEmpty(customUserDetailsService.getRefreshToken(role, userVo.getEmail()))) {
             throw new CustomException(ErrorCode.TOKEN_NOT_VALID);
         }
 
