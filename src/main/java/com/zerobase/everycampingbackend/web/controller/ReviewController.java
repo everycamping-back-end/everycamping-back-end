@@ -7,6 +7,7 @@ import com.zerobase.everycampingbackend.domain.user.entity.Customer;
 import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.task.TaskRejectedException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -27,24 +28,28 @@ public class ReviewController {
 
     private final ReviewService reviewService;
 
-    @PostMapping(value = "/{productId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(value = "/{productId}", consumes = {MediaType.APPLICATION_JSON_VALUE,
+        MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> writeReview(@AuthenticationPrincipal Customer customer,
         @PathVariable Long productId,
         @RequestPart ReviewForm form, MultipartFile image)
-        throws IOException {
+        throws IOException, TaskRejectedException {
         reviewService.writeReview(customer, productId, form, image);
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping(value = "/{reviewId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PutMapping(value = "/{reviewId}", consumes = {MediaType.APPLICATION_JSON_VALUE,
+        MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> editReview(@AuthenticationPrincipal Customer customer,
-        @PathVariable Long reviewId, @RequestPart ReviewForm form, MultipartFile image) throws IOException {
+        @PathVariable Long reviewId, @RequestPart ReviewForm form, MultipartFile image)
+        throws IOException, TaskRejectedException {
         reviewService.editReview(customer, reviewId, form, image);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{reviewId}")
-    public ResponseEntity<?> deleteReview(@AuthenticationPrincipal Customer customer, @PathVariable Long reviewId) {
+    public ResponseEntity<?> deleteReview(@AuthenticationPrincipal Customer customer,
+        @PathVariable Long reviewId) throws TaskRejectedException {
         reviewService.deleteReview(customer, reviewId);
         return ResponseEntity.ok().build();
     }

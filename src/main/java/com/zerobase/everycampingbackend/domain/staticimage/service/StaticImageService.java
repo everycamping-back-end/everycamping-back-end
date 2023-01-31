@@ -1,12 +1,13 @@
 package com.zerobase.everycampingbackend.domain.staticimage.service;
 
+import com.zerobase.everycampingbackend.common.fileutil.ImageUtils;
 import com.zerobase.everycampingbackend.domain.staticimage.client.AwsS3Client;
 import com.zerobase.everycampingbackend.domain.staticimage.dto.S3Path;
-import com.zerobase.everycampingbackend.domain.staticimage.type.ImageFormat;
 import java.io.IOException;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.task.TaskRejectedException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
@@ -20,35 +21,43 @@ public class StaticImageService {
     private final AwsS3Client awsS3Client;
 
     private static final String IMG_DIR_PATH = "img";
+    @Value("${aws.s3.endpointurl}")
+    private String endPointUrl;
 
-    public S3Path saveImage(MultipartFile multipartFile) throws IOException {
-        if(ObjectUtils.isEmpty(multipartFile)){
+    private S3Path uploadFileWithUUID(MultipartFile multipartFile)
+        throws IOException, TaskRejectedException {
+
+        String filePath = IMG_DIR_PATH + "/" + ImageUtils.generateFilename(multipartFile);
+
+        awsS3Client.uploadFileWithUUID(filePath, multipartFile);
+
+        return new S3Path(endPointUrl + "/" + filePath, filePath);
+    }
+
+    public S3Path saveImage(MultipartFile multipartFile) throws IOException, TaskRejectedException {
+        if(!ImageUtils.validateMultipartFile(multipartFile)){
             return new S3Path("", "");
         }
 
-        int pos = Objects.requireNonNull(multipartFile.getOriginalFilename()).lastIndexOf(".");
-        String extension = multipartFile.getOriginalFilename().substring(pos + 1);
-        if(ObjectUtils.isEmpty(ImageFormat.getExtension(extension))){
+        return uploadFileWithUUID(multipartFile);
+    }
+
+    public S3Path editImage(String bucketFilePath, MultipartFile multipartFile)
+        throws IOException, TaskRejectedException {
+        if (StringUtils.hasText(bucketFilePath)) {
+            awsS3Client.deleteFile(bucketFilePath);
+        }
+        if(!ImageUtils.validateMultipartFile(multipartFile)){
             return new S3Path("", "");
         }
-
-        return awsS3Client.uploadFileWithUUID(multipartFile, IMG_DIR_PATH);
+        return uploadFileWithUUID(multipartFile);
     }
 
     public void deleteImage(String bucketFilePath) {
-        if(ObjectUtils.isEmpty(bucketFilePath)){
+        if (ObjectUtils.isEmpty(bucketFilePath)) {
             return;
         }
         awsS3Client.deleteFile(bucketFilePath);
     }
 
-    public S3Path editImage(String bucketFilePath, MultipartFile multipartFile) throws IOException {
-        if(StringUtils.hasText(bucketFilePath)){
-            awsS3Client.deleteFile(bucketFilePath);
-        }
-        if(ObjectUtils.isEmpty(multipartFile)){
-            return new S3Path("", "");
-        }
-        return awsS3Client.uploadFileWithUUID(multipartFile, IMG_DIR_PATH);
-    }
 }

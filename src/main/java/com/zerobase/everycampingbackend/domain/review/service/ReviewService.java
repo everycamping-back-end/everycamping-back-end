@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.task.TaskRejectedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -35,7 +36,7 @@ public class ReviewService {
 
     @Transactional
     public void writeReview(Customer customer, Long productId, ReviewForm form, MultipartFile image)
-        throws IOException {
+        throws IOException, TaskRejectedException {
         log.info(customer.getEmail() + " -> 리뷰 작성 시도");
 
         Customer validCustomer = customerService.getCustomerById(customer.getId());
@@ -55,7 +56,8 @@ public class ReviewService {
     }
 
     @Transactional
-    public void editReview(Customer customer, Long reviewId, ReviewForm form, MultipartFile image) throws IOException{
+    public void editReview(Customer customer, Long reviewId, ReviewForm form, MultipartFile image)
+        throws IOException, TaskRejectedException {
         log.info(customer.getEmail() + " -> 리뷰 수정 시도");
 
         Review review = getReviewById(reviewId);
@@ -64,7 +66,7 @@ public class ReviewService {
         }
 
         S3Path s3Path = staticImageService.editImage(review.getImagePath(), image);
-        if(ObjectUtils.isEmpty(image)){
+        if (ObjectUtils.isEmpty(image)) {
             s3Path.setImageUri(review.getImageUri());
             s3Path.setImagePath(review.getImagePath());
         }
@@ -79,7 +81,7 @@ public class ReviewService {
     }
 
     @Transactional
-    public void deleteReview(Customer customer, Long reviewId) {
+    public void deleteReview(Customer customer, Long reviewId) throws TaskRejectedException {
         log.info(customer.getEmail() + " -> 리뷰 삭제 시도");
 
         Review review = getReviewById(reviewId);
@@ -87,9 +89,9 @@ public class ReviewService {
             throw new CustomException(ErrorCode.REVIEW_EDITOR_NOT_MATCHED);
         }
 
-        reviewRepository.delete(review);
         staticImageService.deleteImage(review.getImagePath());
         productService.deleteReview(review.getProduct(), review.getScore());
+        reviewRepository.delete(review);
 
         log.info(customer.getEmail() + " -> 리뷰 삭제 완료");
     }
