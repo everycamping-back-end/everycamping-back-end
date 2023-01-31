@@ -2,7 +2,7 @@ spring:
   profiles:
     active: local
   config:
-    import: myDatabaseInfo.yml, oauth2.yml
+    import: database.yml, oauth2.yml
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
   jpa:
