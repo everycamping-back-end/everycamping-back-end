@@ -1,5 +1,6 @@
 package com.zerobase.everycampingbackend.domain.auth.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zerobase.everycampingbackend.domain.auth.dto.KakaoToken;
 import com.zerobase.everycampingbackend.domain.auth.dto.OAuth2Attributes;
 import com.zerobase.everycampingbackend.domain.user.form.SocialSignInForm;
@@ -7,12 +8,16 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Slf4j
@@ -44,26 +49,26 @@ public class OAuth2UserService {
     }
 
     private KakaoToken getTokens(ClientRegistration provider, String code) {
-        return WebClient.create()
-            .post()
-            .uri(provider.getProviderDetails().getTokenUri())
-            .headers(header -> header.setContentType(MediaType.APPLICATION_FORM_URLENCODED))
-            .bodyValue(tokenRequest(provider, code))
-            .retrieve()
-            .bodyToMono(KakaoToken.class)
-            .block();
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-//        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(tokenRequest(provider, code), headers);
-//        RestTemplate restTemplate = new RestTemplate();
-//        ResponseEntity<String> response = restTemplate.postForEntity(provider.getProviderDetails().getTokenUri(),
-//            request, String.class);
-//        try {
-//            return new ObjectMapper().readValue(response.getBody(), KakaoToken.class);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            throw new RuntimeException(e);
-//        }
+//        return WebClient.create()
+//            .post()
+//            .uri(provider.getProviderDetails().getTokenUri())
+//            .headers(header -> header.setContentType(MediaType.APPLICATION_FORM_URLENCODED))
+//            .bodyValue(tokenRequest(provider, code))
+//            .retrieve()
+//            .bodyToMono(KakaoToken.class)
+//            .block();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(tokenRequest(provider, code), headers);
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.postForEntity(provider.getProviderDetails().getTokenUri(),
+            request, String.class);
+        try {
+            return new ObjectMapper().readValue(response.getBody(), KakaoToken.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
 
     private MultiValueMap<String, String> tokenRequest(ClientRegistration provider, String code) {

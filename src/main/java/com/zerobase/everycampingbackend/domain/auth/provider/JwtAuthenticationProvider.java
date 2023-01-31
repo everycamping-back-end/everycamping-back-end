@@ -51,11 +51,6 @@ public class JwtAuthenticationProvider {
         }
 
         Claims accessClaims = jwtIssuer.getClaims(jwtDto.getAccessToken());
-
-        if (accessClaims != null && accessClaims.getExpiration().after(new Date())) {
-            throw new CustomException(ErrorCode.TOKEN_STILL_ALIVE);
-        }
-
         Claims refreshClaims = jwtIssuer.getClaims(jwtDto.getRefreshToken());
 
         return accessClaims != null && refreshClaims != null;
