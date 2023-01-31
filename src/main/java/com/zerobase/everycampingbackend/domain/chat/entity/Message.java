@@ -1,7 +1,7 @@
-package com.zerobase.everycampingbackend.domain.question.entity;
+package com.zerobase.everycampingbackend.domain.chat.entity;
 
-import com.zerobase.everycampingbackend.domain.question.form.MessageForm;
-import com.zerobase.everycampingbackend.domain.question.type.UserType;
+import com.zerobase.everycampingbackend.domain.chat.form.MessageForm;
+import com.zerobase.everycampingbackend.domain.chat.type.UserType;
 import java.time.LocalDateTime;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -25,7 +25,7 @@ public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String questionRoomId;
+    private String chatRoomId;
     private String userEmail;
     private String userNickname;
 
@@ -36,7 +36,7 @@ public class Message {
 
     public static Message from(MessageForm messageForm) {
         return Message.builder()
-            .questionRoomId(messageForm.getQuestionRoomId())
+            .chatRoomId(messageForm.getChatRoomId())
             .userEmail(messageForm.getUserEmail())
             .userNickname(messageForm.getUserNickname())
             .userType(messageForm.getUserType())
