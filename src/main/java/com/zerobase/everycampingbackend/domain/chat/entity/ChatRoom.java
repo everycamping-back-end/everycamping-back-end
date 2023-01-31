@@ -4,8 +4,11 @@ import com.zerobase.everycampingbackend.domain.chat.form.CreateChatRoomForm;
 import com.zerobase.everycampingbackend.domain.chat.type.ChatRoomStatus;
 import com.zerobase.everycampingbackend.domain.chat.type.UserType;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -13,6 +16,7 @@ import javax.persistence.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 public class ChatRoom {
 
     @Id
@@ -25,6 +29,9 @@ public class ChatRoom {
 
     @Enumerated(EnumType.STRING)
     private ChatRoomStatus chatRoomStatus;
+
+    @CreatedDate
+    private LocalDateTime createdAt;
 
     public static ChatRoom from(CreateChatRoomForm form) {
         return ChatRoom.builder()
