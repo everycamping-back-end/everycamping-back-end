@@ -50,7 +50,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         , "/sellers/signup"
         , "/sellers/reissue"
         , "/websocket/**"
-        , "/chat-rooms"
+        , "/chat-rooms/**"
         , "/commons/**"
         , "/admins/signup"
         , "/admins/signin"

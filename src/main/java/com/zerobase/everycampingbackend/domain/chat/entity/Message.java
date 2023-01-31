@@ -14,6 +14,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
 
 @Entity
 @NoArgsConstructor
@@ -25,13 +26,15 @@ public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String chatRoomId;
+    private Long chatRoomId;
     private String userEmail;
     private String userNickname;
 
     @Enumerated(EnumType.STRING)
     private UserType userType;
     private String content;
+
+    @CreatedDate
     private LocalDateTime createdAt;
 
     public static Message from(MessageForm messageForm) {
