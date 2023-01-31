@@ -6,6 +6,7 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
 public class MailClient {
     private final JavaMailSender javaMailSender;
 
+    @Async
     public void sendMail(MailForm form) throws MailException {
         MimeMessagePreparator msg = new MimeMessagePreparator() {
             @Override

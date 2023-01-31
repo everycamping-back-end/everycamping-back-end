@@ -8,6 +8,7 @@ import com.zerobase.everycampingbackend.domain.user.entity.Seller;
 import java.io.IOException;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.task.TaskRejectedException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
@@ -33,7 +34,7 @@ public class ProductManageController {
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> addProduct(@AuthenticationPrincipal Seller seller,
         @RequestPart @Valid ProductManageForm form, @RequestPart(required = false) MultipartFile image,
-        @RequestPart(required = false) MultipartFile detailImage) throws IOException {
+        @RequestPart(required = false) MultipartFile detailImage) throws IOException, TaskRejectedException {
         productManageService.addProduct(seller, form, image, detailImage);
         return ResponseEntity.ok().build();
     }
@@ -42,14 +43,14 @@ public class ProductManageController {
     public ResponseEntity<?> updateProduct(@AuthenticationPrincipal Seller seller,
         @PathVariable Long productId,
         @RequestPart @Valid ProductManageForm form, @RequestPart(required = false) MultipartFile image,
-        @RequestPart(required = false) MultipartFile detailImage) throws IOException {
+        @RequestPart(required = false) MultipartFile detailImage) throws IOException, TaskRejectedException {
         productManageService.updateProduct(seller, productId, form, image, detailImage);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{productId}")
     public ResponseEntity<?> deleteProduct(@AuthenticationPrincipal Seller seller,
-        @PathVariable Long productId) {
+        @PathVariable Long productId) throws TaskRejectedException{
         productManageService.deleteProduct(seller, productId);
         return ResponseEntity.ok().build();
     }

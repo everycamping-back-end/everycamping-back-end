@@ -58,6 +58,8 @@ public enum ErrorCode {
   ACCESS_INVALID(HttpStatus.BAD_REQUEST, "허용되지 않은 접근입니다."),
   SELLER_NOT_CONFIRMED(HttpStatus.UNAUTHORIZED, "판매 기능이 허가되지 않은 판매자입니다."),
 
+  TASK_CURRENTLY_UNAVAILABLE(HttpStatus.SERVICE_UNAVAILABLE, "잠시 후 다시 시도해주세요."),
+
   ;
 
 
