@@ -5,6 +5,8 @@ import com.zerobase.everycampingbackend.domain.chat.type.ChatRoomStatus;
 import com.zerobase.everycampingbackend.domain.chat.type.UserType;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @Builder
@@ -18,6 +20,7 @@ public class ChatRoomDto {
     private String requesteeEmail;
     private UserType requesteeUserType;
     private ChatRoomStatus chatRoomStatus;
+    private LocalDateTime createdAt;
 
     public static ChatRoomDto from(ChatRoom chatRoom) {
         return ChatRoomDto.builder()
@@ -27,6 +30,7 @@ public class ChatRoomDto {
                 .requesteeEmail(chatRoom.getRequesteeEmail())
                 .requesteeUserType(chatRoom.getRequesteeUserType())
                 .chatRoomStatus(chatRoom.getChatRoomStatus())
+                .createdAt(chatRoom.getCreatedAt())
                 .build();
     }
 }
