@@ -1,7 +1,6 @@
-package com.zerobase.everycampingbackend.domain.question.form;
+package com.zerobase.everycampingbackend.domain.chat.form;
 
-import com.zerobase.everycampingbackend.domain.question.type.UserType;
-import java.time.LocalDateTime;
+import com.zerobase.everycampingbackend.domain.chat.type.UserType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,10 +11,10 @@ import lombok.Setter;
 @Getter
 @Setter
 public class MessageForm {
-    private String questionRoomId;
+
+    private Long chatRoomId;
     private String userEmail;
     private String userNickname;
     private UserType userType;
     private String content;
-    private LocalDateTime createdAt;
 }

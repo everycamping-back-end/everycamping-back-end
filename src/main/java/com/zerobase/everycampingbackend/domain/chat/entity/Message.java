@@ -1,7 +1,7 @@
-package com.zerobase.everycampingbackend.domain.question.entity;
+package com.zerobase.everycampingbackend.domain.chat.entity;
 
-import com.zerobase.everycampingbackend.domain.question.form.MessageForm;
-import com.zerobase.everycampingbackend.domain.question.type.UserType;
+import com.zerobase.everycampingbackend.domain.chat.form.MessageForm;
+import com.zerobase.everycampingbackend.domain.chat.type.UserType;
 import java.time.LocalDateTime;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -14,6 +14,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
 
 @Entity
 @NoArgsConstructor
@@ -25,18 +26,20 @@ public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String questionRoomId;
+    private Long chatRoomId;
     private String userEmail;
     private String userNickname;
 
     @Enumerated(EnumType.STRING)
     private UserType userType;
     private String content;
+
+    @CreatedDate
     private LocalDateTime createdAt;
 
     public static Message from(MessageForm messageForm) {
         return Message.builder()
-            .questionRoomId(messageForm.getQuestionRoomId())
+            .chatRoomId(messageForm.getChatRoomId())
             .userEmail(messageForm.getUserEmail())
             .userNickname(messageForm.getUserNickname())
             .userType(messageForm.getUserType())
