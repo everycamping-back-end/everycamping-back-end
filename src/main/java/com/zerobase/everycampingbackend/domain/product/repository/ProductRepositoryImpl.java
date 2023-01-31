@@ -43,9 +43,9 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         List<Long> ids = queryFactory.select(product.id)
             .from(product)
             .where(
-                likeName(form.getName()),
                 eqCategory(form.getCategory()),
-                containTags(form.getTags())
+                containTags(form.getTags()),
+                likeName(form.getName())
             )
             .orderBy(getAllOrderSpecifiers(pageable).toArray(OrderSpecifier[]::new))
             .offset(pageable.getOffset())
@@ -94,9 +94,9 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             .from(product)
             .innerJoin(product.seller, seller)
             .where(
-                likeName(form.getName()),
                 eqCategory(form.getCategory()),
-                containTags(form.getTags())
+                containTags(form.getTags()),
+                likeName(form.getName())
             )
             .orderBy(getAllOrderSpecifiers(pageable).toArray(OrderSpecifier[]::new))
             .offset(pageable.getOffset())
