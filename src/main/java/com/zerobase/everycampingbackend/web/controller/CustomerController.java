@@ -2,6 +2,7 @@ package com.zerobase.everycampingbackend.web.controller;
 
 
 import com.zerobase.everycampingbackend.domain.auth.dto.JwtDto;
+import com.zerobase.everycampingbackend.domain.auth.form.CodeForm;
 import com.zerobase.everycampingbackend.domain.auth.service.JwtReissueService;
 import com.zerobase.everycampingbackend.domain.auth.service.OAuth2UserService;
 import com.zerobase.everycampingbackend.domain.user.dto.CustomerDto;
@@ -22,7 +23,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -52,10 +52,10 @@ public class CustomerController {
 //
 //    }
 
-    @GetMapping("/signin/social/{provider}")
+    @PostMapping("/signin/social/{provider}")
     public ResponseEntity<JwtDto> customerSocialSignIn(@PathVariable String provider,
-        @RequestParam String code) {
-        SocialSignInForm form = oAuth2UserService.signIn(provider, code);
+        @RequestBody CodeForm codeForm) {
+        SocialSignInForm form = oAuth2UserService.signIn(provider, codeForm.getCode());
         return ResponseEntity.ok(customerService.socialSignIn(form.getEmail(), form.getNickName()));
     }
 

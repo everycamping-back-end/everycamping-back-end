@@ -10,8 +10,8 @@ aws:
   s3:
     bucketname: everycamping
     endpointurl: https://everycamping.s3.ap-northeast-2.amazonaws.com
-    accesskey: ENC(le4eWEUA0mhIz702w6DaD34OYeyBIHpRRd6NIvUKjSQ=)
-    secretkey: ENC(u635qCpiz8mHZu7Go4oLVM7NCcil3uXp0X6kl+pf2+1mUVkekfULpy6+Et8f+sEvJrKhpKGTz2c=)
+    accesskey: ENC(vEMCqnn8y1/EDxOh+dltN2rVZZ5QK1QhW2iPgkFZw2g=)
+    secretkey: ENC(ESfQCT5E4gH5acKw0VOHs5f0iR15406HwGgf1WcfrqNq4oUHVWQeSrIOvbZf3NbkQ27XKZRiBDM=)
 
 ---
 spring:
