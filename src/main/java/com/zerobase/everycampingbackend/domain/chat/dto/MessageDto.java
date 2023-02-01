@@ -1,5 +1,6 @@
 package com.zerobase.everycampingbackend.domain.chat.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.zerobase.everycampingbackend.domain.chat.entity.Message;
 import com.zerobase.everycampingbackend.domain.chat.type.UserType;
 import lombok.*;
@@ -19,6 +20,8 @@ public class MessageDto {
     private String userNickname;
     private UserType userType;
     private String content;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime createdAt;
 
     public static MessageDto from(Message message) {
