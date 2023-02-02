@@ -23,7 +23,7 @@ spring:
         registration:
           kakao:
             client-name: everycamping
-            redirect-uri: http://localhost:5173/kakaoLoginCall
+            redirect-uri: https://everycamping.netlify.app/kakaoLoginCallback
             client-id: be983b429f1e7b89c3832b7738ae7875
             client-secret: qAXDzUbaRBRrb6tLCGRpSLUszxrbE2fK
 
