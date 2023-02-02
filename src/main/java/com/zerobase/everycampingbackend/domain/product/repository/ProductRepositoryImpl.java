@@ -136,7 +136,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
         List<OrderSpecifier<?>> orderByList = new ArrayList<>();
 
-        if (isEmpty(pageable.getSort()) && pageable.getSort().isSorted()) {
+        if (!isEmpty(pageable.getSort()) && pageable.getSort().isSorted()) {
             for (Sort.Order order : pageable.getSort()) {
                 Order direction = order.getDirection().isAscending() ? Order.ASC : Order.DESC;
                 if ("createdAt".equals(order.getProperty())) {
