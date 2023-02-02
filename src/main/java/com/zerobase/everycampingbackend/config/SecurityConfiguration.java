@@ -52,6 +52,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         , "/admins/signin"
         , "/admins/reissue"
 
+        //헬스체크
+        , "/health"
         //테스트
         , "/test/**"
     };
