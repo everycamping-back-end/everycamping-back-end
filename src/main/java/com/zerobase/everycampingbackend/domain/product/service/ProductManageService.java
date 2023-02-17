@@ -1,5 +1,7 @@
 package com.zerobase.everycampingbackend.domain.product.service;
 
+import com.zerobase.everycampingbackend.domain.product.entity.ProductDocument;
+import com.zerobase.everycampingbackend.domain.product.repository.ProductSearchRepository;
 import com.zerobase.everycampingbackend.exception.CustomException;
 import com.zerobase.everycampingbackend.exception.ErrorCode;
 import com.zerobase.everycampingbackend.domain.staticimage.dto.S3Path;
@@ -30,6 +32,7 @@ public class ProductManageService {
 
     private final ProductRepository productRepository;
     private final StaticImageService staticImageService;
+    private final ProductSearchRepository searchRepository;
 
     @Transactional
     public void addProduct(Seller seller, ProductManageForm form, MultipartFile image,
@@ -41,7 +44,8 @@ public class ProductManageService {
         S3Path imagePath = staticImageService.saveImage(image);
         S3Path detailImagePath = staticImageService.saveImage(detailImage);
 
-        productRepository.save(Product.of(form, seller, imagePath, detailImagePath));
+        Product product = productRepository.save(Product.of(form, seller, imagePath, detailImagePath));
+        searchRepository.save(ProductDocument.from(product));
 
         log.info("상품명 (" + form.getName() + ") 추가 완료");
     }
@@ -70,6 +74,8 @@ public class ProductManageService {
         product.setOf(form, imagePath, detailImagePath);
 
         productRepository.save(product);
+        searchRepository.save(ProductDocument.from(product));
+
 
         log.info("상품명 (" + form.getName() + ") 수정 완료");
     }
@@ -91,6 +97,7 @@ public class ProductManageService {
         staticImageService.deleteImage(product.getDetailImagePath());
 
         productRepository.delete(product);
+        searchRepository.delete(ProductDocument.from(product));
 
         log.info("상품명 (" + product.getName() + ") 삭제 완료");
     }

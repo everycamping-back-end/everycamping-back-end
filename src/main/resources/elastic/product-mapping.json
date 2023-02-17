@@ -1,0 +1,17 @@
+{
+  "properties" : {
+    "id" : {"type" : "keyword"},
+    "name" : {
+      "type" : "text",
+      "analyzer" : "korean"
+    },
+    "category" : {"type" : "keyword"},
+    "tags" : {"type": "keyword"},
+    "price" : {"type" : "integer"},
+    "avgScore" : {"type" : "double"},
+    "createdAt" : {
+      "type" : "date",
+      "format": "uuuu-MM-dd'T'HH:mm:ss.SSS||epoch_millis"
+    }
+  }
+}
