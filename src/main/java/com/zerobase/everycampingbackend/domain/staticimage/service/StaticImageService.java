@@ -29,7 +29,7 @@ public class StaticImageService {
 
         String filePath = IMG_DIR_PATH + "/" + ImageUtils.generateFilename(multipartFile);
 
-        awsS3Client.uploadFileWithUUID(filePath, multipartFile);
+        //awsS3Client.uploadFileWithUUID(filePath, multipartFile);
 
         return new S3Path(endPointUrl + "/" + filePath, filePath);
     }
@@ -45,7 +45,7 @@ public class StaticImageService {
     public S3Path editImage(String bucketFilePath, MultipartFile multipartFile)
         throws IOException, TaskRejectedException {
         if (StringUtils.hasText(bucketFilePath)) {
-            awsS3Client.deleteFile(bucketFilePath);
+            //awsS3Client.deleteFile(bucketFilePath);
         }
         if(!ImageUtils.validateMultipartFile(multipartFile)){
             return new S3Path("", "");
