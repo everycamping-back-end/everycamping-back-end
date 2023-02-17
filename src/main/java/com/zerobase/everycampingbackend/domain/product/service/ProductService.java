@@ -5,6 +5,7 @@ import com.zerobase.everycampingbackend.domain.product.dto.ProductDto;
 import com.zerobase.everycampingbackend.domain.product.entity.Product;
 import com.zerobase.everycampingbackend.domain.product.form.ProductSearchForm;
 import com.zerobase.everycampingbackend.domain.product.repository.ProductRepository;
+import com.zerobase.everycampingbackend.domain.product.repository.ProductSearchQueryRepository;
 import com.zerobase.everycampingbackend.domain.product.type.ProductCategory;
 import com.zerobase.everycampingbackend.exception.CustomException;
 import com.zerobase.everycampingbackend.exception.ErrorCode;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class ProductService {
     private final ProductRepository productRepository;
+    private final ProductSearchQueryRepository searchQueryRepository;
 
     public ProductDetailDto getProductDetail(Long productId) {
         return ProductDetailDto.from(productRepository.findById(productId)
@@ -32,10 +35,12 @@ public class ProductService {
 
     public Slice<ProductDto> getProducts(ProductSearchForm form, Pageable pageable){
         long start = System.currentTimeMillis();
-        Slice<ProductDto> result = productRepository.searchAll(form, pageable);
+//        Slice<ProductDto> result = productRepository.searchAll(form, pageable);
+        List<Long> ids = searchQueryRepository.findByCondition(form, pageable);
+        List<Product> products = productRepository.findAllByIdIn(ids);
         long end = System.currentTimeMillis();
         log.info("검색 수행 : " + (end - start) + "ms 소요");
-        return result;
+        return new SliceImpl<>(products.stream().map(ProductDto::from).collect(Collectors.toList()));
     }
 
     @Transactional
