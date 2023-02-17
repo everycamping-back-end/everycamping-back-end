@@ -43,6 +43,7 @@ logging:
   level:
     com:
       deeping: WARN
+    org.springframework.data.elasticsearch.client.WIRE: TRACE
   file:
     name: log/developer.log
 
